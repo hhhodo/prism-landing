@@ -83,6 +83,66 @@ Footer   → full-bleed
   <img class="scrollframe__img" src="assets/images/hero-glass-2.png" alt="" data-frame="1">
 </section>
 
+<!-- 파란 노트 3 (+동일 노트가 127:18513, 127:14479에도 반복): "스크롤에 따라 영상은 멈춘
+     상태에서 네모 박스와 텍스트가 등장함 / 네모박스는 ASCII 문구 처리됨". Figma 원본 3개
+     섹션(125:14025 / 127:18513 / 127:14479)은 배경 유리 렌더 + 테두리 네모박스 3개 구조가
+     동일하게 반복되고 카피도 전부 동일한 placeholder였음 — 미디어 테마 카피로 3개를
+     다르게 채우고 구조는 그대로 유지. 배경 영상은 IntersectionObserver로 진입 시 멈추고,
+     각 네모박스는 .ascii-media로 ASCII 문구 상태에서 등장. -->
+<section class="callout fb fb--panel" id="callout-1" data-callout>
+  <img class="callout__bg" src="assets/images/hero-glass-1.png" alt="">
+  <div class="callout__marks">
+    <div class="ascii-media callout__mark" data-video-veil>
+      <div class="ascii-media__glyphs" aria-hidden="true"></div>
+      <span class="callout__mark-label">타 채널보다<br>돋보이고 신뢰를 얻다</span>
+    </div>
+    <div class="ascii-media callout__mark" data-video-veil>
+      <div class="ascii-media__glyphs" aria-hidden="true"></div>
+      <span class="callout__mark-label">온에어 아이덴티티<br>14일 안에 완성</span>
+    </div>
+    <div class="ascii-media callout__mark" data-video-veil>
+      <div class="ascii-media__glyphs" aria-hidden="true"></div>
+      <span class="callout__mark-label">더 빠른 송출,<br>더 적은 제작비</span>
+    </div>
+  </div>
+</section>
+
+<section class="callout fb fb--panel" id="callout-2" data-callout>
+  <img class="callout__bg" src="assets/images/hero-glass-2.png" alt="">
+  <div class="callout__marks">
+    <div class="ascii-media callout__mark" data-video-veil>
+      <div class="ascii-media__glyphs" aria-hidden="true"></div>
+      <span class="callout__mark-label">멀티 플랫폼<br>동시 송출</span>
+    </div>
+    <div class="ascii-media callout__mark" data-video-veil>
+      <div class="ascii-media__glyphs" aria-hidden="true"></div>
+      <span class="callout__mark-label">실시간 데이터<br>기반 편성</span>
+    </div>
+    <div class="ascii-media callout__mark" data-video-veil>
+      <div class="ascii-media__glyphs" aria-hidden="true"></div>
+      <span class="callout__mark-label">AI 자동 자막 ·<br>비율 변환</span>
+    </div>
+  </div>
+</section>
+
+<section class="callout fb fb--panel" id="callout-3" data-callout>
+  <img class="callout__bg" src="assets/images/hero-glass-1.png" alt="">
+  <div class="callout__marks">
+    <div class="ascii-media callout__mark" data-video-veil>
+      <div class="ascii-media__glyphs" aria-hidden="true"></div>
+      <span class="callout__mark-label">오디오 ·영상<br>워크플로우 통합</span>
+    </div>
+    <div class="ascii-media callout__mark" data-video-veil>
+      <div class="ascii-media__glyphs" aria-hidden="true"></div>
+      <span class="callout__mark-label">시청 데이터<br>실시간 대시보드</span>
+    </div>
+    <div class="ascii-media callout__mark" data-video-veil>
+      <div class="ascii-media__glyphs" aria-hidden="true"></div>
+      <span class="callout__mark-label">배급 자동화로<br>인력 절감</span>
+    </div>
+  </div>
+</section>
+
 <section class="work fb" id="work">
   <div class="container">
     <div class="work__head" data-reveal>

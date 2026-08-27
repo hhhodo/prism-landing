@@ -99,13 +99,27 @@ html,body{background:var(--prism-bg);color:var(--prism-ink);overflow-x:clip;max-
    the element, not a simple fade-in-view). Media slots assume a <video> will be
    supplied per card (muted/loop/poster) — see js/main.js data-video-veil. ---------- */
 .ascii-media{position:relative;overflow:hidden;width:100%;background:var(--color-placeholder);}
-.ascii-media__glyphs{position:absolute;inset:0;display:grid;
+.ascii-media__glyphs{position:absolute;inset:0;z-index:2;display:grid;
   grid-template-columns:repeat(24,1fr);font-family:var(--font-mono-label);
   font-size:12px;line-height:1;color:rgba(242,242,242,.6);background:var(--prism-bg-panel);
   overflow:hidden;padding:2px;clip-path:inset(0 0 0 0);will-change:clip-path;}
 .ascii-media__glyphs span{opacity:.7;}
-.ascii-media .work-card__video{position:relative;width:100%;height:100%;object-fit:cover;
-  display:block;background:var(--prism-bg-soft);}
+.ascii-media .work-card__video{position:relative;z-index:1;width:100%;height:100%;
+  object-fit:cover;display:block;background:var(--prism-bg-soft);}
+
+/* ---------- glass-render callout sections (blue note 3, repeated x3 across
+   125:14025 / 127:18513 / 127:14479): background render + 3 bordered squares
+   that reveal short labels through the shared .ascii-media glyph-peel. ---------- */
+.callout{position:relative;min-height:70vh;display:flex;align-items:center;overflow:hidden;}
+.callout__bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.55;}
+.callout__marks{position:relative;z-index:1;display:flex;flex-wrap:wrap;
+  gap:var(--space-6);padding-inline:var(--gutter);width:100%;justify-content:space-evenly;}
+.callout__mark{width:180px;aspect-ratio:1/1;border:var(--border-1);border-radius:var(--radius-0);
+  background:rgba(0,0,0,.35);backdrop-filter:blur(4px);display:flex;align-items:center;
+  justify-content:center;text-align:center;}
+.callout__mark-label{position:relative;z-index:0;font-family:var(--font-mono-body);
+  font-size:var(--fs-badge);line-height:1.5;color:var(--prism-ink);padding:var(--space-3);}
+@media (max-width:768px){.callout__mark{width:42vw;}}
 
 /* ---------- feature rows (Selected Work) ---------- */
 .work{padding-block:var(--space-11);}

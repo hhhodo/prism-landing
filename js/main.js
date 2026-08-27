@@ -55,6 +55,18 @@
     onLogoScroll();
   }
 
+  // 3. callout backgrounds "freeze" while their ASCII boxes are on screen — if the
+  // background is ever swapped for a real <video>, pausing it here already works.
+  document.querySelectorAll('[data-callout] .callout__bg').forEach(function (bg) {
+    if (bg.tagName !== 'VIDEO') return;
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) bg.pause(); else bg.play().catch(function () {});
+      });
+    }, { threshold: 0.4 });
+    io.observe(bg);
+  });
+
   // 2. reel cross-fade — frame swap tied directly to scroll position through the
   // section, per the annotation ("스크롤에 따라... 프레임이 넘어감").
   var reel = document.getElementById('reel');
