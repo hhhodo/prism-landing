@@ -52,14 +52,25 @@ html,body{background:var(--prism-bg);color:var(--prism-ink);overflow-x:clip;max-
 .nav.is-scrolled{padding-block:var(--space-3);background:rgba(0,0,0,.86);
   backdrop-filter:blur(10px);border-bottom-color:var(--prism-line);}
 .nav__row{display:flex;align-items:center;justify-content:space-between;}
-.nav__logo{font-family:var(--font-display);font-weight:700;font-size:var(--fs-h3);
-  letter-spacing:-0.02em;transition:font-size .3s ease;}
-.nav.is-scrolled .nav__logo{font-size:var(--fs-body-1);}
+/* invisible — only reserves layout space; #brandLogo renders the visible mark */
+.nav__logo-slot{font-family:var(--font-display);font-weight:700;font-size:var(--fs-body-1);
+  letter-spacing:-0.02em;visibility:hidden;}
 .nav__links{display:flex;align-items:center;gap:var(--space-6);}
 .nav__links a{font-family:var(--font-mono-label);font-size:var(--fs-badge);
   text-transform:uppercase;letter-spacing:.04em;color:var(--prism-ink-subtle);
   transition:color .2s ease;}
 .nav__links a:hover{color:var(--prism-ink);}
+
+/* ---------- brand-logo morph: starts giant, overlapping the hero art (blue note 1's
+   original 400px logotype), then shrinks/moves into the nav slot as the page scrolls.
+   #brandLogo is the only visible mark; #heroLogoSlot / #navLogoSlot are invisible,
+   same-font anchors that js/main.js measures to interpolate between. ---------- */
+.hero__logo-slot{position:absolute;top:var(--space-8);left:var(--gutter);
+  font-family:var(--font-display);font-weight:700;letter-spacing:-0.03em;
+  font-size:clamp(96px,15vw,240px);line-height:1;visibility:hidden;}
+.brand-logo{position:fixed;top:0;left:0;z-index:60;transform-origin:top left;
+  font-family:var(--font-display);font-weight:700;letter-spacing:-0.03em;line-height:1;
+  color:var(--prism-ink);white-space:nowrap;pointer-events:none;will-change:transform;}
 
 /* ---------- hero ---------- */
 .hero{position:relative;min-height:100svh;display:flex;flex-direction:column;

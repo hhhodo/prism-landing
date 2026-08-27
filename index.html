@@ -36,7 +36,7 @@ Footer   → full-bleed
 <header class="nav fb" id="nav">
   <div class="container">
     <div class="nav__row">
-      <a href="#" class="nav__logo">PRISM</a>
+      <span class="nav__logo-slot" id="navLogoSlot">PRISM</span>
       <nav class="nav__links">
         <a href="#work">work</a>
         <a href="#studio">studio</a>
@@ -47,8 +47,15 @@ Footer   → full-bleed
   </div>
 </header>
 
+<!-- 파란 노트 1: 로고가 히어로 위에 초대형으로(히어로 이미지와 겹치게) 시작했다가
+     스크롤에 따라 실제로 크기·위치가 줄어들며 GNB 로고 자리로 이동함(shared-element
+     morph). js/main.js가 #heroLogoSlot(document 좌표) → #navLogoSlot(fixed 좌표) 사이를
+     스크롤 진행도로 보간해 #brandLogo에 적용. -->
+<div class="brand-logo" id="brandLogo" aria-hidden="true">PRISM</div>
+
 <section class="hero fb">
   <div class="container">
+    <span class="hero__logo-slot" id="heroLogoSlot">PRISM</span>
     <div class="grid">
       <div style="grid-column:span 8;">
         <p class="mono-label hero__eyebrow" data-reveal>Broadcast · Content · AI</p>

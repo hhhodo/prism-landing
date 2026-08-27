@@ -14,7 +14,7 @@
 //    element's own scroll progress advances (not a one-shot fade-in-view)
 
 (function () {
-  // 1. nav shrink
+  // 1. nav background/padding shrink (visual chrome, unrelated to the logo morph below)
   var nav = document.getElementById('nav');
   function onScroll() {
     if (window.scrollY > 24) nav.classList.add('is-scrolled');
@@ -22,6 +22,38 @@
   }
   window.addEventListener('scroll', onScroll, { passive: true });
   onScroll();
+
+  // 1b. brand-logo morph — starts giant, overlapping the hero art, and shrinks/
+  // moves into the nav slot as the page scrolls (blue note 1's actual instruction:
+  // the logo starts big overlapping the video/image, not just "small text shrinks").
+  var brandLogo = document.getElementById('brandLogo');
+  var heroSlot = document.getElementById('heroLogoSlot');
+  var navSlot = document.getElementById('navLogoSlot');
+  if (brandLogo && heroSlot && navSlot) {
+    var startRect = null, endRect = null, distance = 1;
+    function measureLogoRects() {
+      startRect = heroSlot.getBoundingClientRect();
+      startRect = { top: startRect.top + window.scrollY, left: startRect.left, fontSize: parseFloat(getComputedStyle(heroSlot).fontSize) };
+      endRect = navSlot.getBoundingClientRect();
+      endRect = { top: endRect.top, left: endRect.left, fontSize: parseFloat(getComputedStyle(navSlot).fontSize) };
+      distance = Math.max(1, (document.querySelector('.hero') || {}).offsetHeight * 0.55 || window.innerHeight * 0.7);
+    }
+    function lerp(a, b, t) { return a + (b - a) * t; }
+    function onLogoScroll() {
+      var progress = Math.min(1, Math.max(0, window.scrollY / distance));
+      var top = lerp(startRect.top - window.scrollY, endRect.top, progress);
+      var left = lerp(startRect.left, endRect.left, progress);
+      var fontSize = lerp(startRect.fontSize, endRect.fontSize, progress);
+      brandLogo.style.transform = 'translate(' + left + 'px,' + top + 'px)';
+      brandLogo.style.fontSize = fontSize + 'px';
+      // brandLogo IS the permanent visible mark — once progress hits 1 it just sits
+      // at the nav slot's position/size for the rest of the page (never hidden).
+    }
+    measureLogoRects();
+    window.addEventListener('scroll', onLogoScroll, { passive: true });
+    window.addEventListener('resize', function () { measureLogoRects(); onLogoScroll(); });
+    onLogoScroll();
+  }
 
   // 2. reel cross-fade — frame swap tied directly to scroll position through the
   // section, per the annotation ("스크롤에 따라... 프레임이 넘어감").
