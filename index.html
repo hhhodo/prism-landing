@@ -1,0 +1,320 @@
+<!--
+variant:
+typo=loud
+image=high
+color=accent
+image-radius=sharp
+card-radius=soft
+button-radius=round
+border=hairline
+button-style=solid
+fw=700/400
+spacing=space-9~space-11
+-->
+<!--
+layout:
+Nav      → full-bleed (fixed)
+Hero     → full-bleed → 8-4
+Frame    → full-bleed (scroll cross-fade media, no split)
+Work     → full-bleed → 7-5 / 4-8 / 5-7 (asymmetric rows, never repeats consecutively)
+Quote    → full-bleed → 4-4-4
+Testi    → full-bleed → 3-3 (x2 rows, static grid replacing the Figma horizontal carousel — hard rule: no carousels)
+Closer   → full-bleed → 8-4
+Footer   → full-bleed
+-->
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PRISM — 미디어의 모든 순간을 설계합니다</title>
+<link rel="stylesheet" href="css/styles.css">
+<link rel="stylesheet" href="css/site.css">
+</head>
+<body>
+
+<header class="nav fb" id="nav">
+  <div class="container">
+    <div class="nav__row">
+      <a href="#" class="nav__logo">PRISM</a>
+      <nav class="nav__links">
+        <a href="#work">work</a>
+        <a href="#studio">studio</a>
+        <a href="#voices">voices</a>
+        <a href="#contact">contact</a>
+      </nav>
+    </div>
+  </div>
+</header>
+
+<section class="hero fb">
+  <div class="container">
+    <div class="grid">
+      <div style="grid-column:span 8;">
+        <p class="mono-label hero__eyebrow" data-reveal>Broadcast · Content · AI</p>
+        <h1 class="hero__title" data-reveal>미디어의 모든 순간을<br>설계합니다</h1>
+        <p class="hero__sub" data-reveal data-reveal-delay="1">
+          기획부터 송출, 데이터 기반 콘텐츠 자동화까지 — PRISM은 브랜드의 이야기가
+          방송·스트리밍·소셜 어디서든 같은 밀도로 전달되도록 설계합니다.
+        </p>
+      </div>
+      <div style="grid-column:span 4;"></div>
+    </div>
+  </div>
+  <img class="hero__art" src="assets/images/hero-glass-1.png" alt="" data-reveal data-reveal-delay="2">
+  <div class="hero__meta">
+    <span class="mono-label">Since 2016</span>
+    <span class="mono-label">+ 12,000 hours on air</span>
+  </div>
+</section>
+
+<!-- 스크롤 시 상단 로고가 축소되며 GNB 로고가 되는 인터랙션(파란 노트 1)은 css/site.css .nav.is-scrolled +
+     js/main.js 스크롤 리스너로 구현. 스크롤에 따라 가운데 영상 프레임이 전환되는 인터랙션(파란 노트 2)은
+     아래 .scrollframe 두 이미지의 opacity 크로스페이드로 구현. -->
+<section class="scrollframe fb fb--panel" id="reel">
+  <img class="scrollframe__img is-active" src="assets/images/hero-glass-1.png" alt="" data-frame="0">
+  <img class="scrollframe__img" src="assets/images/hero-glass-2.png" alt="" data-frame="1">
+</section>
+
+<section class="work fb" id="work">
+  <div class="container">
+    <div class="work__head" data-reveal>
+      <h2>Selected<br>Work</h2>
+      <p class="mono-label">04 Projects — 2024–2026</p>
+    </div>
+
+    <div class="work-row work-row--7-5">
+      <div>
+        <div class="ascii-media work-card__media" data-reveal>
+          <div class="ascii-media__glyphs" aria-hidden="true"></div>
+          <img src="assets/images/portfolio-1.png" alt="">
+        </div>
+        <div class="work-card__meta">
+          <span class="work-card__mark"></span>
+          <div>
+            <div class="work-card__title">채널 리브랜딩</div>
+            <p class="work-card__desc">지상파 뉴스 채널의 온에어 아이덴티티와 그래픽 패키지를 처음부터 다시 설계했습니다.</p>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="ascii-media work-card__media" data-reveal data-reveal-delay="1">
+          <div class="ascii-media__glyphs" aria-hidden="true"></div>
+          <img src="assets/images/portfolio-1.png" alt="">
+        </div>
+        <div class="work-card__meta">
+          <span class="work-card__mark"></span>
+          <div>
+            <div class="work-card__title">라이브 스트리밍 OS</div>
+            <p class="work-card__desc">멀티 플랫폼 동시 송출을 하나의 대시보드에서 제어하는 운영 시스템.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="work-row work-row--4-8">
+      <div>
+        <div class="ascii-media work-card__media" data-reveal>
+          <div class="ascii-media__glyphs" aria-hidden="true"></div>
+          <img src="assets/images/portfolio-1.png" alt="">
+        </div>
+        <div class="work-card__meta">
+          <span class="work-card__mark"></span>
+          <div>
+            <div class="work-card__title">숏폼 오토메이션</div>
+            <p class="work-card__desc">장편 콘텐츠를 AI가 자동 분할·자막·비율 변환하는 숏폼 파이프라인.</p>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="ascii-media work-card__media" data-reveal data-reveal-delay="1">
+          <div class="ascii-media__glyphs" aria-hidden="true"></div>
+          <img src="assets/images/portfolio-1.png" alt="">
+        </div>
+        <div class="work-card__meta">
+          <span class="work-card__mark"></span>
+          <div>
+            <div class="work-card__title">스포츠 중계 그래픽 패키지</div>
+            <p class="work-card__desc">실시간 데이터와 연동되는 스코어보드·로어서드 세트를 리그 전 시즌에 적용했습니다.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="work-row work-row--5-7">
+      <div>
+        <div class="ascii-media work-card__media" data-reveal>
+          <div class="ascii-media__glyphs" aria-hidden="true"></div>
+          <img src="assets/images/portfolio-1.png" alt="">
+        </div>
+        <div class="work-card__meta">
+          <span class="work-card__mark"></span>
+          <div>
+            <div class="work-card__title">팟캐스트 네트워크</div>
+            <p class="work-card__desc">오디오·영상 동시 제작 워크플로우와 배급 자동화를 구축했습니다.</p>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="ascii-media work-card__media" data-reveal data-reveal-delay="1">
+          <div class="ascii-media__glyphs" aria-hidden="true"></div>
+          <img src="assets/images/portfolio-1.png" alt="">
+        </div>
+        <div class="work-card__meta">
+          <span class="work-card__mark"></span>
+          <div>
+            <div class="work-card__title">뉴스룸 데이터 대시보드</div>
+            <p class="work-card__desc">시청 데이터를 실시간으로 시각화해 편성 결정을 지원하는 내부 툴.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="quote fb fb--soft" id="studio">
+  <div class="container">
+    <span class="mono-label quote__eyebrow" data-reveal>Our Strength Is Our People</span>
+    <blockquote data-reveal data-reveal-delay="1">
+      “좋은 방송은 기술이 아니라 함께 만드는 사람들의 밀도에서 나온다고 믿습니다.”
+    </blockquote>
+    <cite data-reveal data-reveal-delay="2">PRISM 제작본부</cite>
+
+    <div class="values grid">
+      <div style="grid-column:span 4;">
+        <div class="value-card" data-reveal>
+          <span class="value-card__mark"></span>
+          <div class="value-card__title">기획 · 전략</div>
+        </div>
+      </div>
+      <div style="grid-column:span 4;">
+        <div class="value-card" data-reveal data-reveal-delay="1">
+          <span class="value-card__mark"></span>
+          <div class="value-card__title">제작 · 송출</div>
+        </div>
+      </div>
+      <div style="grid-column:span 4;">
+        <div class="value-card" data-reveal data-reveal-delay="2">
+          <span class="value-card__mark"></span>
+          <div class="value-card__title">데이터 · 자동화</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="testi fb" id="voices">
+  <div class="container">
+    <div class="testi__head" data-reveal>
+      <h2>Beyond clients.<br>Trusted partners.</h2>
+    </div>
+    <div class="testi-grid grid">
+      <div style="grid-column:span 4;">
+        <div class="testi-card" data-reveal>
+          <div class="testi-card__who">
+            <img class="testi-card__avatar" src="assets/images/avatar-1.png" alt="">
+            <div>
+              <div class="testi-card__name">한지민</div>
+              <div class="testi-card__role">CJ ENM 편성팀</div>
+            </div>
+          </div>
+          <p>PRISM과 작업하면서 방송 퀄리티에 대한 기준 자체가 바뀌었습니다. 디테일을 놓치지 않는 팀입니다.</p>
+        </div>
+      </div>
+      <div style="grid-column:span 4;">
+        <div class="testi-card" data-reveal data-reveal-delay="1">
+          <div class="testi-card__who">
+            <img class="testi-card__avatar" src="assets/images/avatar-2.png" alt="">
+            <div>
+              <div class="testi-card__name">박도현</div>
+              <div class="testi-card__role">웨이브 콘텐츠전략실</div>
+            </div>
+          </div>
+          <p>숏폼 오토메이션 도입 이후 채널 전환 콘텐츠 제작 속도가 세 배 빨라졌습니다.</p>
+        </div>
+      </div>
+      <div style="grid-column:span 4;">
+        <div class="testi-card" data-reveal data-reveal-delay="2">
+          <div class="testi-card__who">
+            <img class="testi-card__avatar" src="assets/images/avatar-3.png" alt="">
+            <div>
+              <div class="testi-card__name">이수아</div>
+              <div class="testi-card__role">스포티비 프로듀서</div>
+            </div>
+          </div>
+          <p>실시간 그래픽 패키지가 시즌 내내 단 한 번도 흔들리지 않았습니다. 믿고 맡길 수 있는 파트너.</p>
+        </div>
+      </div>
+      <div style="grid-column:span 4;">
+        <div class="testi-card" data-reveal>
+          <div class="testi-card__who">
+            <img class="testi-card__avatar" src="assets/images/avatar-4.png" alt="">
+            <div>
+              <div class="testi-card__name">정우진</div>
+              <div class="testi-card__role">카카오엔터 오디오본부</div>
+            </div>
+          </div>
+          <p>오디오와 영상 제작을 하나의 워크플로우로 묶어준 덕분에 팀 운영이 훨씬 단순해졌습니다.</p>
+        </div>
+      </div>
+      <div style="grid-column:span 4;">
+        <div class="testi-card" data-reveal data-reveal-delay="1">
+          <div class="testi-card__who">
+            <img class="testi-card__avatar" src="assets/images/avatar-5.png" alt="">
+            <div>
+              <div class="testi-card__name">최유리</div>
+              <div class="testi-card__role">JTBC 디지털뉴스룸</div>
+            </div>
+          </div>
+          <p>데이터 대시보드 덕분에 편성 회의 시간이 절반으로 줄었습니다.</p>
+        </div>
+      </div>
+      <div style="grid-column:span 4;">
+        <div class="testi-card" data-reveal data-reveal-delay="2">
+          <div class="testi-card__who">
+            <img class="testi-card__avatar" src="assets/images/avatar-6.png" alt="">
+            <div>
+              <div class="testi-card__name">김태호</div>
+              <div class="testi-card__role">넷플릭스 코리아 마케팅</div>
+            </div>
+          </div>
+          <p>브랜드 톤을 정확히 이해하고 채널 리브랜딩을 완성도 있게 마무리해준 팀입니다.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="closer fb fb--soft" id="contact">
+  <div class="container">
+    <div class="closer__row">
+      <div data-reveal>
+        <h2>다음 방송,<br>PRISM과 함께<br>설계해보세요</h2>
+        <p class="closer__sub">기획부터 송출, 자동화까지 — 첫 미팅에서 채널의 현재 상태를 함께 진단해드립니다.</p>
+      </div>
+      <button class="btn" type="button" data-reveal data-reveal-delay="1">문의하기</button>
+    </div>
+  </div>
+</section>
+
+<footer class="footer fb">
+  <div class="container">
+    <div class="footer__top">
+      <a href="#">개인정보 처리방침</a>
+      <a href="#">이용약관</a>
+    </div>
+    <div class="footer__wordmark">PRISM</div>
+    <div class="footer__bottom">
+      <div class="footer__links">
+        <a href="#work">work</a>
+        <a href="#studio">studio</a>
+        <a href="#voices">voices</a>
+      </div>
+      <div class="footer__copy">© 2026 PRISM MEDIA. All Rights Reserved.</div>
+    </div>
+  </div>
+</footer>
+
+<script src="js/main.js"></script>
+</body>
+</html>
