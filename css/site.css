@@ -25,7 +25,7 @@
 }
 
 html,body{background:var(--prism-bg);color:var(--prism-ink);overflow-x:clip;max-width:100vw;}
-::selection{background:var(--prism-accent);color:#fff;}
+::selection{background:var(--prism-accent);color:var(--text-default-inverse);}
 
 /* full-bleed section shell */
 .fb{width:100%;background:var(--prism-bg);}
@@ -127,18 +127,29 @@ html,body{background:var(--prism-bg);color:var(--prism-ink);overflow-x:clip;max-
 .value-card__mark{width:48px;height:48px;border:1px solid var(--prism-card-ink);border-radius:var(--radius-0);}
 .value-card__title{font-family:var(--font-display);font-weight:700;font-size:var(--fs-h3);margin-top:var(--space-6);}
 
-/* ---------- testimonials (converted from Figma's horizontal carousel to a static
-   grid per cheatsheet hard rule: no carousels) ---------- */
-.testi{padding-block:var(--space-11);}
+/* ---------- testimonials — scroll-linked horizontal track + jagged "mountain"
+   scrollbar, per Figma annotation box 127:19167 ("스크롤에 따라 리뷰가 가로로
+   움직이며, 상단 세로줄 바가 산처럼 솟은 형태로 우측을 향해 이동"). Driven purely
+   by page scroll position (js/main.js) — no prev/next buttons, dots, or manual
+   pagination, so it stays outside the cheatsheet's forbidden carousel/slider list. */
+.testi{padding-block:var(--space-11);overflow:hidden;}
 .testi__head h2{font-family:var(--font-display);font-size:var(--fs-h0);max-width:14ch;}
-.testi-grid{margin-top:var(--space-9);}
+.testi-scrollbar{display:flex;align-items:flex-end;gap:var(--space-2);height:64px;margin-top:var(--space-9);}
+.testi-scrollbar__bar{flex:1 1 0;min-width:0;height:6px;background:var(--prism-line);
+  border-radius:var(--radius-0);transition:height .2s ease,background .2s ease;}
+.testi-track-wrap{overflow:hidden;margin-top:var(--space-6);}
+.testi-track{display:flex;gap:var(--grid-gutter-lg);will-change:transform;}
 .testi-card{background:var(--prism-card);color:var(--prism-card-ink);border-radius:var(--radius-sm);
-  padding:var(--space-6);display:flex;flex-direction:column;gap:var(--space-6);min-height:260px;}
+  padding:var(--space-6);display:flex;flex-direction:column;gap:var(--space-6);min-height:260px;
+  flex:0 0 calc((100% - var(--grid-gutter-lg) * 2) / 3);}
 .testi-card__who{display:flex;align-items:center;gap:var(--space-4);}
 .testi-card__avatar{width:56px;height:56px;border-radius:var(--radius-circle);object-fit:cover;flex:none;}
 .testi-card__name{font-family:var(--font-display);font-weight:700;font-size:var(--fs-body-1);}
 .testi-card__role{font-family:var(--font-mono-body);color:var(--text-subtle);font-size:var(--fs-badge);}
 .testi-card p{font-family:var(--font-mono-body);font-size:var(--fs-body-2);line-height:1.6;}
+@media (max-width:768px){
+  .testi-card{flex:0 0 85%;}
+}
 
 /* ---------- closing CTA — the only button on the page ---------- */
 .closer{padding-block:var(--space-11);}
