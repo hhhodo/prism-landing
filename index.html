@@ -13,14 +13,18 @@ spacing=space-9~space-11
 -->
 <!--
 layout:
-Nav      → full-bleed (fixed)
-Hero     → full-bleed → 8-4
-Frame    → full-bleed (scroll cross-fade media, no split)
-Work     → full-bleed → 7-5 / 4-8 / 5-7 (asymmetric rows, never repeats consecutively)
-Quote    → full-bleed → 4-4-4
-Testi    → full-bleed → 3-3 (x2 rows, static grid replacing the Figma horizontal carousel — hard rule: no carousels)
-Closer   → full-bleed → 8-4
-Footer   → full-bleed
+Nav       → full-bleed (fixed) — brand-logo morph starts giant/overlapping hero, shrinks into GNB slot on scroll
+Hero      → full-bleed → 8-4 (title / stat callout, same row, bottom-aligned)
+Frame     → full-bleed (scroll cross-fade media, no split)
+Callout×3 → full-bleed (background render, no grid split — 3 text+square groups at absolute % points, not columns)
+Work      → full-bleed → 8-4 / 12 / 4-8 (asymmetric rows, never repeats consecutively)
+Quote     → full-bleed → 4-4-4 (5 cards, 3-col × 2-row, last cell empty)
+Testi     → full-bleed → real pinned scroll-jack (300vh runway, sticky viewport, vertical
+            scroll drives horizontal translateX + waveform peak — not a static grid, not a
+            manual carousel: no prev/next controls, dots, or pagination, so the hard-rule
+            carousel ban still holds)
+Closer    → full-bleed → 8-4
+Footer    → full-bleed
 -->
 <!DOCTYPE html>
 <html lang="ko">
