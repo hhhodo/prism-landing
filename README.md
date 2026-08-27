@@ -84,20 +84,13 @@ Figma에서 실제로 감지된 폰트: `Helvetica Now Display`(헤드라인, Bo
 `PP Supply Mono`(라벨), `DM Mono`(본문/캡션), `At Aero`(피처 헤딩),
 `KakaoBig`(푸터 링크, 원본은 카카오 사이트 예시라 브랜드 특정 폰트). 이 중
 `Helvetica Now Display` / `PP Supply Mono` / `At Aero` / `KakaoBig`은 모두 유료
-상용 서체로 Google Fonts 등 무료 CDN에 배포되어 있지 않아 그대로 임베드할 수
-없었다. 이에:
+상용 서체로 Google Fonts 등 무료 CDN에 배포되어 있지 않아 그대로 임베드할 수 없다.
 
-- `DM Mono`는 Google Fonts에 실제로 존재하므로 **그대로(치환 없이)** 로드해 본문/
-  라벨 서체로 사용했다.
-- `Helvetica Now Display Bold`는 형태가 가장 가까운 오픈 라이선스 지오메트릭
-  그로테스크인 `Space Grotesk`(700)로 대체.
-- `PP Supply Mono`는 `Space Mono`로 대체.
-- 한글 UI 카피(네비, 카드 타이틀 등)는 styles.css가 이미 로드하는 Pretendard를
-  그대로 사용(브랜드 특정이 아닌 범용 한글 서체이므로 대체 대상 아님).
-
-라이선스로 인해 상용 서체 자체를 그대로 쓸 수 없는 상황이라 가장 근접한 무료
-서체로 대체했음을 명시한다 — Pretendard로 뭉뚱그리거나 임의로 다른 서체를 쓰지
-않았다.
+치트시트 규칙("Figma에서 타이포그래피를 얻을 수 없으면 styles.css의 기본 폰트를
+사용")에 따라, 라이선스 문제로 실제 감지 폰트를 쓸 수 없는 모든 자리는 임의의
+제3 서체로 대체하지 않고 styles.css가 이미 로드하는 **Pretendard로 통일**했다
+(1차 빌드에서 Space Grotesk/Space Mono로 대체했던 것은 사용자 지적으로 되돌림 —
+"styles.css에 Pretendard 있으면 그거 쓰라"는 사용자 지시가 임의 대체보다 우선).
 
 ## 버튼
 

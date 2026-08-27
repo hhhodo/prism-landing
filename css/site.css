@@ -1,5 +1,4 @@
 /* PRISM — media landing. Page-specific overrides only. styles.css is untouched. */
-@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Space+Mono:wght@400;700&family=DM+Mono:wght@400;500&display=swap");
 
 :root{
   /* user-requested grid overrides: full-bleed everywhere, 40px side margin at all sizes */
@@ -17,14 +16,12 @@
   --prism-card-ink:#151515;
   --prism-accent:#2f6bff; /* Figma annotation-box blue — used only as a UI accent for focus/hover, never as a rendered annotation */
 
-  /* fonts detected in Figma: Helvetica Now Display (display), PP Supply Mono (labels),
-     DM Mono (body/mono copy), At Aero (feature headings). Helvetica Now Display / PP Supply
-     Mono / At Aero are paid commercial faces with no Google Fonts distribution, so the
-     nearest open-license geometric equivalents are substituted (Space Grotesk / Space Mono).
-     DM Mono is an exact match and is loaded as the real detected font — see README. */
-  --font-display:'Space Grotesk','Pretendard',sans-serif;
-  --font-mono-label:'Space Mono','Pretendard',monospace;
-  --font-mono-body:'DM Mono','Pretendard',monospace;
+  /* Figma detected Helvetica Now Display / PP Supply Mono / DM Mono / At Aero, none of which
+     are usable here without a paid license. Per project rule, unlicensable Figma fonts fall
+     back to styles.css's default — Pretendard — everywhere, not a third-party substitute. */
+  --font-display:'Pretendard',sans-serif;
+  --font-mono-label:'Pretendard',sans-serif;
+  --font-mono-body:'Pretendard',sans-serif;
 }
 
 html,body{background:var(--prism-bg);color:var(--prism-ink);overflow-x:clip;max-width:100vw;}
