@@ -72,19 +72,17 @@ html,body{background:var(--prism-bg);color:var(--prism-ink);overflow-x:clip;max-
   font-family:var(--font-display);font-weight:700;letter-spacing:-0.03em;line-height:1;
   color:var(--prism-ink);white-space:nowrap;pointer-events:none;will-change:transform;}
 
-/* ---------- hero ---------- */
+/* ---------- hero — 122:5848 실측: 타이틀 74.667px, 스탯 라벨 16px, 같은 행 바닥정렬 ---------- */
 .hero{position:relative;min-height:100svh;display:flex;flex-direction:column;
   justify-content:center;padding-block:var(--space-11);overflow:hidden;}
-.hero__eyebrow{margin-bottom:var(--space-6);}
+.hero .grid{align-items:flex-end;}
 .hero__title{font-family:var(--font-display);font-weight:700;
-  font-size:clamp(40px,6.4vw,var(--fs-display-md));letter-spacing:-0.02em;
-  line-height:1.05;max-width:18ch;}
-.hero__sub{margin-top:var(--space-6);max-width:42ch;color:var(--prism-ink-subtle);
-  font-family:var(--font-mono-body);font-size:var(--fs-body-2);line-height:1.6;}
+  font-size:74.667px;letter-spacing:-0.02em;line-height:1.1;}
 .hero__art{position:absolute;right:-6%;top:50%;transform:translateY(-50%) rotate(18deg);
   width:min(52vw,760px);opacity:.9;pointer-events:none;}
-.hero__meta{position:absolute;right:var(--gutter);bottom:var(--space-8);text-align:right;}
-.hero__meta .mono-label{display:block;}
+.hero__meta{text-align:right;}
+.hero__meta .mono-label{display:block;text-transform:uppercase;}
+@media (max-width:768px){.hero__title{font-size:40px;}}
 
 /* ---------- scroll-frame media: two hero frames cross-fade as the viewer scrolls
    past them (blue note 2: "center video frame changes on scroll") ---------- */
@@ -108,18 +106,25 @@ html,body{background:var(--prism-bg);color:var(--prism-ink);overflow-x:clip;max-
   object-fit:cover;display:block;background:var(--prism-bg-soft);}
 
 /* ---------- glass-render callout sections (blue note 3, repeated x3 across
-   125:14025 / 127:18513 / 127:14479): background render + 3 bordered squares
-   that reveal short labels through the shared .ascii-media glyph-peel. ---------- */
-.callout{position:relative;min-height:70vh;display:flex;align-items:center;overflow:hidden;}
+   125:14025 / 127:18513 / 127:14479). 125:14033/14054/14078 실측: 텍스트+정사각형
+   쌍 3개가 2544×1154 캔버스 위 절대좌표(%)에 흩어져 있음 — 가운데 정렬 3열이 아님.
+   정사각형(115px, 마지막 그룹은 95px)이 .ascii-media 갈음(글리프 veil 대상). ---------- */
+.callout{position:relative;min-height:70vh;overflow:hidden;}
 .callout__bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.55;}
-.callout__marks{position:relative;z-index:1;display:flex;flex-wrap:wrap;
-  gap:var(--space-6);padding-inline:var(--gutter);width:100%;justify-content:space-evenly;}
-.callout__mark{width:180px;aspect-ratio:1/1;border:var(--border-1);border-radius:var(--radius-0);
-  background:rgba(0,0,0,.35);backdrop-filter:blur(4px);display:flex;align-items:center;
-  justify-content:center;text-align:center;}
-.callout__mark-label{position:relative;z-index:0;font-family:var(--font-mono-body);
-  font-size:var(--fs-badge);line-height:1.5;color:var(--prism-ink);padding:var(--space-3);}
-@media (max-width:768px){.callout__mark{width:42vw;}}
+.callout__marks{position:absolute;inset:0;z-index:1;}
+.callout__group{position:absolute;display:flex;align-items:center;gap:var(--space-5);
+  transform:translate(0,-50%);}
+.callout__mark{width:115px;height:115px;flex:none;border:1px solid var(--prism-ink);
+  border-radius:var(--radius-0);background:rgba(255,255,255,.1);backdrop-filter:blur(5px);}
+.callout__mark--sm{width:95px;height:95px;}
+.callout__group-label{font-family:var(--font-mono-body);font-weight:300;
+  font-size:42.23px;line-height:1.2;color:var(--prism-ink);white-space:nowrap;}
+@media (max-width:1024px){
+  .callout__group{position:static;transform:none;flex-direction:column;
+    align-items:flex-start;margin-bottom:var(--space-6);padding-inline:var(--gutter);}
+  .callout__marks{position:relative;display:flex;flex-direction:column;padding-block:var(--space-8);}
+  .callout__group-label{white-space:normal;font-size:24px;}
+}
 
 /* ---------- feature rows (Selected Work) ---------- */
 .work{padding-block:var(--space-11);}
@@ -140,20 +145,22 @@ html,body{background:var(--prism-bg);color:var(--prism-ink);overflow-x:clip;max-
   font-size:var(--fs-body-2);margin-top:var(--space-3);max-width:36ch;}
 @media (max-width:1024px){.work-row{grid-template-columns:1fr!important;}}
 
-/* ---------- pull-quote + values ---------- */
+/* ---------- pull-quote + values — 122:8980 실측: 인용문 64px, 카드 5개
+   bg #ebf0ed / ink #151515, 아이콘 박스 75px, 타이틀 42.667px ---------- */
 .quote{padding-block:var(--space-11);text-align:center;}
 .quote__eyebrow{display:block;margin-bottom:var(--space-6);}
 .quote blockquote{font-family:var(--font-display);font-weight:700;
-  font-size:clamp(28px,3.6vw,var(--fs-h1));line-height:1.3;letter-spacing:-0.02em;
+  font-size:64px;line-height:1.3;letter-spacing:-0.02em;
   max-width:32ch;margin-inline:auto;}
 .quote cite{display:block;margin-top:var(--space-5);color:var(--prism-ink-subtle);
   font-style:normal;font-family:var(--font-mono-body);}
 .values{margin-top:var(--space-10);}
-.value-card{background:var(--prism-card);color:var(--prism-card-ink);border-radius:var(--radius-sm);
+.value-card{background:#ebf0ed;color:#151515;border-radius:var(--radius-sm);
   padding:var(--space-6);display:flex;flex-direction:column;justify-content:space-between;
   min-height:220px;}
-.value-card__mark{width:48px;height:48px;border:1px solid var(--prism-card-ink);border-radius:var(--radius-0);}
-.value-card__title{font-family:var(--font-display);font-weight:700;font-size:var(--fs-h3);margin-top:var(--space-6);}
+.value-card__mark{width:75px;height:75px;border:1px solid #151515;border-radius:var(--radius-0);}
+.value-card__title{font-family:var(--font-display);font-weight:700;font-size:42.667px;margin-top:var(--space-6);}
+@media (max-width:768px){.quote blockquote{font-size:32px;}.value-card__title{font-size:28px;}}
 
 /* ---------- testimonials — scroll-linked horizontal track + jagged "mountain"
    scrollbar, per Figma annotation box 127:19167 ("스크롤에 따라 리뷰가 가로로
