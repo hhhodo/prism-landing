@@ -82,17 +82,19 @@ html,body{background:var(--prism-bg);color:var(--prism-ink);overflow-x:clip;max-
   opacity:0;transition:opacity 1s ease;}
 .scrollframe__img.is-active{opacity:1;}
 
-/* ---------- ascii-reveal media wrapper (blue note 3: boxes load as ASCII glyphs,
-   scroll strips the glyph veil to reveal the real image) ---------- */
-.ascii-media{position:relative;overflow:hidden;width:100%;}
+/* ---------- ascii-reveal media wrapper (blue note 127:19173: "모든 이미지는 ASCII
+   문구(12px) 처리된 상태로 로딩. 스크롤에 따라 위에서 아래로 문구가 벗겨지면서
+   이미지 등장" — a literal top-to-bottom peel driven by scroll position through
+   the element, not a simple fade-in-view). Media slots assume a <video> will be
+   supplied per card (muted/loop/poster) — see js/main.js data-video-veil. ---------- */
+.ascii-media{position:relative;overflow:hidden;width:100%;background:var(--color-placeholder);}
 .ascii-media__glyphs{position:absolute;inset:0;display:grid;
   grid-template-columns:repeat(24,1fr);font-family:var(--font-mono-label);
-  font-size:10px;line-height:1;color:rgba(242,242,242,.5);background:var(--prism-bg-panel);
-  overflow:hidden;padding:2px;transition:opacity .9s ease, transform .9s ease;
-  transform:translateY(0);}
+  font-size:12px;line-height:1;color:rgba(242,242,242,.6);background:var(--prism-bg-panel);
+  overflow:hidden;padding:2px;clip-path:inset(0 0 0 0);will-change:clip-path;}
 .ascii-media__glyphs span{opacity:.7;}
-.ascii-media.is-revealed .ascii-media__glyphs{opacity:0;transform:translateY(-6%);pointer-events:none;}
-.ascii-media img{position:relative;width:100%;height:100%;object-fit:cover;display:block;}
+.ascii-media .work-card__video{position:relative;width:100%;height:100%;object-fit:cover;
+  display:block;background:var(--prism-bg-soft);}
 
 /* ---------- feature rows (Selected Work) ---------- */
 .work{padding-block:var(--space-11);}
@@ -101,10 +103,11 @@ html,body{background:var(--prism-bg);color:var(--prism-ink);overflow-x:clip;max-
 .work__head h2{font-family:var(--font-display);font-size:var(--fs-h0);}
 .work-row{display:grid;gap:var(--space-6);margin-bottom:var(--space-9);}
 .work-row:last-child{margin-bottom:0;}
-.work-row--7-5{grid-template-columns:7fr 5fr;}
+.work-row--8-4{grid-template-columns:8fr 4fr;}
 .work-row--4-8{grid-template-columns:4fr 8fr;}
-.work-row--5-7{grid-template-columns:5fr 7fr;}
+.work-row--12{grid-template-columns:1fr;}
 .work-card__media{aspect-ratio:4/3;}
+.work-card__media--wide{aspect-ratio:21/9;}
 .work-card__meta{display:flex;align-items:flex-start;gap:var(--space-4);margin-top:var(--space-5);}
 .work-card__mark{width:14px;height:14px;border:1px solid var(--prism-line);flex:none;margin-top:6px;}
 .work-card__title{font-family:var(--font-display);font-weight:700;font-size:var(--fs-h3);}
@@ -134,8 +137,8 @@ html,body{background:var(--prism-bg);color:var(--prism-ink);overflow-x:clip;max-
    pagination, so it stays outside the cheatsheet's forbidden carousel/slider list. */
 .testi{padding-block:var(--space-11);overflow:hidden;}
 .testi__head h2{font-family:var(--font-display);font-size:var(--fs-h0);max-width:14ch;}
-.testi-scrollbar{display:flex;align-items:flex-end;gap:var(--space-2);height:64px;margin-top:var(--space-9);}
-.testi-scrollbar__bar{flex:1 1 0;min-width:0;height:6px;background:var(--prism-line);
+.testi-scrollbar{display:flex;align-items:flex-end;width:100%;gap:var(--space-2);height:64px;margin-top:var(--space-9);}
+.testi-scrollbar__bar{flex:1 1 0;min-width:0;height:6px;background:rgba(242,242,242,.25);
   border-radius:var(--radius-0);transition:height .2s ease,background .2s ease;}
 .testi-track-wrap{overflow:hidden;margin-top:var(--space-6);}
 .testi-track{display:flex;gap:var(--grid-gutter-lg);will-change:transform;}
