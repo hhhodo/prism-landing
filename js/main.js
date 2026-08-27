@@ -89,11 +89,19 @@
     onReelScroll();
   }
 
-  // 4. testimonials — horizontal track position + mountain-scrollbar peak both
-  // driven by scroll progress through the .testi section.
+  // 4. testimonials — horizontal track position + waveform-scrollbar peak both
+  // driven by scroll progress through the .testi section. Bar count/spacing
+  // matches the real Figma waveform (123:13056~13305: ~250 thin 4px bars).
   var testi = document.getElementById('voices');
   var track = document.getElementById('testiTrack');
-  var bars = testi ? testi.querySelectorAll('.testi-scrollbar__bar') : [];
+  var scrollbarEl = document.getElementById('testiScrollbar');
+  var BAR_COUNT = 250;
+  if (scrollbarEl) {
+    var barsHtml = '';
+    for (var b = 0; b < BAR_COUNT; b++) barsHtml += '<span class="testi-scrollbar__bar"></span>';
+    scrollbarEl.innerHTML = barsHtml;
+  }
+  var bars = scrollbarEl ? scrollbarEl.querySelectorAll('.testi-scrollbar__bar') : [];
   if (testi && track && bars.length) {
     function onTestiScroll() {
       var rect = testi.getBoundingClientRect();
@@ -108,9 +116,11 @@
       var peak = progress * (bars.length - 1);
       bars.forEach(function (bar, i) {
         var dist = Math.abs(i - peak);
-        var height = Math.max(6, 56 - dist * 14);
+        var height = Math.max(14, 39 - dist * 3.5);
+        var opacity = Math.max(0.05, 0.9 - dist * 0.12);
         bar.style.height = height + 'px';
-        bar.style.background = dist < 1.5 ? 'var(--prism-accent)' : 'var(--prism-line)';
+        bar.style.opacity = opacity;
+        bar.style.background = dist < 1 ? '#fff' : 'rgba(217,217,217,1)';
       });
     }
     window.addEventListener('scroll', onTestiScroll, { passive: true });

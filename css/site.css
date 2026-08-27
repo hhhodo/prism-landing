@@ -162,18 +162,22 @@ html,body{background:var(--prism-bg);color:var(--prism-ink);overflow-x:clip;max-
    pagination, so it stays outside the cheatsheet's forbidden carousel/slider list. */
 .testi{padding-block:var(--space-11);overflow:hidden;}
 .testi__head h2{font-family:var(--font-display);font-size:var(--fs-h0);max-width:14ch;}
-.testi-scrollbar{display:flex;align-items:flex-end;width:100%;gap:var(--space-2);height:64px;margin-top:var(--space-9);}
-.testi-scrollbar__bar{flex:1 1 0;min-width:0;height:6px;background:rgba(242,242,242,.25);
-  border-radius:var(--radius-0);transition:height .2s ease,background .2s ease;}
+.testi-scrollbar{display:flex;align-items:flex-end;width:100%;height:40px;margin-top:var(--space-9);}
+.testi-scrollbar__bar{flex:1 1 0;min-width:0;max-width:4px;height:14px;background:rgba(217,217,217,.05);
+  border-radius:var(--radius-0);transition:height .2s ease,background-color .2s ease,opacity .2s ease;}
 .testi-track-wrap{overflow:hidden;margin-top:var(--space-6);}
 .testi-track{display:flex;gap:var(--grid-gutter-lg);will-change:transform;}
-.testi-card{background:var(--prism-card);color:var(--prism-card-ink);border-radius:var(--radius-sm);
-  padding:var(--space-6);display:flex;flex-direction:column;gap:var(--space-6);min-height:260px;
+/* card bg #d4cccc / text #303539 are the literal measured Figma values
+   (123:13309 etc.) — a dusty-pink card distinct from the page's black/white
+   palette, kept as an explicit brand-color exception rather than flattened
+   to var(--prism-card). */
+.testi-card{background:#d4cccc;color:#303539;border-radius:var(--radius-sm);
+  padding:var(--space-6);display:flex;flex-direction:column;justify-content:space-between;min-height:260px;
   flex:0 0 calc((100% - var(--grid-gutter-lg) * 2) / 3);}
 .testi-card__who{display:flex;align-items:center;gap:var(--space-4);}
-.testi-card__avatar{width:56px;height:56px;border-radius:var(--radius-circle);object-fit:cover;flex:none;}
+.testi-card__avatar{width:101px;height:101px;border-radius:var(--radius-circle);object-fit:cover;flex:none;}
 .testi-card__name{font-family:var(--font-display);font-weight:700;font-size:var(--fs-body-1);}
-.testi-card__role{font-family:var(--font-mono-body);color:var(--text-subtle);font-size:var(--fs-badge);}
+.testi-card__role{font-family:var(--font-mono-body);color:#303539;opacity:.65;font-size:var(--fs-badge);}
 .testi-card p{font-family:var(--font-mono-body);font-size:var(--fs-body-2);line-height:1.6;}
 @media (max-width:768px){
   .testi-card{flex:0 0 85%;}

@@ -262,9 +262,9 @@ Footer   → full-bleed
     <div class="testi__head" data-reveal>
       <h2>Beyond clients.<br>Trusted partners.</h2>
     </div>
-    <div class="testi-scrollbar" aria-hidden="true">
-      <span class="testi-scrollbar__bar"></span><span class="testi-scrollbar__bar"></span><span class="testi-scrollbar__bar"></span><span class="testi-scrollbar__bar"></span><span class="testi-scrollbar__bar"></span><span class="testi-scrollbar__bar"></span><span class="testi-scrollbar__bar"></span><span class="testi-scrollbar__bar"></span><span class="testi-scrollbar__bar"></span><span class="testi-scrollbar__bar"></span><span class="testi-scrollbar__bar"></span><span class="testi-scrollbar__bar"></span><span class="testi-scrollbar__bar"></span><span class="testi-scrollbar__bar"></span><span class="testi-scrollbar__bar"></span><span class="testi-scrollbar__bar"></span><span class="testi-scrollbar__bar"></span><span class="testi-scrollbar__bar"></span><span class="testi-scrollbar__bar"></span><span class="testi-scrollbar__bar"></span><span class="testi-scrollbar__bar"></span><span class="testi-scrollbar__bar"></span><span class="testi-scrollbar__bar"></span><span class="testi-scrollbar__bar"></span>
-    </div>
+    <!-- 123:13056~13305 실측: ~250개의 4px 세로 바로 이루어진 파형. 마크업 비대화를
+         막기 위해 js/main.js가 런타임에 같은 개수만큼 생성. -->
+    <div class="testi-scrollbar" id="testiScrollbar" aria-hidden="true"></div>
     <div class="testi-track-wrap">
       <div class="testi-track" id="testiTrack">
         <div class="testi-card">
