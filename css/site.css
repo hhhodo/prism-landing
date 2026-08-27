@@ -199,15 +199,7 @@ html,body{background:var(--prism-bg);color:var(--prism-ink);overflow-x:clip;max-
   .testi-card{flex:0 0 85%;}
 }
 
-/* ---------- closing CTA — the only button on the page ---------- */
-.closer{padding-block:var(--space-11);}
-.closer__row{display:flex;align-items:flex-end;justify-content:space-between;
-  gap:var(--space-8);flex-wrap:wrap;}
-.closer h2{font-family:var(--font-display);font-weight:700;
-  font-size:clamp(32px,5vw,var(--fs-display-sm));letter-spacing:var(--display-tracking);max-width:16ch;}
-.closer__sub{margin-top:var(--space-5);color:var(--prism-ink-subtle);
-  font-family:var(--font-mono-body);max-width:38ch;}
-
+/* ---------- 문의하기 — 페이지 유일 버튼, nav에만 존재 (지어낸 CTA 클로저 섹션 제거) ---------- */
 .btn{
   font-family:var(--font-mono-label);font-size:var(--fs-badge);text-transform:uppercase;
   background:var(--prism-ink);color:var(--prism-bg);
@@ -215,6 +207,7 @@ html,body{background:var(--prism-bg);color:var(--prism-ink);overflow-x:clip;max-
   padding:var(--space-4) var(--space-6);cursor:pointer;transition:background .2s ease,color .2s ease;
 }
 .btn:hover{background:transparent;color:var(--prism-ink);}
+.nav__cta{padding:var(--space-3) var(--space-5);}
 
 /* ---------- footer ---------- */
 .footer{padding-block:var(--space-9) var(--space-6);}
