@@ -162,17 +162,23 @@ html,body{background:var(--prism-bg);color:var(--prism-ink);overflow-x:clip;max-
 .value-card__title{font-family:var(--font-display);font-weight:700;font-size:42.667px;margin-top:var(--space-6);}
 @media (max-width:768px){.quote blockquote{font-size:32px;}.value-card__title{font-size:28px;}}
 
-/* ---------- testimonials — scroll-linked horizontal track + jagged "mountain"
-   scrollbar, per Figma annotation box 127:19167 ("스크롤에 따라 리뷰가 가로로
-   움직이며, 상단 세로줄 바가 산처럼 솟은 형태로 우측을 향해 이동"). Driven purely
-   by page scroll position (js/main.js) — no prev/next buttons, dots, or manual
-   pagination, so it stays outside the cheatsheet's forbidden carousel/slider list. */
-.testi{padding-block:var(--space-11);overflow:hidden;}
+/* ---------- testimonials — real pinned scroll-jack (127:19167: "스크롤에 따라
+   리뷰가 가로로 움직이며, 상단 세로줄 바가 산처럼 솟은 형태로 우측을 향해 이동").
+   .testi-pin-wrap is a tall (300vh) scroll runway; .testi-pin sticks to the
+   viewport while js/main.js converts scroll progress through the runway into
+   the track's translateX — the section itself doesn't move until it's done,
+   matching a real horizontal-scroll-via-vertical-scroll interaction (not a
+   simple pass-through translate, and no manual carousel controls). */
+.testi{padding-block:var(--space-11) 0;overflow:hidden;}
 .testi__head h2{font-family:var(--font-display);font-size:var(--fs-h0);max-width:14ch;}
-.testi-scrollbar{display:flex;align-items:flex-end;width:100%;height:40px;margin-top:var(--space-9);}
-.testi-scrollbar__bar{flex:1 1 0;min-width:0;max-width:4px;height:14px;background:rgba(217,217,217,.05);
-  border-radius:var(--radius-0);transition:height .2s ease,background-color .2s ease,opacity .2s ease;}
-.testi-track-wrap{overflow:hidden;margin-top:var(--space-6);}
+.testi-pin-wrap{position:relative;height:300vh;}
+.testi-pin{position:sticky;top:0;height:100vh;display:flex;flex-direction:column;justify-content:center;}
+/* 123:13056~13305 실측 스텝값: flat 14px/5%, peak 39px/100% 백색, 대칭 3단
+   (18px/19% → 25px/46% → 32px/73% → 39px/100%) */
+.testi-scrollbar{display:flex;align-items:flex-end;width:100%;height:40px;}
+.testi-scrollbar__bar{flex:1 1 0;min-width:0;max-width:4px;height:14px;
+  background:rgba(217,217,217,.05);border-radius:var(--radius-0);}
+.testi-track-wrap{overflow:hidden;margin-top:var(--space-8);}
 .testi-track{display:flex;gap:var(--grid-gutter-lg);will-change:transform;}
 /* card bg #d4cccc / text #303539 are the literal measured Figma values
    (123:13309 etc.) — a dusty-pink card distinct from the page's black/white

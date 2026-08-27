@@ -89,10 +89,12 @@
     onReelScroll();
   }
 
-  // 4. testimonials — horizontal track position + waveform-scrollbar peak both
-  // driven by scroll progress through the .testi section. Bar count/spacing
-  // matches the real Figma waveform (123:13056~13305: ~250 thin 4px bars).
-  var testi = document.getElementById('voices');
+  // 4. testimonials — real pinned scroll-jack. #testiPinWrap is a 300vh runway;
+  // #testi-pin is position:sticky (CSS), so it stays fixed on screen while the
+  // user scrolls through the runway. Progress is measured against the runway's
+  // own scrollable range, not simple pass-through — the section holds still
+  // until the horizontal move finishes, then releases to normal scroll.
+  var pinWrap = document.getElementById('testiPinWrap');
   var track = document.getElementById('testiTrack');
   var scrollbarEl = document.getElementById('testiScrollbar');
   var BAR_COUNT = 250;
@@ -102,12 +104,20 @@
     scrollbarEl.innerHTML = barsHtml;
   }
   var bars = scrollbarEl ? scrollbarEl.querySelectorAll('.testi-scrollbar__bar') : [];
-  if (testi && track && bars.length) {
+  // 123:13056~13305 실측 스텝: 중심에서 거리별 [height, opacity, isWhitePeak]
+  var WAVE_STEPS = [
+    [39, 1, true],   // center — white peak
+    [32, 0.73, false],
+    [25, 0.46, false],
+    [18, 0.19, false]
+  ];
+  var WAVE_FLAT = [14, 0.05, false];
+  if (pinWrap && track && bars.length) {
     function onTestiScroll() {
-      var rect = testi.getBoundingClientRect();
+      var rect = pinWrap.getBoundingClientRect();
       var vh = window.innerHeight;
-      var total = rect.height - vh;
-      var progress = total > 0 ? (-rect.top) / total : 0;
+      var runway = pinWrap.offsetHeight - vh;
+      var progress = runway > 0 ? (-rect.top) / runway : 0;
       progress = Math.min(1, Math.max(0, progress));
 
       var maxScroll = Math.max(0, track.scrollWidth - track.parentElement.clientWidth);
@@ -115,12 +125,11 @@
 
       var peak = progress * (bars.length - 1);
       bars.forEach(function (bar, i) {
-        var dist = Math.abs(i - peak);
-        var height = Math.max(14, 39 - dist * 3.5);
-        var opacity = Math.max(0.05, 0.9 - dist * 0.12);
-        bar.style.height = height + 'px';
-        bar.style.opacity = opacity;
-        bar.style.background = dist < 1 ? '#fff' : 'rgba(217,217,217,1)';
+        var dist = Math.round(Math.abs(i - peak));
+        var step = WAVE_STEPS[dist] || WAVE_FLAT;
+        bar.style.height = step[0] + 'px';
+        bar.style.opacity = step[1];
+        bar.style.background = step[2] ? '#fff' : '#d9d9d9';
       });
     }
     window.addEventListener('scroll', onTestiScroll, { passive: true });
