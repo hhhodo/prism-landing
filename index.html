@@ -56,7 +56,9 @@ Footer    → full-bleed
 <div class="hero-pin-wrap" id="heroPinWrap">
   <div class="hero-pin" id="heroPin">
     <section class="hero fb">
-      <img class="hero__canvas" src="assets/images/callout-canvas.png" alt="" aria-hidden="true">
+      <video class="hero__bg-video" autoplay muted loop playsinline>
+        <source src="assets/images/video.webm" type="video/webm">
+      </video>
       <span class="hero__logo-slot"><span id="heroLogoSlot">PRISM</span></span>
       <div style="padding-inline:var(--gutter);width:100%;position:relative;z-index:1;">
         <div class="grid">
@@ -78,8 +80,9 @@ Footer    → full-bleed
      js/main.js 스크롤 리스너로 구현. 스크롤에 따라 가운데 영상 프레임이 전환되는 인터랙션(파란 노트 2)은
      아래 .scrollframe 두 이미지의 opacity 크로스페이드로 구현. -->
 <section class="scrollframe fb fb--panel" id="reel">
-  <img class="scrollframe__img is-active" src="assets/images/callout-canvas.png" alt="" data-frame="0">
-  <img class="scrollframe__img" src="assets/images/callout-canvas2.png" alt="" data-frame="1">
+  <video class="scrollframe__video" autoplay muted loop playsinline>
+    <source src="assets/images/video.webm" type="video/webm">
+  </video>
 </section>
 
 <!-- 파란 노트 3 (+동일 노트가 127:18513, 127:14479에도 반복): "스크롤에 따라 영상은 멈춘

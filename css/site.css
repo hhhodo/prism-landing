@@ -105,9 +105,8 @@ html,body{background:var(--prism-bg);color:var(--prism-ink);overflow-x:clip;max-
 .hero{position:relative;aspect-ratio:2544/1210;min-height:520px;display:flex;
   flex-direction:column;justify-content:flex-end;padding-block:var(--space-8) var(--space-9);
   overflow:hidden;}
-.hero__canvas{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
-  opacity:.25;z-index:0;pointer-events:none;}
-.hero .container,.hero .hero__logo-slot{position:relative;z-index:1;}
+.hero__bg-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
+  opacity:.7;z-index:0;pointer-events:none;}
 .hero__art{z-index:2;}
 .hero .grid{align-items:flex-end;}
 /* line-height 1.1 = 실측(leading 82.133px / font-size 74.667px); tracking은 토큰과 일치 */
@@ -125,10 +124,8 @@ html,body{background:var(--prism-bg);color:var(--prism-ink);overflow-x:clip;max-
 
 /* ---------- scroll-frame media: two hero frames cross-fade as the viewer scrolls
    past them (blue note 2: "center video frame changes on scroll") ---------- */
-.scrollframe{position:relative;width:100%;aspect-ratio:16/8.5;overflow:hidden;}
-.scrollframe__img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
-  opacity:0;transition:opacity 1s ease;}
-.scrollframe__img.is-active{opacity:1;}
+.scrollframe{position:relative;width:100%;aspect-ratio:16/9;overflow:hidden;}
+.scrollframe__video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
 
 /* ---------- ascii-reveal media wrapper (blue note 127:19173: "모든 이미지는 ASCII
    문구(12px) 처리된 상태로 로딩. 스크롤에 따라 위에서 아래로 문구가 벗겨지면서

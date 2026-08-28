@@ -67,10 +67,18 @@
       if (progress >= 1) nav.classList.add('is-logo-settled');
       else nav.classList.remove('is-logo-settled');
     }
-    measureLogoRects();
+    function initLogo() {
+      measureLogoRects();
+      onLogoScroll();
+    }
+    // 폰트 로드 완료 후 측정 — 로드 전엔 폴백 폰트 기준으로 좌표가 틀어짐
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(initLogo);
+    } else {
+      initLogo();
+    }
     window.addEventListener('scroll', onLogoScroll, { passive: true });
     window.addEventListener('resize', function () { measureLogoRects(); onLogoScroll(); });
-    onLogoScroll();
   }
 
   // 3. callout backgrounds "freeze" while their ASCII boxes are on screen — if the
