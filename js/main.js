@@ -38,13 +38,34 @@
     el.style.pointerEvents = opacity > 0.01 ? 'auto' : 'none';
   }
 
+  // ── 스크롤 잠금 (콜아웃 애니메이션 동안 스크롤 차단) ────────────
+  var scrollLockEl = null;
+  function lockScroll(ms) {
+    if (scrollLockEl) return;
+    scrollLockEl = document.createElement('div');
+    scrollLockEl.style.cssText = 'position:fixed;inset:0;z-index:99999;cursor:wait;';
+    scrollLockEl.addEventListener('wheel', function(e){ e.preventDefault(); }, { passive: false });
+    scrollLockEl.addEventListener('touchmove', function(e){ e.preventDefault(); }, { passive: false });
+    document.body.appendChild(scrollLockEl);
+    setTimeout(function() {
+      if (scrollLockEl) { scrollLockEl.remove(); scrollLockEl = null; }
+    }, ms);
+  }
+
   // ── 콜아웃 그룹 순차 등장 ────────────────────────────────────
   var triggeredScenes = {};
   function triggerCallout(sceneEl) {
     if (!sceneEl || triggeredScenes[sceneEl.id]) return;
     triggeredScenes[sceneEl.id] = true;
     var groups = sceneEl.querySelectorAll('[data-seq]');
-    // data-seq 순서대로 400ms 간격으로 등장
+    var maxSeq = 0;
+    groups.forEach(function(g) {
+      var s = parseInt(g.dataset.seq, 10);
+      if (s > maxSeq) maxSeq = s;
+    });
+    // 스크롤 잠금 — 마지막 아이템 등장 후 300ms 여유
+    lockScroll(maxSeq * 420 + 300);
+    // data-seq 순서대로 420ms 간격으로 등장 (짝수=박스, 홀수=레이블)
     groups.forEach(function(g) {
       var delay = parseInt(g.dataset.seq, 10) * 420;
       setTimeout(function() { g.classList.add('is-revealed'); }, delay);
@@ -75,9 +96,10 @@
     setScene(sceneC2, c2Op);
     setScene(sceneC3, c3Op);
 
-    if (c1Op > 0.5) triggerCallout(sceneC1); else resetCallout(sceneC1);
-    if (c2Op > 0.5) triggerCallout(sceneC2); else resetCallout(sceneC2);
-    if (c3Op > 0.5) triggerCallout(sceneC3); else resetCallout(sceneC3);
+    // 씬 진입 즉시(>0.01) 트리거 — 스크롤 잠금과 함께 순차 애니메이션 시작
+    if (c1Op > 0.01) triggerCallout(sceneC1); else resetCallout(sceneC1);
+    if (c2Op > 0.01) triggerCallout(sceneC2); else resetCallout(sceneC2);
+    if (c3Op > 0.01) triggerCallout(sceneC3); else resetCallout(sceneC3);
   }
 
   // ── 로고 모프 ────────────────────────────────────────────────
@@ -218,8 +240,8 @@
     if (imgEl && glyphsEl) buildAscii(imgEl, glyphsEl);
   });
 
-  // ── ASCII peel (callout 박스 & work 카드) ────────────────────
-  var veilCards = document.querySelectorAll('.ascii-media');
+  // ── ASCII peel (work 카드만 — callout 박스는 sticky 안이라 scroll과 무관) ──
+  var veilCards = document.querySelectorAll('.ascii-media:not(.callout__mark)');
   function onVeilScroll() {
     var vh = window.innerHeight;
     veilCards.forEach(function (card) {
