@@ -188,8 +188,10 @@
     fitLogoToWidth();
     measureLogoRects();
     onMainScroll();
+    // 위치·크기 확정 후 표시 (첫 프레임 오위치 플래시 방지)
+    if (brandLogo) brandLogo.style.opacity = '1';
   }
-  // 1) 즉시 실행 — 폴백 폰트라도 로드 직후 바로 큰 로고 표시
+  // 1) 즉시 실행 — 폰트 로드 전이라도 위치 계산 시도
   initLogo();
   // 2) 폰트 로드 후 재조정 — PartialSans 기준 크기·위치 정밀 보정
   if (document.fonts && document.fonts.ready) {

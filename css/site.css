@@ -111,7 +111,8 @@ html,body{background:var(--prism-bg);color:var(--prism-ink);overflow-x:clip;max-
 .brand-logo{position:fixed;top:0;left:0;z-index:60;transform-origin:top left;
   font-family:var(--font-logo);font-weight:normal;letter-spacing:var(--display-tracking);
   line-height:1;overflow:visible;font-size:20vw;
-  color:var(--prism-ink);white-space:nowrap;pointer-events:none;will-change:transform;}
+  color:var(--prism-ink);white-space:nowrap;pointer-events:none;will-change:transform;
+  opacity:0;transition:opacity 0.15s ease;}
 
 /* ---------- hero 콘텐츠 (vscroll-scene 안) ---------- */
 .hero__title{font-family:var(--font-display);font-weight:700;
