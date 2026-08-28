@@ -81,9 +81,13 @@ html,body{background:var(--prism-bg);color:var(--prism-ink);overflow-x:clip;max-
   line-height:var(--lh-display);
   color:var(--prism-ink);white-space:nowrap;pointer-events:none;will-change:transform;}
 
-/* ---------- hero — 122:5848 실측: 타이틀 74.667px, 스탯 라벨 16px, 같은 행 바닥정렬 ---------- */
-.hero{position:relative;min-height:100svh;display:flex;flex-direction:column;
-  justify-content:center;padding-block:var(--space-11);overflow:hidden;}
+/* ---------- hero — 122:5848 실측: 2544×1210 캔버스 비율(≈2.1:1, 100svh처럼 세로로
+   길지 않음). min-height:100svh로 강제로 늘려서 로고-타이틀-이미지 사이에 거대한
+   빈 공간이 생기던 버그를 aspect-ratio로 실제 비율에 맞게 고침. 타이틀 행은
+   원본에서도 히어로 하단부에 위치(바닥 정렬). ---------- */
+.hero{position:relative;aspect-ratio:2544/1210;min-height:520px;display:flex;
+  flex-direction:column;justify-content:flex-end;padding-block:var(--space-8) var(--space-9);
+  overflow:hidden;}
 .hero .grid{align-items:flex-end;}
 /* line-height 1.1 = 실측(leading 82.133px / font-size 74.667px); tracking은 토큰과 일치 */
 .hero__title{font-family:var(--font-display);font-weight:700;
