@@ -78,32 +78,59 @@
     else nav.classList.remove('is-logo-settled');
   }
 
-  // ── 비디오 scrub ─────────────────────────────────────────────
-  function updateVideo(p) {
+  // ── 비디오 scrub (RAF 래핑) ───────────────────────────────────
+  var rafId = null;
+  var targetTime = 0;
+  function rafScrub() {
+    rafId = null;
     if (!scrollVid || !scrollVid.duration) return;
-    var target = p * scrollVid.duration;
-    // 부드러운 seek: 차이가 0.3s 이상일 때만
-    if (Math.abs(scrollVid.currentTime - target) > 0.3) {
-      scrollVid.currentTime = target;
+    if (Math.abs(scrollVid.currentTime - targetTime) > 0.016) {
+      scrollVid.currentTime = targetTime;
     }
   }
 
   // ── 메인 스크롤 핸들러 ───────────────────────────────────────
+  var lastScrollP = -1;
   function onMainScroll() {
     if (!vscrollWrap) return;
     var rect = vscrollWrap.getBoundingClientRect();
     var runway = vscrollWrap.offsetHeight - window.innerHeight;
     var p = runway > 0 ? Math.min(1, Math.max(0, -rect.top / runway)) : 0;
+    if (p === lastScrollP) return;
+    lastScrollP = p;
 
     updateLogo(p);
     updateScenes(p);
-    updateVideo(p);
+
+    // 비디오 seek은 RAF로 배치 처리
+    if (scrollVid && scrollVid.duration) {
+      targetTime = p * scrollVid.duration;
+      if (!rafId) rafId = requestAnimationFrame(rafScrub);
+    }
   }
   window.addEventListener('scroll', onMainScroll, { passive: true });
   window.addEventListener('resize', function () { measureLogoRects(); onMainScroll(); });
 
-  // 폰트 로드 후 로고 좌표 측정 → 초기 렌더
+  // 폰트 로드 후 로고 크기 맞춤 + 좌표 측정 → 초기 렌더
+  function fitLogoToWidth() {
+    // heroSlot = #heroLogoSlot (inner span, text만큼의 실제 너비)
+    if (!heroSlot) return;
+    var available = window.innerWidth - 80; // 좌 40px + 우 40px
+    // 부모(.hero__logo-slot)의 font-size를 임시로 100px로 맞춰 텍스트 너비 측정
+    var slot = heroSlot.parentElement || heroSlot;
+    slot.style.fontSize = '100px';
+    slot.style.width = 'auto';
+    slot.style.textAlign = 'left';
+    var w100 = heroSlot.getBoundingClientRect().width;
+    slot.style.width = '100%';
+    slot.style.textAlign = 'center';
+    if (w100 === 0) { slot.style.fontSize = '20vw'; return; }
+    var fitted = Math.floor(available / w100 * 100);
+    slot.style.fontSize = fitted + 'px';
+  }
+
   function initLogo() {
+    fitLogoToWidth();
     measureLogoRects();
     onMainScroll();
   }
@@ -112,6 +139,7 @@
   } else {
     initLogo();
   }
+  window.addEventListener('resize', fitLogoToWidth);
 
   // 초기 씬 설정 (스크롤 전 상태)
   onMainScroll();
