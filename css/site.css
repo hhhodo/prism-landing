@@ -53,12 +53,24 @@ html,body{background:var(--prism-bg);color:var(--prism-ink);overflow-x:clip;max-
 [data-reveal-delay="2"]{transition-delay:.16s;}
 [data-reveal-delay="3"]{transition-delay:.24s;}
 
-/* ---------- hero scroll-pin (blue note 1: 로고 모프 동안 스크롤 잠금)
-   heroPinWrap = 200vh 런웨이. heroPin = position:sticky, height:100vh.
-   100vh 런웨이 소진 후 언스틱 → 일반 스크롤 재개. ---------- */
-.hero-pin-wrap{height:200vh;}
-.hero-pin{position:sticky;top:0;height:100vh;overflow:hidden;}
-.hero-pin .hero{height:100vh;aspect-ratio:unset;min-height:unset;}
+/* ---------- unified video scroll wrap (vscrollWrap)
+   700vh 런웨이. vscrollPin이 sticky 100vh로 고정.
+   비디오 currentTime = progress × duration.
+   씬 4개 (hero / callout×3) opacity로 전환.
+   로고 모프도 동일 progress 0→28.5%(= 200vh/600vh runway)로 구동. ---------- */
+.vscroll-wrap{height:700vh;}
+.vscroll-pin{position:sticky;top:0;height:100vh;overflow:hidden;background:#000;}
+
+/* 비디오: 풀스크린 */
+.vscroll-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;}
+
+/* 씬 공통: 절대 inset-0, 기본 opacity:0, transition으로 부드럽게 전환 */
+.vscroll-scene{position:absolute;inset:0;z-index:1;opacity:0;
+  transition:opacity .6s ease;pointer-events:none;}
+.vscroll-scene.is-active{opacity:1;pointer-events:auto;}
+
+/* 히어로 씬 레이아웃 */
+.vscene-hero-body{position:absolute;bottom:var(--space-9);left:0;right:0;}
 
 /* ---------- nav: logo shrinks into a GNB mark on scroll (blue note 1) ---------- */
 .nav{position:fixed;inset-block-start:0;left:0;right:0;z-index:30;
@@ -98,34 +110,12 @@ html,body{background:var(--prism-bg);color:var(--prism-ink);overflow-x:clip;max-
   line-height:1;
   color:var(--prism-ink);white-space:nowrap;pointer-events:none;will-change:transform;}
 
-/* ---------- hero — 122:5848 실측: 2544×1210 캔버스 비율(≈2.1:1, 100svh처럼 세로로
-   길지 않음). min-height:100svh로 강제로 늘려서 로고-타이틀-이미지 사이에 거대한
-   빈 공간이 생기던 버그를 aspect-ratio로 실제 비율에 맞게 고침. 타이틀 행은
-   원본에서도 히어로 하단부에 위치(바닥 정렬). ---------- */
-.hero{position:relative;aspect-ratio:2544/1210;min-height:520px;display:flex;
-  flex-direction:column;justify-content:flex-end;padding-block:var(--space-8) var(--space-9);
-  overflow:hidden;}
-.hero__bg-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
-  opacity:.7;z-index:0;pointer-events:none;}
-.hero__art{z-index:2;}
-.hero .grid{align-items:flex-end;}
-/* line-height 1.1 = 실측(leading 82.133px / font-size 74.667px); tracking은 토큰과 일치 */
+/* ---------- hero 콘텐츠 (vscroll-scene 안) ---------- */
 .hero__title{font-family:var(--font-display);font-weight:700;
   font-size:74.667px;letter-spacing:var(--display-tracking);line-height:1.1;}
-/* 122:7181 실측 위치(우측, 타이틀/스탯 행과 겹치는 상단부) — MCP 히어로와 동일한
-   구성으로 복원. 회전각은 js/main.js가 스크롤에 따라 CSS 변수 --hero-art-rot으로
-   계속 갱신, 스크롤하면서 실제로 돌아가는 것처럼 보이게 함 */
-.hero__art{position:absolute;right:-6%;top:50%;z-index:1;--hero-art-rot:18deg;
-  transform:translateY(-50%) rotate(var(--hero-art-rot));
-  width:min(52vw,760px);opacity:.9;pointer-events:none;will-change:transform;}
 .hero__meta{text-align:right;}
 .hero__meta .mono-label{display:block;text-transform:uppercase;}
 @media (max-width:768px){.hero__title{font-size:40px;}}
-
-/* ---------- scroll-frame media: two hero frames cross-fade as the viewer scrolls
-   past them (blue note 2: "center video frame changes on scroll") ---------- */
-.scrollframe{position:relative;width:100%;aspect-ratio:16/9;overflow:hidden;}
-.scrollframe__video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
 
 /* ---------- ascii-reveal media wrapper (blue note 127:19173: "모든 이미지는 ASCII
    문구(12px) 처리된 상태로 로딩. 스크롤에 따라 위에서 아래로 문구가 벗겨지면서

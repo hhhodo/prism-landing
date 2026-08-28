@@ -1,169 +1,122 @@
-// PRISM — interactions derived from the Figma file's blue annotation notes:
-// 1) "스크롤 시 상단 로고 텍스트가 작아지면서 GNB 로고가 됨" -> nav shrink on scroll
-// 2) "스크롤에 따라 가운데 영상이 프레임이 넘어감" -> .scrollframe cross-fade, driven by
-//    scroll position through the section (not a timer)
-// 3) "스크롤에 따라 영상은 멈춘 상태에서 네모 박스와 텍스트가 등장함 / ASCII 문구 처리됨"
-//    (near the glass-render feature callouts)
-// 4) "스크롤에 따라 리뷰가 가로로 움직이며, 상단의 세로줄 바가 산처럼 솟은 형태로 우측을
-//    향해 이동(스크롤바 역할)" -> .testi-track horizontal scroll-linked translate +
-//    .testi-scrollbar "mountain" bar peak that travels right with scroll progress
-// 5) "마우스를 호버하면 모자이크(ASCII)처럼 됨" -> .footer__wordmark hover filter (in site.css)
-// 6) "모든 이미지는 ASCII 문구(12px) 처리된 상태로 로딩. 스크롤에 따라 위에서 아래로
-//    문구가 벗겨지면서 이미지 등장" -> every .ascii-media (work-card video slots) loads
-//    fully glyph-covered; the glyph veil peels top-to-bottom via clip-path as the
-//    element's own scroll progress advances (not a one-shot fade-in-view)
+// PRISM — interactions
+// vscrollWrap(700vh)이 모든 스크롤 인터랙션의 단일 런웨이:
+//   0 → 28.5% (= 200vh/600vh): 로고 모프 (히어로 씬 표시)
+//  28.5→ 33%: 히어로 씬 페이드아웃
+//  33 → 38%: 전환 구간
+//  38 → 57%: callout-1 씬
+//  57 → 76%: callout-2 씬
+//  76 → 95%: callout-3 씬
+//  95→100%: 아웃트로
+// 비디오: currentTime = progress × duration (스크롤 scrub)
 
 (function () {
-  // 0. hero glass render rotates continuously as the page scrolls — not a fixed
-  // 18deg, the rotation angle is driven by scrollY so it visibly keeps turning.
-  var heroArt = document.getElementById('heroArt');
-  if (heroArt) {
-    function onHeroArtScroll() {
-      var deg = 18 + window.scrollY * 0.06;
-      heroArt.style.setProperty('--hero-art-rot', deg + 'deg');
-    }
-    window.addEventListener('scroll', onHeroArtScroll, { passive: true });
-    onHeroArtScroll();
-  }
-
-  // 1. nav background/padding shrink (visual chrome, unrelated to the logo morph below)
   var nav = document.getElementById('nav');
-  function onScroll() {
-    if (window.scrollY > 24) nav.classList.add('is-scrolled');
-    else nav.classList.remove('is-scrolled');
-  }
-  window.addEventListener('scroll', onScroll, { passive: true });
-  onScroll();
-
-  // 1b. brand-logo morph + scroll-pin (blue note 1).
-  // heroPinWrap(200vh)이 런웨이. heroPin이 sticky로 고정된 상태에서 로고만 모프.
-  // 런웨이 100% 소진 → is-logo-settled → GNB 컨텐츠 등장 + 일반 스크롤 재개.
   var brandLogo = document.getElementById('brandLogo');
   var heroSlot = document.getElementById('heroLogoSlot');
   var navSlot = document.getElementById('navLogoSlot');
-  var heroPinWrap = document.getElementById('heroPinWrap');
-  if (brandLogo && heroSlot && navSlot && heroPinWrap) {
-    var startRect = null, endRect = null;
-    function measureLogoRects() {
-      // heroPin이 sticky이므로 heroSlot은 항상 같은 viewport 위치에 있음 — scrollY 더할 필요 없음
-      var sr = heroSlot.getBoundingClientRect();
-      startRect = { top: sr.top, left: sr.left, fontSize: parseFloat(getComputedStyle(heroSlot).fontSize) };
-      var er = navSlot.getBoundingClientRect();
-      endRect = { top: er.top, left: er.left, fontSize: parseFloat(getComputedStyle(navSlot).fontSize) };
-    }
-    function lerp(a, b, t) { return a + (b - a) * t; }
-    function onLogoScroll() {
-      // heroPinWrap 내부 스크롤 진행도(0→1)로 로고 모프
-      var rect = heroPinWrap.getBoundingClientRect();
-      var runway = heroPinWrap.offsetHeight - window.innerHeight;
-      var progress = runway > 0 ? Math.min(1, Math.max(0, -rect.top / runway)) : 0;
+  var vscrollWrap = document.getElementById('vscrollWrap');
+  var scrollVid = document.getElementById('scrollVid');
 
-      var top = lerp(startRect.top, endRect.top, progress);
-      var left = lerp(startRect.left, endRect.left, progress);
-      var fontSize = lerp(startRect.fontSize, endRect.fontSize, progress);
-      brandLogo.style.transform = 'translate(' + left + 'px,' + top + 'px)';
-      brandLogo.style.fontSize = fontSize + 'px';
+  // 씬 요소
+  var sceneHero = document.getElementById('vscene-hero');
+  var sceneC1 = document.getElementById('vscene-c1');
+  var sceneC2 = document.getElementById('vscene-c2');
+  var sceneC3 = document.getElementById('vscene-c3');
 
-      if (progress >= 1) nav.classList.add('is-logo-settled');
-      else nav.classList.remove('is-logo-settled');
-    }
-    function initLogo() {
-      measureLogoRects();
-      onLogoScroll();
-    }
-    // 폰트 로드 완료 후 측정 — 로드 전엔 폴백 폰트 기준으로 좌표가 틀어짐
-    if (document.fonts && document.fonts.ready) {
-      document.fonts.ready.then(initLogo);
-    } else {
-      initLogo();
-    }
-    window.addEventListener('scroll', onLogoScroll, { passive: true });
-    window.addEventListener('resize', function () { measureLogoRects(); onLogoScroll(); });
+  // ── nav 스크롤 배경 ──────────────────────────────────────────
+  function onNavScroll() {
+    if (window.scrollY > 24) nav.classList.add('is-scrolled');
+    else nav.classList.remove('is-scrolled');
+  }
+  window.addEventListener('scroll', onNavScroll, { passive: true });
+  onNavScroll();
+
+  // ── 씬 opacity 헬퍼 ─────────────────────────────────────────
+  function setScene(el, opacity) {
+    if (!el) return;
+    el.style.opacity = opacity;
+    el.style.pointerEvents = opacity > 0.01 ? 'auto' : 'none';
   }
 
-  // 3. callout backgrounds "freeze" while their ASCII boxes are on screen — if the
-  // background is ever swapped for a real <video>, pausing it here already works.
-  document.querySelectorAll('[data-callout] .callout__bg').forEach(function (bg) {
-    if (bg.tagName !== 'VIDEO') return;
-    var io = new IntersectionObserver(function (entries) {
-      entries.forEach(function (entry) {
-        if (entry.isIntersecting) bg.pause(); else bg.play().catch(function () {});
-      });
-    }, { threshold: 0.4 });
-    io.observe(bg);
-  });
+  // ── 씬 전환 (progress 0~1) ───────────────────────────────────
+  function updateScenes(p) {
+    // hero: 0~0.30 표시, 0.30~0.36 페이드아웃
+    var heroOp = p < 0.30 ? 1 : p < 0.36 ? 1 - (p - 0.30) / 0.06 : 0;
+    // c1: 0.36~0.40 페이드인, 0.40~0.57 표시, 0.57~0.60 페이드아웃
+    var c1Op = p < 0.36 ? 0 : p < 0.40 ? (p - 0.36) / 0.04 : p < 0.57 ? 1 : p < 0.60 ? 1 - (p - 0.57) / 0.03 : 0;
+    // c2: 0.60~0.63 페이드인, 0.63~0.76 표시, 0.76~0.79 페이드아웃
+    var c2Op = p < 0.60 ? 0 : p < 0.63 ? (p - 0.60) / 0.03 : p < 0.76 ? 1 : p < 0.79 ? 1 - (p - 0.76) / 0.03 : 0;
+    // c3: 0.79~0.82 페이드인, 0.82~0.95 표시, 0.95~0.99 페이드아웃
+    var c3Op = p < 0.79 ? 0 : p < 0.82 ? (p - 0.79) / 0.03 : p < 0.95 ? 1 : p < 0.99 ? 1 - (p - 0.95) / 0.04 : 0;
 
-  // 2. reel cross-fade — frame swap tied directly to scroll position through the
-  // section, per the annotation ("스크롤에 따라... 프레임이 넘어감").
-  var reel = document.getElementById('reel');
-  var frames = reel ? reel.querySelectorAll('.scrollframe__img') : [];
-  if (frames.length > 1) {
-    var reelActive = -1;
-    function onReelScroll() {
-      var rect = reel.getBoundingClientRect();
-      var vh = window.innerHeight;
-      var progress = (vh - rect.top) / (vh + rect.height);
-      progress = Math.min(1, Math.max(0, progress));
-      var idx = Math.min(frames.length - 1, Math.floor(progress * frames.length));
-      if (idx !== reelActive) {
-        frames.forEach(function (f) { f.classList.remove('is-active'); });
-        frames[idx].classList.add('is-active');
-        reelActive = idx;
-      }
+    setScene(sceneHero, heroOp);
+    setScene(sceneC1, c1Op);
+    setScene(sceneC2, c2Op);
+    setScene(sceneC3, c3Op);
+  }
+
+  // ── 로고 모프 ────────────────────────────────────────────────
+  var startRect = null, endRect = null;
+  function measureLogoRects() {
+    if (!heroSlot || !navSlot) return;
+    var sr = heroSlot.getBoundingClientRect();
+    startRect = { top: sr.top, left: sr.left, fontSize: parseFloat(getComputedStyle(heroSlot).fontSize) };
+    var er = navSlot.getBoundingClientRect();
+    endRect = { top: er.top, left: er.left, fontSize: parseFloat(getComputedStyle(navSlot).fontSize) };
+  }
+  function lerp(a, b, t) { return a + (b - a) * t; }
+  function updateLogo(p) {
+    if (!brandLogo || !startRect || !endRect) return;
+    // 로고 모프: 0~0.285 (= 200vh / 700vh runway)
+    var logoProg = Math.min(1, p / 0.285);
+    var top = lerp(startRect.top, endRect.top, logoProg);
+    var left = lerp(startRect.left, endRect.left, logoProg);
+    var fontSize = lerp(startRect.fontSize, endRect.fontSize, logoProg);
+    brandLogo.style.transform = 'translate(' + left + 'px,' + top + 'px)';
+    brandLogo.style.fontSize = fontSize + 'px';
+    if (logoProg >= 1) nav.classList.add('is-logo-settled');
+    else nav.classList.remove('is-logo-settled');
+  }
+
+  // ── 비디오 scrub ─────────────────────────────────────────────
+  function updateVideo(p) {
+    if (!scrollVid || !scrollVid.duration) return;
+    var target = p * scrollVid.duration;
+    // 부드러운 seek: 차이가 0.3s 이상일 때만
+    if (Math.abs(scrollVid.currentTime - target) > 0.3) {
+      scrollVid.currentTime = target;
     }
-    window.addEventListener('scroll', onReelScroll, { passive: true });
-    onReelScroll();
   }
 
-  // 4. testimonials — real pinned scroll-jack. #testiPinWrap is a 300vh runway;
-  // #testi-pin is position:sticky (CSS), so it stays fixed on screen while the
-  // user scrolls through the runway. Progress is measured against the runway's
-  // own scrollable range, not simple pass-through — the section holds still
-  // until the horizontal move finishes, then releases to normal scroll.
-  var pinWrap = document.getElementById('testiPinWrap');
-  var track = document.getElementById('testiTrack');
-  var scrollbarEl = document.getElementById('testiScrollbar');
-  var BAR_COUNT = 250;
-  if (scrollbarEl) {
-    var barsHtml = '';
-    for (var b = 0; b < BAR_COUNT; b++) barsHtml += '<span class="testi-scrollbar__bar"></span>';
-    scrollbarEl.innerHTML = barsHtml;
+  // ── 메인 스크롤 핸들러 ───────────────────────────────────────
+  function onMainScroll() {
+    if (!vscrollWrap) return;
+    var rect = vscrollWrap.getBoundingClientRect();
+    var runway = vscrollWrap.offsetHeight - window.innerHeight;
+    var p = runway > 0 ? Math.min(1, Math.max(0, -rect.top / runway)) : 0;
+
+    updateLogo(p);
+    updateScenes(p);
+    updateVideo(p);
   }
-  var bars = scrollbarEl ? scrollbarEl.querySelectorAll('.testi-scrollbar__bar') : [];
-  // 123:13056~13305 실측 스텝: 중심에서 거리별 [height, opacity, isWhitePeak]
-  var WAVE_STEPS = [
-    [39, 1, true],   // center — white peak
-    [32, 0.73, false],
-    [25, 0.46, false],
-    [18, 0.19, false]
-  ];
-  var WAVE_FLAT = [14, 0.05, false];
-  if (pinWrap && track && bars.length) {
-    function onTestiScroll() {
-      var rect = pinWrap.getBoundingClientRect();
-      var vh = window.innerHeight;
-      var runway = pinWrap.offsetHeight - vh;
-      var progress = runway > 0 ? (-rect.top) / runway : 0;
-      progress = Math.min(1, Math.max(0, progress));
+  window.addEventListener('scroll', onMainScroll, { passive: true });
+  window.addEventListener('resize', function () { measureLogoRects(); onMainScroll(); });
 
-      var maxScroll = Math.max(0, track.scrollWidth - track.parentElement.clientWidth);
-      track.style.transform = 'translateX(-' + (progress * maxScroll) + 'px)';
-
-      var peak = progress * (bars.length - 1);
-      bars.forEach(function (bar, i) {
-        var dist = Math.round(Math.abs(i - peak));
-        var step = WAVE_STEPS[dist] || WAVE_FLAT;
-        bar.style.height = step[0] + 'px';
-        bar.style.opacity = step[1];
-        bar.style.background = step[2] ? '#fff' : '#d9d9d9';
-      });
-    }
-    window.addEventListener('scroll', onTestiScroll, { passive: true });
-    window.addEventListener('resize', onTestiScroll);
-    onTestiScroll();
+  // 폰트 로드 후 로고 좌표 측정 → 초기 렌더
+  function initLogo() {
+    measureLogoRects();
+    onMainScroll();
+  }
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(initLogo);
+  } else {
+    initLogo();
   }
 
-  // 6a. generate a deterministic ASCII glyph veil for each .ascii-media block
+  // 초기 씬 설정 (스크롤 전 상태)
+  onMainScroll();
+
+  // ── ASCII 글리프 생성 ─────────────────────────────────────────
   var GLYPHS = '01#$%&*+=~/\\<>PRISM';
   document.querySelectorAll('.ascii-media__glyphs').forEach(function (el) {
     var out = '';
@@ -173,9 +126,7 @@
     el.innerHTML = out;
   });
 
-  // 6b. top-to-bottom peel of the glyph veil, driven by each card's own scroll
-  // progress. Applies to both work cards ([data-work-veil]) and callout boxes
-  // ([data-callout-box]) — same ASCII peel mechanic per blue note 6.
+  // ── ASCII peel (callout 박스 & work 카드) ────────────────────
   var veilCards = document.querySelectorAll('.ascii-media');
   function onVeilScroll() {
     var vh = window.innerHeight;
@@ -191,8 +142,43 @@
   window.addEventListener('resize', onVeilScroll);
   onVeilScroll();
 
-  // generic reveal-on-scroll for every remaining [data-reveal] element
-  // (headings, quote, CTA, etc. — ascii-media handles its own reveal above)
+  // ── 증언 스크롤재킹 ──────────────────────────────────────────
+  var pinWrap = document.getElementById('testiPinWrap');
+  var track = document.getElementById('testiTrack');
+  var scrollbarEl = document.getElementById('testiScrollbar');
+  var BAR_COUNT = 250;
+  if (scrollbarEl) {
+    var barsHtml = '';
+    for (var b = 0; b < BAR_COUNT; b++) barsHtml += '<span class="testi-scrollbar__bar"></span>';
+    scrollbarEl.innerHTML = barsHtml;
+  }
+  var bars = scrollbarEl ? scrollbarEl.querySelectorAll('.testi-scrollbar__bar') : [];
+  var WAVE_STEPS = [[39,1,true],[32,0.73,false],[25,0.46,false],[18,0.19,false]];
+  var WAVE_FLAT = [14, 0.05, false];
+  if (pinWrap && track && bars.length) {
+    function onTestiScroll() {
+      var rect = pinWrap.getBoundingClientRect();
+      var vh = window.innerHeight;
+      var runway = pinWrap.offsetHeight - vh;
+      var progress = runway > 0 ? (-rect.top) / runway : 0;
+      progress = Math.min(1, Math.max(0, progress));
+      var maxScroll = Math.max(0, track.scrollWidth - track.parentElement.clientWidth);
+      track.style.transform = 'translateX(-' + (progress * maxScroll) + 'px)';
+      var peak = progress * (bars.length - 1);
+      bars.forEach(function (bar, i) {
+        var dist = Math.round(Math.abs(i - peak));
+        var step = WAVE_STEPS[dist] || WAVE_FLAT;
+        bar.style.height = step[0] + 'px';
+        bar.style.opacity = step[1];
+        bar.style.background = step[2] ? '#fff' : '#d9d9d9';
+      });
+    }
+    window.addEventListener('scroll', onTestiScroll, { passive: true });
+    window.addEventListener('resize', onTestiScroll);
+    onTestiScroll();
+  }
+
+  // ── reveal-on-scroll ─────────────────────────────────────────
   var revealTargets = document.querySelectorAll('[data-reveal]');
   var revealObserver = new IntersectionObserver(function (entries) {
     entries.forEach(function (entry) {
