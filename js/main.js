@@ -60,6 +60,11 @@
       brandLogo.style.fontSize = fontSize + 'px';
       // brandLogo IS the permanent visible mark — once progress hits 1 it just sits
       // at the nav slot's position/size for the rest of the page (never hidden).
+
+      // GNB 콘텐츠(링크/버튼)는 로고가 완전히 자리 잡기 전까진 숨김 — "폰트가 GNB
+      // 좌상단을 향해 작아진 다음에 GNB 컨텐츠가 나온다"는 요구사항.
+      if (progress >= 1) nav.classList.add('is-logo-settled');
+      else nav.classList.remove('is-logo-settled');
     }
     measureLogoRects();
     window.addEventListener('scroll', onLogoScroll, { passive: true });

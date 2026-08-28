@@ -55,19 +55,25 @@ html,body{background:var(--prism-bg);color:var(--prism-ink);overflow-x:clip;max-
 /* invisible — only reserves layout space; #brandLogo renders the visible mark */
 .nav__logo-slot{font-family:var(--font-display);font-weight:700;font-size:var(--fs-body-1);
   letter-spacing:var(--display-tracking);visibility:hidden;}
+/* GNB 콘텐츠(링크/버튼)는 시작 화면에서 안 보임 — 로고가 화면 가득 채운 채 시작해서
+   좌상단 GNB 자리로 다 줄어들기 전까지는 등장하지 않음. js/main.js가 로고 모프
+   progress===1일 때 .nav에 is-logo-settled를 붙여 트리거. */
+.nav__links,.nav__cta{opacity:0;pointer-events:none;transition:opacity .35s ease;}
+.nav.is-logo-settled .nav__links,.nav.is-logo-settled .nav__cta{opacity:1;pointer-events:auto;}
 .nav__links{display:flex;align-items:center;gap:var(--space-6);}
 .nav__links a{font-family:var(--font-mono-label);font-size:var(--fs-body-2);
   text-transform:uppercase;color:var(--prism-ink-subtle);
   transition:color .2s ease;}
 .nav__links a:hover{color:var(--prism-ink);}
 
-/* ---------- brand-logo morph: starts giant, overlapping the hero art (blue note 1's
-   original 400px logotype), then shrinks/moves into the nav slot as the page scrolls.
-   #brandLogo is the only visible mark; #heroLogoSlot / #navLogoSlot are invisible,
-   same-font anchors that js/main.js measures to interpolate between. ---------- */
-.hero__logo-slot{position:absolute;top:var(--space-8);left:var(--gutter);
+/* ---------- brand-logo morph: 시작은 화면을 가득 채우는 초대형 로고(정중앙),
+   스크롤에 따라 실제로 크기·위치가 줄어들며 GNB 좌상단 로고 자리로 이동(shared-element
+   morph). #brandLogo가 유일하게 보이는 마크; #heroLogoSlot(정중앙, 화면 채움) /
+   #navLogoSlot(GNB 자리)은 js/main.js가 좌표를 재기 위한 투명 앵커. ---------- */
+.hero__logo-slot{position:absolute;inset:0;display:flex;align-items:center;
+  justify-content:center;text-align:center;
   font-family:var(--font-display);font-weight:700;letter-spacing:var(--display-tracking);
-  font-size:clamp(96px,15vw,240px);line-height:var(--lh-display);visibility:hidden;}
+  font-size:clamp(120px,20vw,340px);line-height:var(--lh-display);visibility:hidden;}
 .brand-logo{position:fixed;top:0;left:0;z-index:60;transform-origin:top left;
   font-family:var(--font-display);font-weight:700;letter-spacing:var(--display-tracking);
   line-height:var(--lh-display);
@@ -80,11 +86,12 @@ html,body{background:var(--prism-bg);color:var(--prism-ink);overflow-x:clip;max-
 /* line-height 1.1 = 실측(leading 82.133px / font-size 74.667px); tracking은 토큰과 일치 */
 .hero__title{font-family:var(--font-display);font-weight:700;
   font-size:74.667px;letter-spacing:var(--display-tracking);line-height:1.1;}
-/* 회전각은 js/main.js가 스크롤에 따라 CSS 변수 --hero-art-rot으로 계속 갱신 —
-   정적 18deg 고정이 아니라 스크롤하면서 실제로 돌아가는 것처럼 보이게 함 */
-.hero__art{position:absolute;right:-6%;top:50%;--hero-art-rot:18deg;
-  transform:translateY(-50%) rotate(var(--hero-art-rot));
-  width:min(52vw,760px);opacity:.9;pointer-events:none;will-change:transform;}
+/* 정중앙에 위치, 초대형 로고를 살짝 가린 채(z-index 위) — 회전각은 js/main.js가
+   스크롤에 따라 CSS 변수 --hero-art-rot으로 계속 갱신, 스크롤하면서 실제로
+   돌아가는 것처럼 보이게 함 */
+.hero__art{position:absolute;left:50%;top:50%;z-index:1;--hero-art-rot:18deg;
+  transform:translate(-50%,-50%) rotate(var(--hero-art-rot));
+  width:min(40vw,620px);opacity:.95;pointer-events:none;will-change:transform;}
 .hero__meta{text-align:right;}
 .hero__meta .mono-label{display:block;text-transform:uppercase;}
 @media (max-width:768px){.hero__title{font-size:40px;}}
