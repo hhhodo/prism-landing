@@ -172,19 +172,10 @@ html,body{background:var(--prism-bg);color:var(--prism-ink);overflow-x:clip;max-
 /* 박스 내부 이미지 */
 .callout__mark-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1;}
 
-/* ASCII 글리프 베일 — 이미지 위, 반투명 배경으로 이미지 비침, 호버 시 사라짐 */
-.callout__mark .ascii-media__glyphs{z-index:2;background:rgba(14,14,14,.55);
+/* ASCII 글리프 베일 — 기본은 완전 불투명, 호버 시 사라지고 이미지 노출 */
+.callout__mark .ascii-media__glyphs{z-index:2;background:var(--prism-bg-panel);
   transition:opacity .35s ease;}
 .callout__mark:hover .ascii-media__glyphs{opacity:0;}
-
-/* 호버 텍스트 레이어 */
-.callout__mark-hover{position:absolute;inset:0;z-index:3;
-  display:flex;align-items:center;justify-content:center;text-align:center;
-  padding:var(--space-3);background:rgba(0,0,0,.82);
-  font-family:var(--font-mono-body);font-size:11px;line-height:1.4;
-  color:var(--prism-ink);
-  opacity:0;transition:opacity .35s ease;pointer-events:none;}
-.callout__mark:hover .callout__mark-hover{opacity:1;}
 .callout__mark{cursor:pointer;}
 
 /* line-height 1.2 = 실측(leading 50.676px / font-size 42.23px) */

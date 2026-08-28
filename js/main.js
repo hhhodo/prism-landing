@@ -171,9 +171,9 @@
     var w100 = heroSlot.getBoundingClientRect().width;
     slot.style.width = '100%';
     slot.style.textAlign = 'center';
-    // w100이 너무 작으면 (폰트 미로드 등) 폭발적 크기 방지
-    if (w100 < 20) { slot.style.fontSize = '20vw'; return; }
-    var fitted = Math.min(Math.floor(available / w100 * 100), Math.floor(available * 0.5));
+    // PRISM 5글자: 폰트 미로드 시 w100이 비정상적으로 작음 → 폴백
+    if (w100 < 80) { slot.style.fontSize = '20vw'; return; }
+    var fitted = Math.floor(available / w100 * 100);
     slot.style.fontSize = fitted + 'px';
   }
 
