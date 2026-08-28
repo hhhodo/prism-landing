@@ -1,8 +1,8 @@
 /* PRISM — media landing. Page-specific overrides only. styles.css is untouched. */
 
 @font-face {
-  font-family: 'ClimateCrisisHangulVf';
-  src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2212@1.0/ClimateCrisisKRVF.woff2') format('woff2');
+  font-family: 'PartialSans';
+  src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2307-1@1.1/PartialSansKR-Regular.woff2') format('woff2');
   font-weight: normal;
   font-display: swap;
 }
@@ -26,7 +26,7 @@
   /* Figma detected Helvetica Now Display / PP Supply Mono / DM Mono / At Aero, none of which
      are usable here without a paid license. Per project rule, unlicensable Figma fonts fall
      back to styles.css's default — Pretendard — everywhere, not a third-party substitute. */
-  --font-logo:'ClimateCrisisHangulVf','Pretendard',sans-serif;
+  --font-logo:'PartialSans','Pretendard',sans-serif;
   --font-display:'Pretendard',sans-serif;
   --font-mono-label:'Pretendard',sans-serif;
   --font-mono-body:'Pretendard',sans-serif;
@@ -65,7 +65,7 @@ html,body{background:var(--prism-bg);color:var(--prism-ink);overflow-x:clip;max-
 .vscroll-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;}
 
 /* 씬 공통: 절대 inset-0, 기본 opacity:0, transition으로 부드럽게 전환 */
-.vscroll-scene{position:absolute;inset:0;z-index:1;opacity:0;
+.vscroll-scene{position:absolute;inset:0;z-index:1;opacity:0;overflow:visible;
   transition:opacity .6s ease;pointer-events:none;}
 .vscroll-scene.is-active{opacity:1;pointer-events:auto;}
 
@@ -99,15 +99,15 @@ html,body{background:var(--prism-bg);color:var(--prism-ink);overflow-x:clip;max-
    자리로 이동 — 큰 대각선 이동이 아니라 "그 자리에서 작아지는" 움직임에 가까움.
    #brandLogo가 유일하게 보이는 마크; #heroLogoSlot(상단 실제 자리) /
    #navLogoSlot(GNB 자리)은 js/main.js가 좌표를 재기 위한 투명 앵커. ---------- */
-/* heroLogoSlot: hero section 기준 절대 중앙 배치 — JS 좌표 앵커용, 눈에 안 보임 */
+/* heroLogoSlot: vscroll-pin 기준 절대 중앙 배치 — JS 좌표 앵커용, 눈에 안 보임 */
 .hero__logo-slot{position:absolute;top:50%;left:0;width:100%;text-align:center;
   transform:translateY(-50%);
-  font-family:var(--font-logo);font-weight:700;letter-spacing:var(--display-tracking);
-  font-size:23vw;line-height:1;visibility:hidden;z-index:0;}
+  font-family:var(--font-logo);font-weight:normal;letter-spacing:var(--display-tracking);
+  font-size:20vw;line-height:1;visibility:hidden;z-index:0;}
 /* 실제 보이는 로고 — 초기엔 화면 중앙 꽉 참, 스크롤하면 GNB 자리로 이동 */
 .brand-logo{position:fixed;top:0;left:0;z-index:60;transform-origin:top left;
-  font-family:var(--font-logo);font-weight:700;letter-spacing:var(--display-tracking);
-  line-height:1;
+  font-family:var(--font-logo);font-weight:normal;letter-spacing:var(--display-tracking);
+  line-height:1;overflow:visible;
   color:var(--prism-ink);white-space:nowrap;pointer-events:none;will-change:transform;}
 
 /* ---------- hero 콘텐츠 (vscroll-scene 안) ---------- */
