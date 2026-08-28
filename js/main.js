@@ -133,16 +133,19 @@
     fitLogoToWidth();
     measureLogoRects();
     onMainScroll();
+    // 측정·배치 완료 후 한 번에 표시 — 로드 직후 작게 보였다가 커지는 현상 방지
+    if (brandLogo) brandLogo.style.opacity = '1';
   }
+  // 폰트 로드 완료 후에만 실행 (그 전엔 로고 숨김 상태)
   if (document.fonts && document.fonts.ready) {
     document.fonts.ready.then(initLogo);
   } else {
     initLogo();
   }
-  window.addEventListener('resize', fitLogoToWidth);
+  window.addEventListener('resize', function() { fitLogoToWidth(); measureLogoRects(); onMainScroll(); });
 
-  // 초기 씬 설정 (스크롤 전 상태)
-  onMainScroll();
+  // 씬 초기화 — 로고와 별개로 씬 opacity만 미리 설정
+  updateScenes(0);
 
   // ── ASCII 글리프 생성 ─────────────────────────────────────────
   var GLYPHS = '01#$%&*+=~/\\<>PRISM';
