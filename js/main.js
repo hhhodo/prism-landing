@@ -14,6 +14,18 @@
 //    element's own scroll progress advances (not a one-shot fade-in-view)
 
 (function () {
+  // 0. hero glass render rotates continuously as the page scrolls — not a fixed
+  // 18deg, the rotation angle is driven by scrollY so it visibly keeps turning.
+  var heroArt = document.getElementById('heroArt');
+  if (heroArt) {
+    function onHeroArtScroll() {
+      var deg = 18 + window.scrollY * 0.06;
+      heroArt.style.setProperty('--hero-art-rot', deg + 'deg');
+    }
+    window.addEventListener('scroll', onHeroArtScroll, { passive: true });
+    onHeroArtScroll();
+  }
+
   // 1. nav background/padding shrink (visual chrome, unrelated to the logo morph below)
   var nav = document.getElementById('nav');
   function onScroll() {
