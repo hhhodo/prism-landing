@@ -159,22 +159,29 @@
   window.addEventListener('resize', function () { measureLogoRects(); onMainScroll(); });
 
   // 폰트 로드 후 로고 크기 맞춤 + 좌표 측정 → 초기 렌더
+  // brandLogo 자체를 100px로 임시 설정해 실제 렌더링 폰트(PartialSans) 기준으로 측정
   function fitLogoToWidth() {
-    // heroSlot = #heroLogoSlot (inner span, text만큼의 실제 너비)
-    if (!heroSlot) return;
-    var available = window.innerWidth - 80; // 좌 40px + 우 40px
-    // 부모(.hero__logo-slot)의 font-size를 임시로 100px로 맞춰 텍스트 너비 측정
-    var slot = heroSlot.parentElement || heroSlot;
-    slot.style.fontSize = '100px';
-    slot.style.width = 'auto';
-    slot.style.textAlign = 'left';
-    var w100 = heroSlot.getBoundingClientRect().width;
-    slot.style.width = '100%';
-    slot.style.textAlign = 'center';
-    // PRISM 5글자: 폰트 미로드 시 w100이 비정상적으로 작음 → 폴백
-    if (w100 < 80) { slot.style.fontSize = '20vw'; return; }
+    if (!brandLogo || !heroSlot) return;
+    var available = window.innerWidth - 80; // 좌우 40px 여백
+
+    // 1) brandLogo를 100px로 잠깐 바꿔 실제 텍스트 너비 측정 (getBoundingClientRect는 reflow 강제)
+    var savedSize = brandLogo.style.fontSize;
+    var savedTransform = brandLogo.style.transform;
+    brandLogo.style.fontSize = '100px';
+    brandLogo.style.transform = 'translate(0,0)';
+    var w100 = brandLogo.getBoundingClientRect().width;
+    brandLogo.style.fontSize = savedSize || '20vw';
+    brandLogo.style.transform = savedTransform;
+
+    if (w100 < 80) return; // 폰트 미로드 → 폴백 유지
     var fitted = Math.floor(available / w100 * 100);
+
+    // 2) heroSlot 부모도 동기화 (measureLogoRects 좌표 앵커로 사용)
+    var slot = heroSlot.parentElement || heroSlot;
     slot.style.fontSize = fitted + 'px';
+
+    // 3) brandLogo 바로 적용
+    brandLogo.style.fontSize = fitted + 'px';
   }
 
   function initLogo() {
