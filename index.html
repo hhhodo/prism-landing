@@ -37,44 +37,42 @@ Footer    → full-bleed
 <body>
 
 <header class="nav fb" id="nav">
-  <div class="container">
-    <div class="nav__row">
-      <span class="nav__logo-slot" id="navLogoSlot">PRISM</span>
-      <nav class="nav__links">
-        <a href="#work">work</a>
-        <a href="#studio">studio</a>
-        <a href="#voices">voices</a>
-      </nav>
-      <button class="btn nav__cta" type="button">문의하기</button>
-    </div>
+  <div class="nav__row" style="padding-inline:var(--gutter);">
+    <span class="nav__logo-slot" id="navLogoSlot">PRISM</span>
+    <nav class="nav__links">
+      <a href="#work">work</a>
+      <a href="#studio">studio</a>
+      <a href="#voices">voices</a>
+    </nav>
+    <button class="btn nav__cta" type="button">문의하기</button>
   </div>
 </header>
 
-<!-- 파란 노트 1: 로고가 히어로 위에 초대형으로(히어로 이미지와 겹치게) 시작했다가
-     스크롤에 따라 실제로 크기·위치가 줄어들며 GNB 로고 자리로 이동함(shared-element
-     morph). js/main.js가 #heroLogoSlot(document 좌표) → #navLogoSlot(fixed 좌표) 사이를
-     스크롤 진행도로 보간해 #brandLogo에 적용. -->
+<!-- 파란 노트 1: 로고 모프 + 스크롤 핀. heroPinWrap(200vh)이 스크롤 런웨이.
+     heroPin이 position:sticky로 화면에 고정된 채 로고만 작아짐.
+     100vh 런웨이 다 소비되면 heroPin이 unstick → 일반 스크롤 재개. -->
 <div class="brand-logo" id="brandLogo" aria-hidden="true">PRISM</div>
 
-<section class="hero fb">
-  <img class="hero__canvas" src="assets/images/callout-canvas.png" alt="" aria-hidden="true">
-  <div class="container">
-    <span class="hero__logo-slot"><span id="heroLogoSlot">PRISM</span></span>
-    <div class="grid">
-      <!-- 122:5848 실측: 히어로엔 타이틀 2줄 + 우측 스탯(hero__meta) 딱 두 덩어리뿐,
-           eyebrow/서브카피 문단은 Figma에 없던 지어낸 내용이라 제거 -->
-      <div class="hero__title-col" style="grid-column:span 8;">
-        <h1 class="hero__title" data-reveal>미디어의 모든 순간을<br>설계합니다</h1>
+<div class="hero-pin-wrap" id="heroPinWrap">
+  <div class="hero-pin" id="heroPin">
+    <section class="hero fb">
+      <img class="hero__canvas" src="assets/images/callout-canvas.png" alt="" aria-hidden="true">
+      <div style="padding-inline:var(--gutter);width:100%;position:relative;z-index:1;">
+        <span class="hero__logo-slot"><span id="heroLogoSlot">PRISM</span></span>
+        <div class="grid">
+          <div class="hero__title-col" style="grid-column:span 8;">
+            <h1 class="hero__title" data-reveal>미디어의 모든 순간을<br>설계합니다</h1>
+          </div>
+          <div class="hero__meta" style="grid-column:span 4;" data-reveal data-reveal-delay="1">
+            <span class="mono-label">Since 2016</span>
+            <span class="mono-label">+ 12,000 hours on air</span>
+          </div>
+        </div>
       </div>
-      <!-- 실측: 스탯은 히어로 하단 고정이 아니라 타이틀과 같은 행, self-end(바닥 정렬) -->
-      <div class="hero__meta" style="grid-column:span 4;" data-reveal data-reveal-delay="1">
-        <span class="mono-label">Since 2016</span>
-        <span class="mono-label">+ 12,000 hours on air</span>
-      </div>
-    </div>
+      <img class="hero__art" id="heroArt" src="assets/images/glass-render.png" alt="" data-reveal data-reveal-delay="2">
+    </section>
   </div>
-  <img class="hero__art" id="heroArt" src="assets/images/glass-render.png" alt="" data-reveal data-reveal-delay="2">
-</section>
+</div>
 
 <!-- 스크롤 시 상단 로고가 축소되며 GNB 로고가 되는 인터랙션(파란 노트 1)은 css/site.css .nav.is-scrolled +
      js/main.js 스크롤 리스너로 구현. 스크롤에 따라 가운데 영상 프레임이 전환되는 인터랙션(파란 노트 2)은
@@ -180,7 +178,6 @@ Footer    → full-bleed
 </section>
 
 <section class="work fb" id="work">
-  <div class="container">
     <div class="work__head" data-reveal>
       <h2>Selected<br>Work</h2>
       <p class="mono-label">05 Projects — 2024–2026</p>
@@ -259,11 +256,9 @@ Footer    → full-bleed
         </div>
       </div>
     </div>
-  </div>
 </section>
 
 <section class="quote fb fb--soft" id="studio">
-  <div class="container">
     <span class="mono-label quote__eyebrow" data-reveal>Our Strength Is Our People</span>
     <blockquote data-reveal data-reveal-delay="1">
       “좋은 방송은 기술이 아니라 함께 만드는 사람들의 밀도에서 나온다고 믿습니다.”
@@ -304,7 +299,6 @@ Footer    → full-bleed
       </div>
       <div style="grid-column:span 4;"></div>
     </div>
-  </div>
 </section>
 
 <!-- 가로 스크롤 = 세로 스크롤을 pin된 섹션 안에서 가로 이동으로 변환하는 스크롤재킹.
@@ -312,14 +306,14 @@ Footer    → full-bleed
      .testi-pin이 position:sticky로 화면에 고정된 채 js/main.js가 wrapper 내부
      스크롤 진행도를 트랙의 translateX로 변환한다. -->
 <section class="testi fb" id="voices">
-  <div class="container">
+  <div style="padding-inline:var(--gutter);">
     <div class="testi__head" data-reveal>
       <h2>Beyond clients.<br>Trusted partners.</h2>
     </div>
   </div>
   <div class="testi-pin-wrap" id="testiPinWrap">
     <div class="testi-pin">
-      <div class="container">
+      <div style="padding-inline:var(--gutter);">
         <!-- 123:13056~13305 실측: ~250개의 4px 세로 바로 이루어진 파형, 정확한
              opacity/height 스텝값(5→19→46→73→100%, 14→18→25→32→39px)으로 생성. -->
         <div class="testi-scrollbar" id="testiScrollbar" aria-hidden="true"></div>
@@ -395,7 +389,6 @@ Footer    → full-bleed
 <!-- 원본 Figma에는 별도 CTA 클로저 섹션이 없음 — 지어낸 섹션 전체 제거.
      "문의하기 외 모든 버튼 제거" 지시에 따라 유일한 버튼은 nav에만 존재. -->
 <footer class="footer fb">
-  <div class="container">
     <div class="footer__top">
       <a href="#">개인정보 처리방침</a>
       <a href="#">이용약관</a>
@@ -409,7 +402,6 @@ Footer    → full-bleed
       </div>
       <div class="footer__copy">© 2026 PRISM MEDIA. All Rights Reserved.</div>
     </div>
-  </div>
 </footer>
 
 <script src="js/main.js"></script>

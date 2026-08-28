@@ -35,34 +35,35 @@
   window.addEventListener('scroll', onScroll, { passive: true });
   onScroll();
 
-  // 1b. brand-logo morph — starts giant, overlapping the hero art, and shrinks/
-  // moves into the nav slot as the page scrolls (blue note 1's actual instruction:
-  // the logo starts big overlapping the video/image, not just "small text shrinks").
+  // 1b. brand-logo morph + scroll-pin (blue note 1).
+  // heroPinWrap(200vh)이 런웨이. heroPin이 sticky로 고정된 상태에서 로고만 모프.
+  // 런웨이 100% 소진 → is-logo-settled → GNB 컨텐츠 등장 + 일반 스크롤 재개.
   var brandLogo = document.getElementById('brandLogo');
   var heroSlot = document.getElementById('heroLogoSlot');
   var navSlot = document.getElementById('navLogoSlot');
-  if (brandLogo && heroSlot && navSlot) {
-    var startRect = null, endRect = null, distance = 1;
+  var heroPinWrap = document.getElementById('heroPinWrap');
+  if (brandLogo && heroSlot && navSlot && heroPinWrap) {
+    var startRect = null, endRect = null;
     function measureLogoRects() {
-      startRect = heroSlot.getBoundingClientRect();
-      startRect = { top: startRect.top + window.scrollY, left: startRect.left, fontSize: parseFloat(getComputedStyle(heroSlot).fontSize) };
-      endRect = navSlot.getBoundingClientRect();
-      endRect = { top: endRect.top, left: endRect.left, fontSize: parseFloat(getComputedStyle(navSlot).fontSize) };
-      distance = Math.max(1, (document.querySelector('.hero') || {}).offsetHeight * 0.55 || window.innerHeight * 0.7);
+      // heroPin이 sticky이므로 heroSlot은 항상 같은 viewport 위치에 있음 — scrollY 더할 필요 없음
+      var sr = heroSlot.getBoundingClientRect();
+      startRect = { top: sr.top, left: sr.left, fontSize: parseFloat(getComputedStyle(heroSlot).fontSize) };
+      var er = navSlot.getBoundingClientRect();
+      endRect = { top: er.top, left: er.left, fontSize: parseFloat(getComputedStyle(navSlot).fontSize) };
     }
     function lerp(a, b, t) { return a + (b - a) * t; }
     function onLogoScroll() {
-      var progress = Math.min(1, Math.max(0, window.scrollY / distance));
-      var top = lerp(startRect.top - window.scrollY, endRect.top, progress);
+      // heroPinWrap 내부 스크롤 진행도(0→1)로 로고 모프
+      var rect = heroPinWrap.getBoundingClientRect();
+      var runway = heroPinWrap.offsetHeight - window.innerHeight;
+      var progress = runway > 0 ? Math.min(1, Math.max(0, -rect.top / runway)) : 0;
+
+      var top = lerp(startRect.top, endRect.top, progress);
       var left = lerp(startRect.left, endRect.left, progress);
       var fontSize = lerp(startRect.fontSize, endRect.fontSize, progress);
       brandLogo.style.transform = 'translate(' + left + 'px,' + top + 'px)';
       brandLogo.style.fontSize = fontSize + 'px';
-      // brandLogo IS the permanent visible mark — once progress hits 1 it just sits
-      // at the nav slot's position/size for the rest of the page (never hidden).
 
-      // GNB 콘텐츠(링크/버튼)는 로고가 완전히 자리 잡기 전까진 숨김 — "폰트가 GNB
-      // 좌상단을 향해 작아진 다음에 GNB 컨텐츠가 나온다"는 요구사항.
       if (progress >= 1) nav.classList.add('is-logo-settled');
       else nav.classList.remove('is-logo-settled');
     }

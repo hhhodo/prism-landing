@@ -45,6 +45,13 @@ html,body{background:var(--prism-bg);color:var(--prism-ink);overflow-x:clip;max-
 [data-reveal-delay="2"]{transition-delay:.16s;}
 [data-reveal-delay="3"]{transition-delay:.24s;}
 
+/* ---------- hero scroll-pin (blue note 1: 로고 모프 동안 스크롤 잠금)
+   heroPinWrap = 200vh 런웨이. heroPin = position:sticky, height:100vh.
+   100vh 런웨이 소진 후 언스틱 → 일반 스크롤 재개. ---------- */
+.hero-pin-wrap{height:200vh;}
+.hero-pin{position:sticky;top:0;height:100vh;overflow:hidden;}
+.hero-pin .hero{height:100vh;aspect-ratio:unset;min-height:unset;}
+
 /* ---------- nav: logo shrinks into a GNB mark on scroll (blue note 1) ---------- */
 .nav{position:fixed;inset-block-start:0;left:0;right:0;z-index:30;
   padding-block:var(--space-6);transition:padding-block .3s ease, background .3s ease, border-color .3s ease;
@@ -172,7 +179,7 @@ html,body{background:var(--prism-bg);color:var(--prism-ink);overflow-x:clip;max-
 }
 
 /* ---------- feature rows (Selected Work) ---------- */
-.work{padding-block:var(--space-11);}
+.work{padding-block:var(--space-11);padding-inline:var(--gutter);}
 .work__head{display:flex;align-items:flex-end;justify-content:space-between;
   margin-bottom:var(--space-9);gap:var(--space-5);}
 .work__head h2{font-family:var(--font-display);font-size:var(--fs-h0);}
@@ -192,7 +199,7 @@ html,body{background:var(--prism-bg);color:var(--prism-ink);overflow-x:clip;max-
 
 /* ---------- pull-quote + values — 122:8980 실측: 인용문 64px, 카드 5개
    bg #ebf0ed / ink #151515, 아이콘 박스 75px, 타이틀 42.667px ---------- */
-.quote{padding-block:var(--space-11);text-align:center;}
+.quote{padding-block:var(--space-11);padding-inline:var(--gutter);text-align:center;}
 .quote__eyebrow{display:block;margin-bottom:var(--space-6);}
 .quote blockquote{font-family:var(--font-display);font-weight:700;
   font-size:64px;line-height:var(--lh-h1);letter-spacing:var(--display-tracking);
@@ -252,7 +259,7 @@ html,body{background:var(--prism-bg);color:var(--prism-ink);overflow-x:clip;max-
 .nav__cta{padding:var(--space-3) var(--space-5);}
 
 /* ---------- footer ---------- */
-.footer{padding-block:var(--space-9) var(--space-6);}
+.footer{padding-block:var(--space-9) var(--space-6);padding-inline:var(--gutter);}
 .footer__top{display:flex;align-items:center;gap:var(--space-6);margin-bottom:var(--space-9);}
 .footer__top a{font-family:var(--font-mono-body);font-size:var(--fs-body-2);color:var(--prism-ink-subtle);}
 .footer__top a:hover{color:var(--prism-ink);}
