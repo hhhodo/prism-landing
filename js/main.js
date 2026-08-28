@@ -149,8 +149,9 @@
     var w100 = heroSlot.getBoundingClientRect().width;
     slot.style.width = '100%';
     slot.style.textAlign = 'center';
-    if (w100 === 0) { slot.style.fontSize = '20vw'; return; }
-    var fitted = Math.floor(available / w100 * 100);
+    // w100이 너무 작으면 (폰트 미로드 등) 폭발적 크기 방지
+    if (w100 < 20) { slot.style.fontSize = '20vw'; return; }
+    var fitted = Math.min(Math.floor(available / w100 * 100), Math.floor(available * 0.5));
     slot.style.fontSize = fitted + 'px';
   }
 

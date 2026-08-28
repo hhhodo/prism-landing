@@ -154,12 +154,15 @@ html,body{background:var(--prism-bg);color:var(--prism-ink);overflow-x:clip;max-
   background:radial-gradient(ellipse 80% 70% at 50% 50%,rgba(0,0,0,0) 30%,rgba(14,14,14,.85) 100%);}
 
 .callout__marks{position:absolute;inset:0;z-index:3;}
-/* 기본 숨김 — 씬 진입 시 data-seq 순서대로 .is-revealed 클래스로 등장 */
+/* 그룹: 위치 컨테이너만 담당, 항상 표시 (자식이 개별 등장) */
 .callout__group{position:absolute;display:flex;align-items:center;gap:var(--space-5);
-  transform:translate(0,-50%) translateY(12px);
-  opacity:0;filter:blur(4px);
-  transition:opacity .5s ease, filter .5s ease, transform .5s ease;}
-.callout__group.is-revealed{opacity:1;filter:blur(0);transform:translate(0,-50%);}
+  transform:translateY(-50%);}
+/* 박스·레이블 개별 숨김 — data-seq 순서(짝수=박스, 홀수=레이블)로 순차 등장 */
+.callout__mark[data-seq],.callout__group-label[data-seq]{
+  opacity:0;filter:blur(4px);transform:translateY(10px);
+  transition:opacity .45s ease, filter .45s ease, transform .45s ease;}
+.callout__mark[data-seq].is-revealed,.callout__group-label[data-seq].is-revealed{
+  opacity:1;filter:blur(0);transform:translateY(0);}
 
 /* 115px 박스 (Figma: border 1px #f2f2f2 + 내부 frosted 73px blur element) */
 .callout__mark{position:relative;width:115px;height:115px;flex:none;
@@ -169,8 +172,8 @@ html,body{background:var(--prism-bg);color:var(--prism-ink);overflow-x:clip;max-
 /* 박스 내부 이미지 */
 .callout__mark-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1;}
 
-/* ASCII 글리프 베일 — 이미지 위, 호버 시 사라짐 */
-.callout__mark .ascii-media__glyphs{z-index:2;background:rgba(14,14,14,.85);
+/* ASCII 글리프 베일 — 이미지 위, 반투명 배경으로 이미지 비침, 호버 시 사라짐 */
+.callout__mark .ascii-media__glyphs{z-index:2;background:rgba(14,14,14,.55);
   transition:opacity .35s ease;}
 .callout__mark:hover .ascii-media__glyphs{opacity:0;}
 
