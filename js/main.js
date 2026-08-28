@@ -133,14 +133,12 @@
     fitLogoToWidth();
     measureLogoRects();
     onMainScroll();
-    // 측정·배치 완료 후 한 번에 표시 — 로드 직후 작게 보였다가 커지는 현상 방지
-    if (brandLogo) brandLogo.style.opacity = '1';
   }
-  // 폰트 로드 완료 후에만 실행 (그 전엔 로고 숨김 상태)
+  // 1) 즉시 실행 — 폴백 폰트라도 로드 직후 바로 큰 로고 표시
+  initLogo();
+  // 2) 폰트 로드 후 재조정 — PartialSans 기준 크기·위치 정밀 보정
   if (document.fonts && document.fonts.ready) {
     document.fonts.ready.then(initLogo);
-  } else {
-    initLogo();
   }
   window.addEventListener('resize', function() { fitLogoToWidth(); measureLogoRects(); onMainScroll(); });
 
