@@ -26,7 +26,8 @@
   /* Figma detected Helvetica Now Display / PP Supply Mono / DM Mono / At Aero, none of which
      are usable here without a paid license. Per project rule, unlicensable Figma fonts fall
      back to styles.css's default — Pretendard — everywhere, not a third-party substitute. */
-  --font-display:'ClimateCrisisHangulVf','Pretendard',sans-serif;
+  --font-logo:'ClimateCrisisHangulVf','Pretendard',sans-serif;
+  --font-display:'Pretendard',sans-serif;
   --font-mono-label:'Pretendard',sans-serif;
   --font-mono-body:'Pretendard',sans-serif;
 }
@@ -67,7 +68,7 @@ html,body{background:var(--prism-bg);color:var(--prism-ink);overflow-x:clip;max-
   backdrop-filter:blur(10px);border-bottom-color:var(--prism-line);}
 .nav__row{display:flex;align-items:center;justify-content:space-between;}
 /* invisible — only reserves layout space; #brandLogo renders the visible mark */
-.nav__logo-slot{font-family:var(--font-display);font-weight:700;font-size:var(--fs-body-1);
+.nav__logo-slot{font-family:var(--font-logo);font-weight:700;font-size:var(--fs-body-1);
   letter-spacing:var(--display-tracking);visibility:hidden;}
 /* GNB 콘텐츠(링크/버튼)는 시작 화면에서 안 보임 — 로고가 화면 가득 채운 채 시작해서
    좌상단 GNB 자리로 다 줄어들기 전까지는 등장하지 않음. js/main.js가 로고 모프
@@ -86,15 +87,15 @@ html,body{background:var(--prism-bg);color:var(--prism-ink);overflow-x:clip;max-
    자리로 이동 — 큰 대각선 이동이 아니라 "그 자리에서 작아지는" 움직임에 가까움.
    #brandLogo가 유일하게 보이는 마크; #heroLogoSlot(상단 실제 자리) /
    #navLogoSlot(GNB 자리)은 js/main.js가 좌표를 재기 위한 투명 앵커. ---------- */
-/* heroLogoSlot: 화면 꽉 찰 크기의 투명 앵커 — JS가 좌표 재는 용도 */
-.hero__logo-slot{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
-  width:100%;text-align:center;
-  font-family:var(--font-display);font-weight:700;letter-spacing:var(--display-tracking);
-  font-size:23vw;line-height:1;visibility:hidden;}
+/* heroLogoSlot: hero section 기준 절대 중앙 배치 — JS 좌표 앵커용, 눈에 안 보임 */
+.hero__logo-slot{position:absolute;top:50%;left:0;width:100%;text-align:center;
+  transform:translateY(-50%);
+  font-family:var(--font-logo);font-weight:700;letter-spacing:var(--display-tracking);
+  font-size:23vw;line-height:1;visibility:hidden;z-index:0;}
 /* 실제 보이는 로고 — 초기엔 화면 중앙 꽉 참, 스크롤하면 GNB 자리로 이동 */
 .brand-logo{position:fixed;top:0;left:0;z-index:60;transform-origin:top left;
-  font-family:var(--font-display);font-weight:700;letter-spacing:var(--display-tracking);
-  line-height:1;text-align:center;
+  font-family:var(--font-logo);font-weight:700;letter-spacing:var(--display-tracking);
+  line-height:1;
   color:var(--prism-ink);white-space:nowrap;pointer-events:none;will-change:transform;}
 
 /* ---------- hero — 122:5848 실측: 2544×1210 캔버스 비율(≈2.1:1, 100svh처럼 세로로
