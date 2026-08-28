@@ -1,5 +1,12 @@
 /* PRISM — media landing. Page-specific overrides only. styles.css is untouched. */
 
+@font-face {
+  font-family: 'ClimateCrisisHangulVf';
+  src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2212@1.0/ClimateCrisisKRVF.woff2') format('woff2');
+  font-weight: normal;
+  font-display: swap;
+}
+
 :root{
   /* user-requested grid overrides: full-bleed everywhere, 40px side margin at all sizes */
   --gutter:40px;
@@ -19,7 +26,7 @@
   /* Figma detected Helvetica Now Display / PP Supply Mono / DM Mono / At Aero, none of which
      are usable here without a paid license. Per project rule, unlicensable Figma fonts fall
      back to styles.css's default — Pretendard — everywhere, not a third-party substitute. */
-  --font-display:'Pretendard',sans-serif;
+  --font-display:'ClimateCrisisHangulVf','Pretendard',sans-serif;
   --font-mono-label:'Pretendard',sans-serif;
   --font-mono-body:'Pretendard',sans-serif;
 }
@@ -79,13 +86,15 @@ html,body{background:var(--prism-bg);color:var(--prism-ink);overflow-x:clip;max-
    자리로 이동 — 큰 대각선 이동이 아니라 "그 자리에서 작아지는" 움직임에 가까움.
    #brandLogo가 유일하게 보이는 마크; #heroLogoSlot(상단 실제 자리) /
    #navLogoSlot(GNB 자리)은 js/main.js가 좌표를 재기 위한 투명 앵커. ---------- */
-.hero__logo-slot{position:absolute;top:2.4%;left:var(--gutter);
-  width:calc(100% - var(--gutter) * 2);
+/* heroLogoSlot: 화면 꽉 찰 크기의 투명 앵커 — JS가 좌표 재는 용도 */
+.hero__logo-slot{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  width:100%;text-align:center;
   font-family:var(--font-display);font-weight:700;letter-spacing:var(--display-tracking);
-  font-size:clamp(80px,13.5vw,260px);line-height:var(--lh-display);visibility:hidden;}
+  font-size:23vw;line-height:1;visibility:hidden;}
+/* 실제 보이는 로고 — 초기엔 화면 중앙 꽉 참, 스크롤하면 GNB 자리로 이동 */
 .brand-logo{position:fixed;top:0;left:0;z-index:60;transform-origin:top left;
   font-family:var(--font-display);font-weight:700;letter-spacing:var(--display-tracking);
-  line-height:var(--lh-display);
+  line-height:1;text-align:center;
   color:var(--prism-ink);white-space:nowrap;pointer-events:none;will-change:transform;}
 
 /* ---------- hero — 122:5848 실측: 2544×1210 캔버스 비율(≈2.1:1, 100svh처럼 세로로
