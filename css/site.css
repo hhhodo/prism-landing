@@ -126,11 +126,12 @@ html,body{background:var(--prism-bg);color:var(--prism-ink);overflow-x:clip;max-
    the element, not a simple fade-in-view). Media slots assume a <video> will be
    supplied per card (muted/loop/poster) — see js/main.js data-video-veil. ---------- */
 .ascii-media{position:relative;overflow:hidden;width:100%;background:var(--prism-bg-panel);}
-.ascii-media__glyphs{position:absolute;inset:0;z-index:2;display:grid;
-  grid-template-columns:repeat(24,1fr);font-family:var(--font-mono-label);
-  font-size:12px;line-height:1;color:rgba(242,242,242,.6);background:var(--prism-bg-panel);
-  overflow:hidden;padding:2px;clip-path:inset(0 0 0 0);will-change:clip-path;}
-.ascii-media__glyphs span{opacity:.7;}
+.ascii-media__glyphs{position:absolute;inset:0;z-index:2;display:block;
+  font-family:'Courier New',Courier,monospace;
+  font-size:6px;line-height:1.15;letter-spacing:0;
+  white-space:pre;overflow:hidden;
+  color:rgba(242,242,242,.85);background:var(--prism-bg-panel);
+  clip-path:inset(0 0 0 0);will-change:clip-path;}
 .ascii-media .work-card__img{position:absolute;inset:0;width:100%;height:100%;
   object-fit:cover;display:block;z-index:1;}
 

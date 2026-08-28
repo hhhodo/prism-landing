@@ -145,14 +145,51 @@
   // 씬 초기화 — 로고와 별개로 씬 opacity만 미리 설정
   updateScenes(0);
 
-  // ── ASCII 글리프 생성 ─────────────────────────────────────────
-  var GLYPHS = '01#$%&*+=~/\\<>PRISM';
-  document.querySelectorAll('.ascii-media__glyphs').forEach(function (el) {
-    var out = '';
-    for (var i = 0; i < 96; i++) {
-      out += '<span>' + GLYPHS[(i * 7) % GLYPHS.length] + '</span>';
-    }
-    el.innerHTML = out;
+  // ── ASCII 아트 생성 — canvas로 이미지 픽셀 밝기 → 문자 밀도 매핑 ────────
+  // 밝기 낮을수록 밀도 높은 문자 (어두운 배경 기준)
+  var ASCII_MAP = ' .\'`^",:;Il!i><~+_-?][}{1)(|tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$';
+
+  function buildAscii(imgEl, glyphsEl) {
+    var img = new Image();
+    img.onload = function () {
+      var rect = glyphsEl.getBoundingClientRect();
+      var w = Math.max(rect.width || glyphsEl.offsetWidth, 60);
+      var h = Math.max(rect.height || glyphsEl.offsetHeight, 60);
+      // Courier New: 폭 ≈ 높이 × 0.6
+      var fontSize = 6;
+      var charH = fontSize * 1.15;
+      var charW = fontSize * 0.6;
+      var cols = Math.floor(w / charW);
+      var rows = Math.floor(h / charH);
+
+      var canvas = document.createElement('canvas');
+      canvas.width = cols;
+      canvas.height = rows;
+      var ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, cols, rows);
+      var data = ctx.getImageData(0, 0, cols, rows).data;
+
+      var lines = [];
+      for (var r = 0; r < rows; r++) {
+        var line = '';
+        for (var c = 0; c < cols; c++) {
+          var idx = (r * cols + c) * 4;
+          var brightness = (data[idx] * 0.299 + data[idx + 1] * 0.587 + data[idx + 2] * 0.114) / 255;
+          // 어두운 픽셀 → 밀도 높은 문자 (배경이 어두우므로 반전)
+          var ci = Math.floor((1 - brightness) * (ASCII_MAP.length - 1));
+          line += ASCII_MAP[ci];
+        }
+        lines.push(line);
+      }
+      glyphsEl.textContent = lines.join('\n');
+    };
+    img.src = imgEl.src;
+  }
+
+  document.querySelectorAll('.ascii-media').forEach(function (container) {
+    var imgEl = container.querySelector('img');
+    var glyphsEl = container.querySelector('.ascii-media__glyphs');
+    if (imgEl && glyphsEl) buildAscii(imgEl, glyphsEl);
   });
 
   // ── ASCII peel (callout 박스 & work 카드) ────────────────────
