@@ -57,6 +57,7 @@ Footer    → full-bleed
 <div class="brand-logo" id="brandLogo" aria-hidden="true">PRISM</div>
 
 <section class="hero fb">
+  <img class="hero__canvas" src="assets/images/callout-canvas.png" alt="" aria-hidden="true">
   <div class="container">
     <span class="hero__logo-slot"><span id="heroLogoSlot">PRISM</span></span>
     <div class="grid">
@@ -72,15 +73,15 @@ Footer    → full-bleed
       </div>
     </div>
   </div>
-  <img class="hero__art" id="heroArt" src="assets/images/hero-glass-1.png" alt="" data-reveal data-reveal-delay="2">
+  <img class="hero__art" id="heroArt" src="assets/images/glass-render.png" alt="" data-reveal data-reveal-delay="2">
 </section>
 
 <!-- 스크롤 시 상단 로고가 축소되며 GNB 로고가 되는 인터랙션(파란 노트 1)은 css/site.css .nav.is-scrolled +
      js/main.js 스크롤 리스너로 구현. 스크롤에 따라 가운데 영상 프레임이 전환되는 인터랙션(파란 노트 2)은
      아래 .scrollframe 두 이미지의 opacity 크로스페이드로 구현. -->
 <section class="scrollframe fb fb--panel" id="reel">
-  <img class="scrollframe__img is-active" src="assets/images/hero-glass-1.png" alt="" data-frame="0">
-  <img class="scrollframe__img" src="assets/images/hero-glass-2.png" alt="" data-frame="1">
+  <img class="scrollframe__img is-active" src="assets/images/callout-canvas.png" alt="" data-frame="0">
+  <img class="scrollframe__img" src="assets/images/callout-canvas2.png" alt="" data-frame="1">
 </section>
 
 <!-- 파란 노트 3 (+동일 노트가 127:18513, 127:14479에도 반복): "스크롤에 따라 영상은 멈춘
@@ -92,54 +93,87 @@ Footer    → full-bleed
 <!-- 125:14033/14054/14078 실측 좌표(2544×1154 캔버스 대비 %): 텍스트+115px 정사각형
      쌍이 유리 렌더 위 세 지점에 흩어져 있음(가운데 정렬 3열 아님). -->
 <section class="callout fb fb--panel" id="callout-1" data-callout>
-  <video class="callout__bg" muted loop playsinline preload="none" poster="assets/images/hero-glass-1.png"></video>
+  <img class="callout__bg-img" src="assets/images/callout-canvas.png" alt="">
+  <div class="callout__tile-grid" aria-hidden="true"></div>
+  <div class="callout__vignette" aria-hidden="true"></div>
   <div class="callout__marks">
     <div class="callout__group" style="left:21.5%;top:52.7%;">
       <span class="callout__group-label">타 채널보다<br>돋보이고 신뢰를 얻다</span>
-      <div class="ascii-media callout__mark" data-video-veil><div class="ascii-media__glyphs" aria-hidden="true"></div></div>
+      <div class="ascii-media callout__mark" data-callout-box>
+        <div class="ascii-media__glyphs" aria-hidden="true"></div>
+        <img class="callout__mark-img" src="assets/images/tile-container.png" alt="">
+      </div>
     </div>
     <div class="callout__group" style="left:54.9%;top:21.3%;">
-      <div class="ascii-media callout__mark" data-video-veil><div class="ascii-media__glyphs" aria-hidden="true"></div></div>
+      <div class="ascii-media callout__mark" data-callout-box>
+        <div class="ascii-media__glyphs" aria-hidden="true"></div>
+        <img class="callout__mark-img" src="assets/images/tile-container.png" alt="">
+      </div>
       <span class="callout__group-label">온에어 아이덴티티<br>14일 안에 완성</span>
     </div>
     <div class="callout__group" style="left:67.4%;top:66.5%;">
-      <div class="ascii-media callout__mark callout__mark--sm" data-video-veil><div class="ascii-media__glyphs" aria-hidden="true"></div></div>
+      <div class="ascii-media callout__mark callout__mark--sm" data-callout-box>
+        <div class="ascii-media__glyphs" aria-hidden="true"></div>
+        <img class="callout__mark-img" src="assets/images/tile-container2.png" alt="">
+      </div>
       <span class="callout__group-label">더 빠른 송출,<br>더 적은 제작비</span>
     </div>
   </div>
 </section>
 
 <section class="callout fb fb--panel" id="callout-2" data-callout>
-  <video class="callout__bg" muted loop playsinline preload="none" poster="assets/images/hero-glass-2.png"></video>
+  <img class="callout__bg-img" src="assets/images/callout-canvas2.png" alt="">
+  <div class="callout__tile-grid" aria-hidden="true"></div>
+  <div class="callout__vignette" aria-hidden="true"></div>
   <div class="callout__marks">
     <div class="callout__group" style="left:21.5%;top:52.7%;">
       <span class="callout__group-label">멀티 플랫폼<br>동시 송출</span>
-      <div class="ascii-media callout__mark" data-video-veil><div class="ascii-media__glyphs" aria-hidden="true"></div></div>
+      <div class="ascii-media callout__mark" data-callout-box>
+        <div class="ascii-media__glyphs" aria-hidden="true"></div>
+        <img class="callout__mark-img" src="assets/images/tile-container.png" alt="">
+      </div>
     </div>
     <div class="callout__group" style="left:54.9%;top:21.3%;">
-      <div class="ascii-media callout__mark" data-video-veil><div class="ascii-media__glyphs" aria-hidden="true"></div></div>
+      <div class="ascii-media callout__mark" data-callout-box>
+        <div class="ascii-media__glyphs" aria-hidden="true"></div>
+        <img class="callout__mark-img" src="assets/images/tile-container.png" alt="">
+      </div>
       <span class="callout__group-label">실시간 데이터<br>기반 편성</span>
     </div>
     <div class="callout__group" style="left:67.4%;top:66.5%;">
-      <div class="ascii-media callout__mark callout__mark--sm" data-video-veil><div class="ascii-media__glyphs" aria-hidden="true"></div></div>
+      <div class="ascii-media callout__mark callout__mark--sm" data-callout-box>
+        <div class="ascii-media__glyphs" aria-hidden="true"></div>
+        <img class="callout__mark-img" src="assets/images/tile-container2.png" alt="">
+      </div>
       <span class="callout__group-label">AI 자동 자막 ·<br>비율 변환</span>
     </div>
   </div>
 </section>
 
 <section class="callout fb fb--panel" id="callout-3" data-callout>
-  <video class="callout__bg" muted loop playsinline preload="none" poster="assets/images/hero-glass-1.png"></video>
+  <img class="callout__bg-img" src="assets/images/callout-canvas.png" alt="">
+  <div class="callout__tile-grid" aria-hidden="true"></div>
+  <div class="callout__vignette" aria-hidden="true"></div>
   <div class="callout__marks">
     <div class="callout__group" style="left:21.5%;top:52.7%;">
       <span class="callout__group-label">오디오·영상<br>워크플로우 통합</span>
-      <div class="ascii-media callout__mark" data-video-veil><div class="ascii-media__glyphs" aria-hidden="true"></div></div>
+      <div class="ascii-media callout__mark" data-callout-box>
+        <div class="ascii-media__glyphs" aria-hidden="true"></div>
+        <img class="callout__mark-img" src="assets/images/tile-container.png" alt="">
+      </div>
     </div>
     <div class="callout__group" style="left:54.9%;top:21.3%;">
-      <div class="ascii-media callout__mark" data-video-veil><div class="ascii-media__glyphs" aria-hidden="true"></div></div>
+      <div class="ascii-media callout__mark" data-callout-box>
+        <div class="ascii-media__glyphs" aria-hidden="true"></div>
+        <img class="callout__mark-img" src="assets/images/tile-container.png" alt="">
+      </div>
       <span class="callout__group-label">시청 데이터<br>실시간 대시보드</span>
     </div>
     <div class="callout__group" style="left:67.4%;top:66.5%;">
-      <div class="ascii-media callout__mark callout__mark--sm" data-video-veil><div class="ascii-media__glyphs" aria-hidden="true"></div></div>
+      <div class="ascii-media callout__mark callout__mark--sm" data-callout-box>
+        <div class="ascii-media__glyphs" aria-hidden="true"></div>
+        <img class="callout__mark-img" src="assets/images/tile-container2.png" alt="">
+      </div>
       <span class="callout__group-label">배급 자동화로<br>인력 절감</span>
     </div>
   </div>
@@ -154,9 +188,9 @@ Footer    → full-bleed
 
     <div class="work-row work-row--8-4">
       <div>
-        <div class="ascii-media work-card__media" data-video-veil>
+        <div class="ascii-media work-card__media" data-work-veil>
           <div class="ascii-media__glyphs" aria-hidden="true"></div>
-          <video class="work-card__video" muted loop playsinline preload="none" poster=""></video>
+          <img class="work-card__img" src="assets/images/callout-canvas.png" alt="">
         </div>
         <div class="work-card__meta">
           <span class="work-card__mark"></span>
@@ -167,9 +201,9 @@ Footer    → full-bleed
         </div>
       </div>
       <div>
-        <div class="ascii-media work-card__media" data-video-veil>
+        <div class="ascii-media work-card__media" data-work-veil>
           <div class="ascii-media__glyphs" aria-hidden="true"></div>
-          <video class="work-card__video" muted loop playsinline preload="none" poster=""></video>
+          <img class="work-card__img" src="assets/images/callout-canvas2.png" alt="">
         </div>
         <div class="work-card__meta">
           <span class="work-card__mark"></span>
@@ -183,9 +217,9 @@ Footer    → full-bleed
 
     <div class="work-row work-row--12">
       <div>
-        <div class="ascii-media work-card__media work-card__media--wide" data-video-veil>
+        <div class="ascii-media work-card__media work-card__media--wide" data-work-veil>
           <div class="ascii-media__glyphs" aria-hidden="true"></div>
-          <video class="work-card__video" muted loop playsinline preload="none" poster=""></video>
+          <img class="work-card__img" src="assets/images/glass-render.png" alt="">
         </div>
         <div class="work-card__meta">
           <span class="work-card__mark"></span>
@@ -199,9 +233,9 @@ Footer    → full-bleed
 
     <div class="work-row work-row--4-8">
       <div>
-        <div class="ascii-media work-card__media" data-video-veil>
+        <div class="ascii-media work-card__media" data-work-veil>
           <div class="ascii-media__glyphs" aria-hidden="true"></div>
-          <video class="work-card__video" muted loop playsinline preload="none" poster=""></video>
+          <img class="work-card__img" src="assets/images/callout-canvas2.png" alt="">
         </div>
         <div class="work-card__meta">
           <span class="work-card__mark"></span>
@@ -212,9 +246,9 @@ Footer    → full-bleed
         </div>
       </div>
       <div>
-        <div class="ascii-media work-card__media" data-video-veil>
+        <div class="ascii-media work-card__media" data-work-veil>
           <div class="ascii-media__glyphs" aria-hidden="true"></div>
-          <video class="work-card__video" muted loop playsinline preload="none" poster=""></video>
+          <img class="work-card__img" src="assets/images/callout-canvas.png" alt="">
         </div>
         <div class="work-card__meta">
           <span class="work-card__mark"></span>

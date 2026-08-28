@@ -88,6 +88,10 @@ html,body{background:var(--prism-bg);color:var(--prism-ink);overflow-x:clip;max-
 .hero{position:relative;aspect-ratio:2544/1210;min-height:520px;display:flex;
   flex-direction:column;justify-content:flex-end;padding-block:var(--space-8) var(--space-9);
   overflow:hidden;}
+.hero__canvas{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
+  opacity:.25;z-index:0;pointer-events:none;}
+.hero .container,.hero .hero__logo-slot{position:relative;z-index:1;}
+.hero__art{z-index:2;}
 .hero .grid{align-items:flex-end;}
 /* line-height 1.1 = 실측(leading 82.133px / font-size 74.667px); tracking은 토큰과 일치 */
 .hero__title{font-family:var(--font-display);font-weight:700;
@@ -114,32 +118,52 @@ html,body{background:var(--prism-bg);color:var(--prism-ink);overflow-x:clip;max-
    이미지 등장" — a literal top-to-bottom peel driven by scroll position through
    the element, not a simple fade-in-view). Media slots assume a <video> will be
    supplied per card (muted/loop/poster) — see js/main.js data-video-veil. ---------- */
-.ascii-media{position:relative;overflow:hidden;width:100%;background:var(--color-placeholder);}
+.ascii-media{position:relative;overflow:hidden;width:100%;background:var(--prism-bg-panel);}
 .ascii-media__glyphs{position:absolute;inset:0;z-index:2;display:grid;
   grid-template-columns:repeat(24,1fr);font-family:var(--font-mono-label);
   font-size:12px;line-height:1;color:rgba(242,242,242,.6);background:var(--prism-bg-panel);
   overflow:hidden;padding:2px;clip-path:inset(0 0 0 0);will-change:clip-path;}
 .ascii-media__glyphs span{opacity:.7;}
-.ascii-media .work-card__video{position:relative;z-index:1;width:100%;height:100%;
-  object-fit:cover;display:block;background:var(--prism-bg-soft);}
+.ascii-media .work-card__img{position:absolute;inset:0;width:100%;height:100%;
+  object-fit:cover;display:block;z-index:1;}
 
 /* ---------- glass-render callout sections (blue note 3, repeated x3 across
-   125:14025 / 127:18513 / 127:14479). 125:14033/14054/14078 실측: 텍스트+정사각형
-   쌍 3개가 2544×1154 캔버스 위 절대좌표(%)에 흩어져 있음 — 가운데 정렬 3열이 아님.
-   정사각형(115px, 마지막 그룹은 95px)이 .ascii-media 갈음(글리프 veil 대상). ---------- */
-.callout{position:relative;min-height:70vh;overflow:hidden;}
-.callout__bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.55;}
-.callout__marks{position:absolute;inset:0;z-index:1;}
+   125:14025 / 127:18513 / 127:14479). 실측: 텍스트+정사각형 쌍 3개가 2544×1154
+   캔버스 위 절대좌표(%)에 흩어져 있음. 배경: imgCanvas (글래스 렌더) + 73px 타일
+   그리드 반복 오버레이 + 방사형 비네팅. ---------- */
+.callout{position:relative;min-height:70vh;overflow:hidden;background:var(--prism-bg-panel);}
+
+/* 실제 글래스 렌더 이미지 (Figma imgCanvas) */
+.callout__bg-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.6;z-index:0;}
+
+/* 73px 타일 그리드 (Figma imgContainer 반복) — 미묘한 텍스처 */
+.callout__tile-grid{position:absolute;inset:0;z-index:1;
+  background-image:url('../assets/images/tile-container.png');
+  background-size:73px 73px;background-repeat:repeat;opacity:.08;}
+
+/* 방사형 비네팅 — 엣지를 #0e0e0e로 fade */
+.callout__vignette{position:absolute;inset:0;z-index:2;pointer-events:none;
+  background:radial-gradient(ellipse 80% 70% at 50% 50%,rgba(0,0,0,0) 30%,rgba(14,14,14,.85) 100%);}
+
+.callout__marks{position:absolute;inset:0;z-index:3;}
 .callout__group{position:absolute;display:flex;align-items:center;gap:var(--space-5);
   transform:translate(0,-50%);}
-.callout__mark{width:115px;height:115px;flex:none;border:1px solid var(--prism-ink);
-  border-radius:var(--radius-0);background:rgba(255,255,255,.1);backdrop-filter:blur(5px);}
+
+/* 115px 박스 (Figma: border 1px #f2f2f2 + 내부 frosted 73px blur element) */
+.callout__mark{position:relative;width:115px;height:115px;flex:none;
+  border:1px solid var(--prism-ink);border-radius:var(--radius-0);overflow:hidden;background:transparent;}
 .callout__mark--sm{width:95px;height:95px;}
-/* line-height 1.2 = 실측(leading 50.676px / font-size 42.23px). 원본은 DM Mono
-   Light(300)이지만 Variant Memo가 fw=700/400 두 가지만 선언했으므로 400으로 고정
-   (세 번째 굵기 도입 금지 — 하드룰 위반이었음) */
+
+/* 박스 내부 이미지 (data-callout-box 스크롤 peel로 등장) */
+.callout__mark-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1;}
+
+/* ASCII 글리프 베일 — 이미지 위에 올려서 peel 애니메이션 */
+.callout__mark .ascii-media__glyphs{z-index:2;background:rgba(14,14,14,.85);}
+
+/* line-height 1.2 = 실측(leading 50.676px / font-size 42.23px) */
 .callout__group-label{font-family:var(--font-mono-body);font-weight:400;
-  font-size:42.23px;line-height:1.2;color:var(--prism-ink);white-space:nowrap;}
+  font-size:42.23px;line-height:1.2;color:var(--prism-ink);white-space:nowrap;
+  text-shadow:0 2px 12px rgba(0,0,0,.6);}
 @media (max-width:1024px){
   .callout__group{position:static;transform:none;flex-direction:column;
     align-items:flex-start;margin-bottom:var(--space-6);padding-inline:var(--gutter);}

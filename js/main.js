@@ -165,8 +165,8 @@
   });
 
   // 6b. top-to-bottom peel of the glyph veil, driven by each card's own scroll
-  // progress (starts peeling as it enters the viewport, fully peeled once its
-  // center passes viewport-center) — a literal scroll-linked wipe, not a fade.
+  // progress. Applies to both work cards ([data-work-veil]) and callout boxes
+  // ([data-callout-box]) — same ASCII peel mechanic per blue note 6.
   var veilCards = document.querySelectorAll('.ascii-media');
   function onVeilScroll() {
     var vh = window.innerHeight;
@@ -181,21 +181,6 @@
   window.addEventListener('scroll', onVeilScroll, { passive: true });
   window.addEventListener('resize', onVeilScroll);
   onVeilScroll();
-
-  // 6c. video veils — play/pause the card's <video> as it enters/leaves view.
-  // No real footage is bundled yet (assumes video src is supplied later); the
-  // element is wired so dropping in a real <source>/src makes this work as-is.
-  document.querySelectorAll('[data-video-veil] video').forEach(function (video) {
-    var wrap = video.closest('[data-video-veil]');
-    var io = new IntersectionObserver(function (entries) {
-      entries.forEach(function (entry) {
-        if (!video.currentSrc && !video.src) return;
-        if (entry.isIntersecting) video.play().catch(function () {});
-        else video.pause();
-      });
-    }, { threshold: 0.3 });
-    io.observe(wrap);
-  });
 
   // generic reveal-on-scroll for every remaining [data-reveal] element
   // (headings, quote, CTA, etc. — ascii-media handles its own reveal above)
