@@ -38,6 +38,27 @@
     el.style.pointerEvents = opacity > 0.01 ? 'auto' : 'none';
   }
 
+  // ── 콜아웃 그룹 순차 등장 ────────────────────────────────────
+  var triggeredScenes = {};
+  function triggerCallout(sceneEl) {
+    if (!sceneEl || triggeredScenes[sceneEl.id]) return;
+    triggeredScenes[sceneEl.id] = true;
+    var groups = sceneEl.querySelectorAll('[data-seq]');
+    // data-seq 순서대로 400ms 간격으로 등장
+    groups.forEach(function(g) {
+      var delay = parseInt(g.dataset.seq, 10) * 420;
+      setTimeout(function() { g.classList.add('is-revealed'); }, delay);
+    });
+  }
+  // 씬이 다시 숨겨질 때 초기화 (다음 씬 진입 대비)
+  function resetCallout(sceneEl) {
+    if (!sceneEl || !triggeredScenes[sceneEl.id]) return;
+    triggeredScenes[sceneEl.id] = false;
+    sceneEl.querySelectorAll('[data-seq]').forEach(function(g) {
+      g.classList.remove('is-revealed');
+    });
+  }
+
   // ── 씬 전환 (progress 0~1) ───────────────────────────────────
   function updateScenes(p) {
     // hero: 0~0.30 표시, 0.30~0.36 페이드아웃
@@ -53,6 +74,10 @@
     setScene(sceneC1, c1Op);
     setScene(sceneC2, c2Op);
     setScene(sceneC3, c3Op);
+
+    if (c1Op > 0.5) triggerCallout(sceneC1); else resetCallout(sceneC1);
+    if (c2Op > 0.5) triggerCallout(sceneC2); else resetCallout(sceneC2);
+    if (c3Op > 0.5) triggerCallout(sceneC3); else resetCallout(sceneC3);
   }
 
   // ── 로고 모프 ────────────────────────────────────────────────

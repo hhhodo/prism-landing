@@ -154,19 +154,35 @@ html,body{background:var(--prism-bg);color:var(--prism-ink);overflow-x:clip;max-
   background:radial-gradient(ellipse 80% 70% at 50% 50%,rgba(0,0,0,0) 30%,rgba(14,14,14,.85) 100%);}
 
 .callout__marks{position:absolute;inset:0;z-index:3;}
+/* 기본 숨김 — 씬 진입 시 data-seq 순서대로 .is-revealed 클래스로 등장 */
 .callout__group{position:absolute;display:flex;align-items:center;gap:var(--space-5);
-  transform:translate(0,-50%);}
+  transform:translate(0,-50%) translateY(12px);
+  opacity:0;filter:blur(4px);
+  transition:opacity .5s ease, filter .5s ease, transform .5s ease;}
+.callout__group.is-revealed{opacity:1;filter:blur(0);transform:translate(0,-50%);}
 
 /* 115px 박스 (Figma: border 1px #f2f2f2 + 내부 frosted 73px blur element) */
 .callout__mark{position:relative;width:115px;height:115px;flex:none;
   border:1px solid var(--prism-ink);border-radius:var(--radius-0);overflow:hidden;background:transparent;}
 .callout__mark--sm{width:95px;height:95px;}
 
-/* 박스 내부 이미지 (data-callout-box 스크롤 peel로 등장) */
+/* 박스 내부 이미지 */
 .callout__mark-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1;}
 
-/* ASCII 글리프 베일 — 이미지 위에 올려서 peel 애니메이션 */
-.callout__mark .ascii-media__glyphs{z-index:2;background:rgba(14,14,14,.85);}
+/* ASCII 글리프 베일 — 이미지 위, 호버 시 사라짐 */
+.callout__mark .ascii-media__glyphs{z-index:2;background:rgba(14,14,14,.85);
+  transition:opacity .35s ease;}
+.callout__mark:hover .ascii-media__glyphs{opacity:0;}
+
+/* 호버 텍스트 레이어 */
+.callout__mark-hover{position:absolute;inset:0;z-index:3;
+  display:flex;align-items:center;justify-content:center;text-align:center;
+  padding:var(--space-3);background:rgba(0,0,0,.82);
+  font-family:var(--font-mono-body);font-size:11px;line-height:1.4;
+  color:var(--prism-ink);
+  opacity:0;transition:opacity .35s ease;pointer-events:none;}
+.callout__mark:hover .callout__mark-hover{opacity:1;}
+.callout__mark{cursor:pointer;}
 
 /* line-height 1.2 = 실측(leading 50.676px / font-size 42.23px) */
 .callout__group-label{font-family:var(--font-mono-body);font-weight:400;
