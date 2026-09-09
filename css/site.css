@@ -212,9 +212,8 @@ html,body{background:var(--prism-bg);color:var(--prism-ink);overflow-x:clip;max-
 .work-row--lg-sm .work-item--sm .work-item__frame,
 .work-row--sm-lg .work-item--sm .work-item__frame{aspect-ratio:730/760;}
 .work-item__frame img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;z-index:1;}
-.work-item figcaption{display:flex;align-items:flex-start;gap:var(--space-5);
+.work-item figcaption{display:flex;align-items:flex-start;
   padding-block:var(--space-4);margin-top:var(--space-6);}
-.work-item__mark{flex:none;width:14px;height:14px;margin-top:6px;border:1px solid var(--prism-line);}
 .work-item__copy{display:flex;flex-direction:column;gap:var(--space-3);}
 .work-item__title{font-family:var(--font-display);font-weight:400;font-size:32px;
   color:var(--prism-ink);line-height:1.25;}
@@ -244,21 +243,21 @@ html,body{background:var(--prism-bg);color:var(--prism-ink);overflow-x:clip;max-
   font-size:var(--fs-h2);color:var(--prism-ink-subtle);opacity:.55;transition:opacity .25s ease;}
 @media (max-width:768px){.quote blockquote{font-size:28px;}.quote cite{font-size:20px;}}
 
-/* ---------- stats — 6장 아이콘 카드, 3열×2행, 라이트 카드(#ebf0ed), 화면 꽉 채움 ---------- */
-.stats{padding-block:var(--space-9);padding-inline:var(--gutter);
-  min-height:100vh;display:flex;align-items:center;box-sizing:border-box;}
-.stats__inner{width:100%;height:100%;}
+/* ---------- stats — 6장 아이콘 카드, 3열×2행, 라이트 카드(#ebf0ed).
+   사이즈/여백/본문 크기를 아래 testi-card와 동일하게 맞춤 (padding 48px,
+   min-height 340px, gap = --grid-gutter-lg, 본문 폰트 크기 동일). ---------- */
+.stats{padding-block:var(--space-9);padding-inline:var(--gutter);box-sizing:border-box;}
+.stats__inner{width:100%;}
 .stats-grid{display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(2,1fr);
-  gap:var(--space-4);height:calc(100vh - var(--space-9) * 2);}
+  gap:var(--grid-gutter-lg);}
 .stat-card{background:var(--prism-card);color:var(--prism-card-ink);border-radius:0;
-  padding:var(--space-7);display:flex;flex-direction:column;justify-content:space-between;}
+  padding:48px;min-height:340px;display:flex;flex-direction:column;justify-content:space-between;}
 .stat-card__icon{width:64px;height:64px;color:var(--prism-card-ink);}
 .stat-card__icon svg{width:100%;height:100%;}
-.stat-card__label{font-family:var(--font-display);font-weight:400;font-size:var(--fs-h3);
+.stat-card__label{font-family:var(--font-display);font-weight:400;font-size:var(--fs-body-1);
   line-height:1.2;}
 @media (max-width:768px){
-  .stats{min-height:auto;}
-  .stats-grid{grid-template-columns:1fr;grid-template-rows:none;height:auto;}
+  .stats-grid{grid-template-columns:1fr;grid-template-rows:none;}
   .stat-card{min-height:220px;}
 }
 
@@ -286,15 +285,24 @@ html,body{background:var(--prism-bg);color:var(--prism-ink);overflow-x:clip;max-
    the track's translateX — the section itself doesn't move until it's done,
    matching a real horizontal-scroll-via-vertical-scroll interaction (not a
    simple pass-through translate, and no manual carousel controls). */
-.testi{padding-block:var(--space-11) 0;overflow:hidden;}
+/* overflow:hidden 없음 — 이게 있으면 .testi-pin의 position:sticky가 부모
+   스크롤 컨테이너를 이 섹션 자신으로 오인해서 전혀 고정되지 않고 그냥
+   문서와 같이 흘러가버림(가로 스크롤과 동시에 세로로도 스크롤되며 카드가
+   화면 밖으로 사라지던 원인). 가로 오버플로우 클리핑은 .testi-track-wrap이
+   이미 담당하므로 여기서는 필요 없음. */
+.testi{padding-block:var(--space-11) 0;}
 .testi__head h2{font-family:var(--font-display);font-size:var(--fs-h1);font-weight:400;
   line-height:var(--lh-h1);max-width:14ch;}
 .testi-pin-wrap{position:relative;height:300vh;}
 .testi-pin{position:sticky;top:0;height:100vh;display:flex;flex-direction:column;justify-content:center;}
 /* 123:13056~13305 실측 스텝값: flat 14px/5%, peak 39px/100% 백색, 대칭 3단
-   (18px/19% → 25px/46% → 32px/73% → 39px/100%) */
-.testi-scrollbar{display:flex;align-items:flex-end;width:100%;height:40px;}
-.testi-scrollbar__bar{flex:1 1 0;min-width:0;max-width:4px;height:14px;
+   (18px/19% → 25px/46% → 32px/73% → 39px/100%).
+   flex:1 1 0 + max-width로 늘리면 grow가 max-width에서 막혀 뒤쪽에 빈 공간만
+   남고 바들끼리는 다닥다닥 붙어버림 — justify-content:space-between으로
+   고정폭 바들을 끝에서 끝까지 균등한 여백을 두고 벌려놓음. */
+.testi-scrollbar{display:flex;align-items:flex-end;justify-content:space-between;
+  width:100%;height:40px;}
+.testi-scrollbar__bar{flex:none;width:4px;height:14px;
   background:rgba(217,217,217,.05);border-radius:var(--radius-0);}
 .testi-track-wrap{overflow:hidden;margin-top:var(--space-8);}
 .testi-track{display:flex;gap:var(--grid-gutter-lg);will-change:transform;}
