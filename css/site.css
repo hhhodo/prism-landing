@@ -63,7 +63,10 @@ img{filter:grayscale(1);}
    씬 4개 (hero / callout×3) opacity로 전환.
    로고 모프도 동일 progress 0→28.5%(= 200vh/600vh runway)로 구동. ---------- */
 .vscroll-wrap{height:900vh;}
-.vscroll-pin{position:sticky;top:0;height:100vh;overflow:hidden;background:#000;}
+/* 100dvh를 지원하는 브라우저(대부분의 모바일)에서는 100vh 대신 이걸 써서,
+   iOS Safari 주소창이 접혔다 펼쳐질 때 100vh 기준이 흔들려 핀 고정 영역이
+   출렁이거나 하단에 빈 틈이 생기는 문제를 피함. 미지원 브라우저는 100vh 유지. */
+.vscroll-pin{position:sticky;top:0;height:100vh;height:100dvh;overflow:hidden;background:#000;}
 
 /* 비디오: 풀스크린, mix-blend-mode:screen으로 어두운 배경은 투명해져
    로고 위에 밝은 오브젝트만 덮이는 효과 */
@@ -301,7 +304,7 @@ img{filter:grayscale(1);}
 .testi__head h2{font-family:var(--font-display);font-size:var(--fs-h1);font-weight:400;
   line-height:var(--lh-h1);max-width:14ch;}
 .testi-pin-wrap{position:relative;height:300vh;margin-top:var(--space-9);}
-.testi-pin{position:sticky;top:0;height:100vh;display:flex;flex-direction:column;justify-content:center;}
+.testi-pin{position:sticky;top:0;height:100vh;height:100dvh;display:flex;flex-direction:column;justify-content:center;}
 /* 123:13056~13305 실측 스텝값: flat 14px/5%, peak 39px/100% 백색, 대칭 3단
    (18px/19% → 25px/46% → 32px/73% → 39px/100%).
    flex:1 1 0 + max-width로 늘리면 grow가 max-width에서 막혀 뒤쪽에 빈 공간만
@@ -376,4 +379,39 @@ img{filter:grayscale(1);}
   .hero__art{display:none;}
   .hero__meta{position:static;text-align:left;margin-top:var(--space-8);}
   .values .grid,.testi-grid .grid{gap:var(--space-4);}
+
+  /* ---- nav: 좁은 화면에서 링크+버튼이 겹치거나 넘치지 않게 간격/크기 축소 ---- */
+  .nav__row{gap:var(--space-3);}
+  .nav__links{gap:var(--space-4);}
+  .nav__links a{font-size:12px;}
+  .nav__cta{padding:var(--space-2) var(--space-4);font-size:12px;}
+
+  /* ---- callout 박스: 1024px 미디어쿼리에서 이미 세로 스택으로 바뀌지만
+     115px/95px 박스는 작은 폰에서도 여전히 큼 — 한 단계 더 축소 ---- */
+  .callout__mark{width:80px;height:80px;}
+  .callout__mark--sm{width:66px;height:66px;}
+
+  /* ---- Selected projects: 캡션 폰트가 데스크톱 그대로라 좁은 화면에서 큼 ---- */
+  .work-item__title{font-size:24px;}
+  .work-item__desc{font-size:13px;}
+  .work-row{gap:var(--space-6);margin-bottom:var(--space-9);}
+
+  /* ---- 카드류 패딩 축소 (48px 패딩은 375px 화면에서 카드 안쪽이 너무 좁아짐) ---- */
+  .stat-card{padding:var(--space-6);}
+  .stat-card__label{font-size:20px;}
+  .testi-card{padding:var(--space-6);}
+  .testi-card p{font-size:18px;}
+
+  /* ---- footer: 링크 줄이 좁은 화면에서 겹치지 않게 wrap 허용 ---- */
+  .footer__top{flex-wrap:wrap;row-gap:var(--space-3);}
+  .footer__bottom{gap:var(--space-3);}
+}
+
+@media (max-width:480px){
+  /* ---- 아주 좁은 화면(작은 폰): 콜아웃 라벨·워크 캡션 한 번 더 축소 ---- */
+  .callout__group-label{font-size:18px;}
+  .work-item__title{font-size:20px;}
+  .stats-grid{gap:var(--space-3);}
+  .stat-card{min-height:180px;padding:var(--space-5);}
+  .testi-card{padding:var(--space-5);}
 }

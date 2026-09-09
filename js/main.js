@@ -656,13 +656,20 @@
   var pinWrap = document.getElementById('testiPinWrap');
   var track = document.getElementById('testiTrack');
   var scrollbarEl = document.getElementById('testiScrollbar');
-  var BAR_COUNT = 250;
-  if (scrollbarEl) {
+  // 바 폭이 고정(4px)이라 개수가 고정이면 좁은 화면에서 (개수×최소폭)이 컨테이너보다
+  // 커져 오른쪽으로 넘쳐버림(모바일에서 실제로 발생) — 컨테이너 폭에 맞춰 개수를
+  // 매번 다시 계산해서 항상 끝에서 끝까지만 채우도록 함.
+  var bars = [];
+  function buildTestiBars() {
+    if (!scrollbarEl) return;
+    var w = scrollbarEl.getBoundingClientRect().width || window.innerWidth;
+    var count = Math.max(20, Math.min(250, Math.floor(w / 8)));
     var barsHtml = '';
-    for (var b = 0; b < BAR_COUNT; b++) barsHtml += '<span class="testi-scrollbar__bar"></span>';
+    for (var b = 0; b < count; b++) barsHtml += '<span class="testi-scrollbar__bar"></span>';
     scrollbarEl.innerHTML = barsHtml;
+    bars = scrollbarEl.querySelectorAll('.testi-scrollbar__bar');
   }
-  var bars = scrollbarEl ? scrollbarEl.querySelectorAll('.testi-scrollbar__bar') : [];
+  buildTestiBars();
   var WAVE_STEPS = [[39,1,true],[32,0.73,false],[25,0.46,false],[18,0.19,false]];
   var WAVE_FLAT = [14, 0.05, false];
   if (pinWrap && track && bars.length) {
@@ -684,7 +691,11 @@
       });
     }
     window.addEventListener('scroll', onTestiScroll, { passive: true });
-    window.addEventListener('resize', onTestiScroll);
+    var testiResizeTimer = null;
+    window.addEventListener('resize', function () {
+      clearTimeout(testiResizeTimer);
+      testiResizeTimer = setTimeout(function () { buildTestiBars(); onTestiScroll(); }, 150);
+    });
     onTestiScroll();
   }
 
