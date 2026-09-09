@@ -232,9 +232,15 @@
     // 폭에 따라 brandLogo의 실측 핏 크기와 어긋나서 "인트로랑 사이즈가 다르다"는
     // 문제가 있었음. SVG text 엘리먼트에 직접 font-size/y(베이스라인)를 지정한다.
     var footerSvgText = document.getElementById('footerWordmarkSvgText');
+    var footerWordmarkEl = document.getElementById('footerWordmark');
     if (footerSvgText) {
       footerSvgText.setAttribute('font-size', fitted + 'px');
       footerSvgText.setAttribute('y', Math.round(fitted * 0.82) + 'px');
+      // CSS 기본값(height:20vw)은 폭 기준으로 맞춘 fitted 폰트 크기와 다를 수
+      // 있어서(자간·글자 개수에 따라 20vw보다 커질 수 있음), 박스 높이를 실제
+      // 폰트 크기에 맞춰야 글자가 위아래로 잘리거나 밀려 보이지 않음 — 아스키
+      // 캡처도 이 박스 크기를 그대로 쓰므로 안 맞으면 세로로 잘려 보였음.
+      if (footerWordmarkEl) footerWordmarkEl.style.height = fitted + 'px';
       window.dispatchEvent(new CustomEvent('footerwordmark:resized'));
     }
   }
@@ -475,57 +481,97 @@
     var DOT = 13; // px — 도트 한 칸 크기. 작을수록 더 잘게 나뉨(요청대로 더 잘게)
     var dots = []; // {el, cx, cy} — cx/cy는 wordmark 기준 도트 중심 좌표
     var buildGen = 0; // 비동기 이미지 로드가 겹칠 때 최신 요청만 반영
+    var BUFFER = 120; // px — 클론 SVG를 실제 박스보다 넉넉하게 키워서 글자 끝(M)이
+    // 잘리지 않게 함. 폰트가 다르게 렌더되면 실제보다 조금 더 넓게 나올 수 있어서
+    // 안전 여유를 둠. 샘플링은 여전히 원래 폭 w까지만 하므로 도트 좌표엔 영향 없음.
 
-    // 지금까지 두 번 실패한 이유:
+    // 지금까지 실패했던 이유들:
     // 1) HTML 인라인 요소의 getBoundingClientRect()는 폰트 라인박스(잉크보다
     //    훨씬 큰 여백 포함) 전체를 줌 → 네모난 덩어리로만 활성화됨.
     // 2) SVG <tspan>.getBBox()도 이 폰트에선 브라우저가 글자별 잉크가 아니라
     //    폰트의 공통 ascent/descent(em 박스)를 반환해서 모든 글자 높이가
     //    똑같이 나옴 → 역시 네모난 덩어리.
-    // 그래서 이번엔 아예 "박스로 판단"하지 않고, 실제로 화면에 떠 있는 이
-    // <svg> 엘리먼트 자체를 그대로 직렬화해서 캔버스에 래스터라이즈한 뒤
-    // 픽셀 밝기를 직접 읽는다 — 다른 곳에 다시 그리거나 근사하는 단계가
-    // 전혀 없으므로 화면과 어긋날 수가 없다. CSS 변수(fill:var(--prism-ink)
-    // 등)는 이미지로 분리되는 순간 못 읽으므로, 복제본에 실제 계산된 값을
-    // 인라인으로 박아넣고 그 복제본만 직렬화한다.
+    // 3) 실제 살아있는 <svg>를 복제해서 래스터라이즈하는 방식으로 바꾼 뒤에도,
+    //    복제본을 별도 이미지로 분리하는 순간 페이지의 @font-face(원격 woff2)를
+    //    못 읽어서 커스텀 폰트 'PartialSans'가 시스템 폴백 폰트로 대체됐다 —
+    //    그래서 아스키가 실제 글자보다 훨씬 얇고, 다른 위치에 그려지고,
+    //    자간이 달라져서 M 근처가 박스 밖으로 밀려 잘려 보였음.
+    // 그래서 이번엔 폰트 파일 자체를 fetch로 가져와 base64로 인코딩한 뒤
+    // 복제 SVG 안에 <style>@font-face{...}</style>로 직접 박아 넣는다 —
+    // 그러면 이미지로 분리되어도 진짜 PartialSans로 그려진다.
+    var fontDataUrlPromise = null;
+    function getFontDataUrl() {
+      if (fontDataUrlPromise) return fontDataUrlPromise;
+      fontDataUrlPromise = fetch('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2307-1@1.1/PartialSansKR-Regular.woff2')
+        .then(function (res) { return res.arrayBuffer(); })
+        .then(function (buf) {
+          var bytes = new Uint8Array(buf);
+          var binary = '';
+          var chunk = 0x8000;
+          for (var i = 0; i < bytes.length; i += chunk) {
+            binary += String.fromCharCode.apply(null, bytes.subarray(i, i + chunk));
+          }
+          return 'data:font/woff2;base64,' + btoa(binary);
+        })
+        .catch(function () { return null; }); // 실패해도 최소한 폴백 폰트로라도 진행
+      return fontDataUrlPromise;
+    }
+
     function build() {
       var wordmarkRect = wordmark.getBoundingClientRect();
       var w = Math.max(wordmarkRect.width, 100), h = Math.max(wordmarkRect.height, 100);
       var myGen = ++buildGen;
 
-      var textCs = getComputedStyle(svgText);
-      var clone = svgEl.cloneNode(true);
-      clone.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
-      clone.setAttribute('width', w);
-      clone.setAttribute('height', h);
-      var cloneText = clone.querySelector('text');
-      cloneText.setAttribute('fill', '#ffffff');
-      cloneText.setAttribute('font-family', textCs.fontFamily);
-      cloneText.setAttribute('font-weight', textCs.fontWeight);
-      cloneText.setAttribute('letter-spacing', textCs.letterSpacing);
-      var rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-      rect.setAttribute('x', '0'); rect.setAttribute('y', '0');
-      rect.setAttribute('width', String(w)); rect.setAttribute('height', String(h));
-      rect.setAttribute('fill', '#000000');
-      clone.insertBefore(rect, clone.firstChild);
+      getFontDataUrl().then(function (fontDataUrl) {
+        if (myGen !== buildGen) return;
+        var textCs = getComputedStyle(svgText);
+        var clone = svgEl.cloneNode(true);
+        clone.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+        var cw = w + BUFFER, ch = h + BUFFER;
+        clone.setAttribute('width', cw);
+        clone.setAttribute('height', ch);
+        clone.setAttribute('overflow', 'visible');
 
-      var svgMarkup = new XMLSerializer().serializeToString(clone);
-      var svgUrl = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svgMarkup);
-      var img = new Image();
-      img.onload = function () {
-        if (myGen !== buildGen) return;
-        var srcCanvas = document.createElement('canvas');
-        srcCanvas.width = w; srcCanvas.height = h;
-        var srcCtx = srcCanvas.getContext('2d');
-        srcCtx.drawImage(img, 0, 0, w, h);
-        finishBuild(srcCanvas, w, h);
-      };
-      img.onerror = function () {
-        if (myGen !== buildGen) return;
-        dotsEl.innerHTML = '';
-        dots = [];
-      };
-      img.src = svgUrl;
+        var cloneText = clone.querySelector('text');
+        cloneText.setAttribute('fill', '#ffffff');
+        cloneText.setAttribute('font-family', 'FooterWordmarkClone');
+        cloneText.setAttribute('font-weight', textCs.fontWeight);
+        cloneText.setAttribute('letter-spacing', textCs.letterSpacing);
+
+        if (fontDataUrl) {
+          var styleEl = document.createElementNS('http://www.w3.org/2000/svg', 'style');
+          styleEl.textContent = '@font-face{font-family:"FooterWordmarkClone";' +
+            'src:url("' + fontDataUrl + '") format("woff2");}';
+          clone.insertBefore(styleEl, clone.firstChild);
+        }
+
+        var rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+        rect.setAttribute('x', '0'); rect.setAttribute('y', '0');
+        rect.setAttribute('width', String(cw)); rect.setAttribute('height', String(ch));
+        rect.setAttribute('fill', '#000000');
+        clone.insertBefore(rect, clone.firstChild);
+
+        var svgMarkup = new XMLSerializer().serializeToString(clone);
+        var svgUrl = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svgMarkup);
+        var img = new Image();
+        img.onload = function () {
+          if (myGen !== buildGen) return;
+          var srcCanvas = document.createElement('canvas');
+          srcCanvas.width = w; srcCanvas.height = h;
+          var srcCtx = srcCanvas.getContext('2d');
+          // cw×ch로 그려진 이미지에서 좌상단 w×h만 "잘라서"(스케일 없이) 씀 —
+          // 버퍼는 잘림 방지용 여유 공간일 뿐이라 0,0 기준 원본 크기 그대로
+          // 크롭해야 도트 좌표계(w/h 기준)와 어긋나지 않음
+          srcCtx.drawImage(img, 0, 0, w, h, 0, 0, w, h);
+          finishBuild(srcCanvas, w, h);
+        };
+        img.onerror = function () {
+          if (myGen !== buildGen) return;
+          dotsEl.innerHTML = '';
+          dots = [];
+        };
+        img.src = svgUrl;
+      });
     }
 
     function finishBuild(srcCanvas, w, h) {
