@@ -256,7 +256,9 @@
   updateScenes(0);
 
   // ── ASCII 아트 생성 — canvas로 이미지 픽셀 밝기 → 문자 밀도 매핑 ────────
-  // 밝기 낮을수록 밀도 높은 문자 (어두운 배경 기준)
+  // 밝은 픽셀일수록 밀도 높은 문자. 배경이 어둡고 글자색이 밝기 때문에
+  // (원본의 밝은 부분 = 밀도 높은 밝은 글자, 어두운 부분 = 공백으로 배경 그대로)
+  // 그래야 실제 이미지 명암과 맞게 보임 — 반전시키면 색반전처럼 보임.
   var ASCII_MAP = ' .\'`^",:;Il!i><~+_-?][}{1)(|tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$';
 
   function buildAscii(imgEl, glyphsEl) {
@@ -285,8 +287,8 @@
         for (var c = 0; c < cols; c++) {
           var idx = (r * cols + c) * 4;
           var brightness = (data[idx] * 0.299 + data[idx + 1] * 0.587 + data[idx + 2] * 0.114) / 255;
-          // 어두운 픽셀 → 밀도 높은 문자 (배경이 어두우므로 반전)
-          var ci = Math.floor((1 - brightness) * (ASCII_MAP.length - 1));
+          // 밝은 픽셀 → 밀도 높은 문자 (반전 없음 — 원본 명암과 일치)
+          var ci = Math.floor(brightness * (ASCII_MAP.length - 1));
           line += ASCII_MAP[ci];
         }
         lines.push(line);
