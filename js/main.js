@@ -441,6 +441,85 @@
     mark.addEventListener('mouseleave', onLeave);
   });
 
+  // ── 푸터 대형 PRISM 워드마크 — 마우스 오버 시 커서를 중심으로 한 원형
+  // 영역만 아스키아트로 드러남 (callout 박스와 같은 발상이지만, 뒤에 사진이
+  // 있는 게 아니라 글자 자체 위에 영상 마지막 프레임 기반 아스키를 얹음) ──
+  (function initFooterWordmarkAscii() {
+    var wordmark = document.getElementById('footerWordmark');
+    var asciiEl = wordmark ? wordmark.querySelector('.footer__wordmark-ascii') : null;
+    if (!wordmark || !asciiEl) return;
+
+    function buildFromFrame(source) {
+      var vw = source.videoWidth || source.naturalWidth;
+      var vh = source.videoHeight || source.naturalHeight;
+      if (!vw || !vh) return;
+      var rect = wordmark.getBoundingClientRect();
+      var w = Math.max(rect.width, 100), h = Math.max(rect.height, 100);
+      var boxAspect = w / h, srcAspect = vw / vh;
+      var sx, sy, sw, sh;
+      if (srcAspect > boxAspect) { sh = vh; sw = sh * boxAspect; sx = (vw - sw) / 2; sy = 0; }
+      else { sw = vw; sh = sw / boxAspect; sx = 0; sy = (vh - sh) / 2; }
+
+      var fontSize = 16, charW = fontSize * 0.6, charH = fontSize * 1.15;
+      var cols = Math.max(1, Math.floor(w / charW));
+      var rows = Math.max(1, Math.floor(h / charH));
+      var canvas = document.createElement('canvas');
+      canvas.width = cols; canvas.height = rows;
+      var ctx = canvas.getContext('2d');
+      ctx.drawImage(source, sx, sy, sw, sh, 0, 0, cols, rows);
+      var data = ctx.getImageData(0, 0, cols, rows).data;
+
+      // 자동 레벨 — 모자이크와 동일한 이유(어두운 프레임이어도 텍스처가 보이게)
+      var minB = 1, maxB = 0;
+      for (var i = 0; i < data.length; i += 4) {
+        var b = (data[i] * 0.299 + data[i + 1] * 0.587 + data[i + 2] * 0.114) / 255;
+        if (b < minB) minB = b;
+        if (b > maxB) maxB = b;
+      }
+      var range = Math.max(0.05, maxB - minB);
+
+      var lines = [];
+      for (var r = 0; r < rows; r++) {
+        var line = '';
+        for (var c = 0; c < cols; c++) {
+          var idx = (r * cols + c) * 4;
+          var b2 = (data[idx] * 0.299 + data[idx + 1] * 0.587 + data[idx + 2] * 0.114) / 255;
+          b2 = (b2 - minB) / range;
+          b2 = Math.min(1, Math.max(0, (b2 - 0.5) * ASCII_CONTRAST + 0.5));
+          var ci = Math.floor(b2 * (ASCII_MAP.length - 1));
+          line += ASCII_MAP[ci];
+        }
+        lines.push(line);
+      }
+      asciiEl.textContent = lines.join('\n');
+    }
+
+    var built = false;
+    function tryBuild() {
+      if (built || !scrollVid || scrollVid.readyState < 2) return;
+      built = true;
+      buildFromFrame(scrollVid);
+    }
+    window.addEventListener('load', tryBuild);
+    // 리사이즈되면 이전 크기 기준으로 만든 아스키가 안 맞으므로 다시 만들게 함
+    var resizeTimer = null;
+    window.addEventListener('resize', function () {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(function () { built = false; tryBuild(); }, 200);
+    });
+
+    var FOOTER_REVEAL_RADIUS = 140; // px — 큰 워드마크에 맞춘 더 넓은 원
+    wordmark.addEventListener('mousemove', function (e) {
+      tryBuild();
+      var rect = wordmark.getBoundingClientRect();
+      var x = e.clientX - rect.left, y = e.clientY - rect.top;
+      asciiEl.style.clipPath = 'circle(' + FOOTER_REVEAL_RADIUS + 'px at ' + x + 'px ' + y + 'px)';
+    });
+    wordmark.addEventListener('mouseleave', function () {
+      asciiEl.style.clipPath = 'circle(0px at 50% 50%)';
+    });
+  })();
+
   // ── ASCII peel (work 카드만 — callout 박스는 sticky 안이라 scroll과 무관) ──
   var veilCards = document.querySelectorAll('.ascii-media:not(.callout__mark)');
   function onVeilScroll() {
