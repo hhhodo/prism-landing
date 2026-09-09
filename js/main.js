@@ -156,8 +156,15 @@
 
     // 비디오 seek은 RAF로 배치 처리
     if (scrollVid && scrollVid.duration) {
-      // callout 구간(p≥0.36)에서는 비디오를 p=0.36 프레임에 고정
-      targetTime = Math.min(p, 0.36) * scrollVid.duration;
+      // 각 callout 씬이 활성인 동안만 비디오 고정, 씬 사이 전환 구간에서는 정상 scrub
+      var vidP = p < 0.36 ? p          // 히어로: 정상 scrub
+               : p < 0.57 ? 0.36       // c1 활성: 0.36 프레임 고정
+               : p < 0.60 ? p          // c1→c2 전환: scrub
+               : p < 0.76 ? 0.60       // c2 활성: 0.60 프레임 고정
+               : p < 0.79 ? p          // c2→c3 전환: scrub
+               : p < 0.95 ? 0.79       // c3 활성: 0.79 프레임 고정
+               : p;                    // 아웃트로: scrub
+      targetTime = vidP * scrollVid.duration;
       if (!rafId) rafId = requestAnimationFrame(rafScrub);
     }
   }
