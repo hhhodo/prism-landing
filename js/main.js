@@ -120,8 +120,9 @@
       for (var i = 0; i < TOTAL; i++) {
         var cellIdx = fillOrder[i];
         var ratio = i / TOTAL;
-        var threshold = 1 - Math.pow(1 - ratio, 5); // 역5제곱 — 초반 느리게 하나씩, 후반 폭발적 쏟아짐
-        var t = mp < threshold ? 0 : mp >= threshold + 0.008 ? 1 : (mp - threshold) / 0.008;
+        var threshold = 1 - Math.pow(1 - ratio, 3.5); // 역3.5제곱 — 초반 적당히, 후반 폭발
+        threshold *= 0.85; // 전체를 85% 지점까지 압축 → 스크롤 끝나기 전 완전히 채워짐
+        var t = mp < threshold ? 0 : mp >= threshold + 0.006 ? 1 : (mp - threshold) / 0.006;
         mosaicCells[cellIdx].style.opacity = t;
       }
     }
