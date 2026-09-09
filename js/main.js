@@ -16,8 +16,9 @@
   // ── 서비스 스크롤박스 섹션 ────────────────────────────────────
   var svcScrollWrap = document.getElementById('svcScrollWrap');
   var svcCards = Array.prototype.slice.call(document.querySelectorAll('.svc-card'));
-  // 카드 4개: p=0.10, 0.30, 0.50, 0.70 에서 순차 등장
-  var svcThresholds = [0.10, 0.30, 0.50, 0.70];
+  // 카드 4개: 각 카드마다 스크롤 100vh 필요.
+  // runway = 500vh - 100vh = 400vh → 카드별 임계값: 50/400, 150/400, 250/400, 350/400
+  var svcThresholds = [0.125, 0.375, 0.625, 0.875];
   function updateSvcCards() {
     if (!svcScrollWrap) return;
     var rect = svcScrollWrap.getBoundingClientRect();
@@ -25,8 +26,10 @@
     var p = runway > 0 ? Math.min(1, Math.max(0, -rect.top / runway)) : 0;
     svcCards.forEach(function(card, i) {
       if (p >= svcThresholds[i]) card.classList.add('is-visible');
+      else card.classList.remove('is-visible');
     });
   }
+  updateSvcCards();
   var heroSlot = document.getElementById('heroLogoSlot');
   var navSlot = document.getElementById('navLogoSlot');
   var vscrollWrap = document.getElementById('vscrollWrap');
