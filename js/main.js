@@ -187,6 +187,9 @@
   function initLogo(show) {
     fitLogoToWidth();
     measureLogoRects();
+    // lastScrollP 리셋 — 폰트 로드 전후로 두 번 호출될 때 p===lastScrollP 조기 리턴을 막아
+    // updateLogo가 반드시 실행되도록 강제
+    lastScrollP = -1;
     onMainScroll();
     // 폰트 로드 완료 후에만 표시 — 그 전에는 opacity:0 유지해 오위치 플래시 방지
     if (show && brandLogo) brandLogo.style.opacity = '1';
