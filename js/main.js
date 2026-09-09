@@ -365,23 +365,37 @@
     var vh = source.videoHeight || source.naturalHeight;
     if (!vw || !vh) return;
 
-    // 실제 화면의 object-fit:cover와 동일한 크롭 — 뷰포트 비율 기준
+    // 실제 화면에 쓰인 object-fit과 동일한 방식으로 캡처해야 함 — 실제 버그:
+    // 모바일에서 .vscroll-video는 object-fit:contain(레터박스, 축소돼 보임)인데
+    // 이 함수는 항상 cover 크롭으로만 캡처해서, 아스키 모자이크가 실제 화면보다
+    // 훨씬 크게(꽉 채운 것처럼) 그려져 실제 영상 크기와 안 맞아 보였음.
     var viewportAspect = (window.innerWidth > 0 && window.innerHeight > 0)
       ? window.innerWidth / window.innerHeight
       : 16 / 9; // 뷰포트 크기를 읽을 수 없는 예외 상황(예: 숨겨진 탭) 대비 fallback
     var srcAspect = vw / vh;
-    var sx, sy, sw, sh;
-    if (srcAspect > viewportAspect) {
-      sh = vh; sw = sh * viewportAspect; sx = (vw - sw) / 2; sy = 0;
-    } else {
-      sw = vw; sh = sw / viewportAspect; sx = 0; sy = (vh - sh) / 2;
-    }
+    var isContain = getComputedStyle(source).objectFit === 'contain';
 
     var CAP_W = 960, CAP_H = Math.round(CAP_W / viewportAspect);
     var cap = document.createElement('canvas');
     cap.width = CAP_W; cap.height = CAP_H;
     var capCtx = cap.getContext('2d');
-    capCtx.drawImage(source, sx, sy, sw, sh, 0, 0, CAP_W, CAP_H);
+
+    if (isContain) {
+      // contain: 크롭 없이 전체 소스를 캔버스 안에 레터박스로 축소 배치 —
+      // 실제 화면에서 보이는 영상 크기/위치와 동일하게 맞춤.
+      var scale = Math.min(CAP_W / vw, CAP_H / vh);
+      var dw = vw * scale, dh = vh * scale;
+      var dx = (CAP_W - dw) / 2, dy = (CAP_H - dh) / 2;
+      capCtx.drawImage(source, 0, 0, vw, vh, dx, dy, dw, dh);
+    } else {
+      var sx, sy, sw, sh;
+      if (srcAspect > viewportAspect) {
+        sh = vh; sw = sh * viewportAspect; sx = (vw - sw) / 2; sy = 0;
+      } else {
+        sw = vw; sh = sw / viewportAspect; sx = 0; sy = (vh - sh) / 2;
+      }
+      capCtx.drawImage(source, sx, sy, sw, sh, 0, 0, CAP_W, CAP_H);
+    }
 
     // 자동 레벨 보정 — 마지막 프레임이 어둡거나(페이드아웃 등) 밋밋한 경우
     // 아스키 글자가 거의 안 보여서 "영상이 안 가려진 것처럼" 보이는 문제가 있었음.
@@ -397,11 +411,7 @@
     var levelRange = Math.max(0.05, maxB - minB); // 0으로 안 나눠지게 최소치 보장
 
     var cellCapW = CAP_W / COLS, cellCapH = CAP_H / ROWS;
-    // 모바일은 셀이 훨씬 작아서 같은 5px 폰트를 쓰면 글자 수가 너무 적어
-    // 아스키 패턴이 뭉개진 채로 커 보였음(신고: "아스키아트 사이즈 너무큼") —
-    // 화면이 좁을수록 폰트를 줄여 같은 면적에 더 촘촘한 문자를 채운다.
-    // CSS .mosaic-cell__ascii의 반응형 font-size와 반드시 일치시켜야 함.
-    var fontSize = window.innerWidth <= 768 ? 3 : 5;
+    var fontSize = 5; // 작은 셀에 맞춘 축소 폰트 — CSS .mosaic-cell__ascii와 반드시 일치
     var charW = fontSize * 0.6, charH = fontSize * 1.15;
     var tmp = document.createElement('canvas');
     var tctx = tmp.getContext('2d');

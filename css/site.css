@@ -321,10 +321,6 @@ img{filter:grayscale(1);}
 .mosaic-cell__ascii{width:100%;height:100%;display:block;overflow:hidden;
   font-family:'Courier New',Courier,monospace;font-size:5px;line-height:1.15;
   letter-spacing:0;white-space:pre;color:rgba(242,242,242,.9);}
-@media (max-width:768px){
-  /* js/main.js buildMosaicFromFrame의 모바일 분기(fontSize=3)와 반드시 일치 */
-  .mosaic-cell__ascii{font-size:3px;}
-}
 
 /* ---------- testimonials — real pinned scroll-jack (127:19167: "스크롤에 따라
    리뷰가 가로로 움직이며, 상단 세로줄 바가 산처럼 솟은 형태로 우측을 향해 이동").
