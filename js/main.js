@@ -156,7 +156,8 @@
 
     // 비디오 seek은 RAF로 배치 처리
     if (scrollVid && scrollVid.duration) {
-      targetTime = p * scrollVid.duration;
+      // callout 구간(p≥0.36)에서는 비디오를 p=0.36 프레임에 고정
+      targetTime = Math.min(p, 0.36) * scrollVid.duration;
       if (!rafId) rafId = requestAnimationFrame(rafScrub);
     }
   }
