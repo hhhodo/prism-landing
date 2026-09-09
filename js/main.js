@@ -120,7 +120,7 @@
       for (var i = 0; i < TOTAL; i++) {
         var cellIdx = fillOrder[i];
         var ratio = i / TOTAL;
-        var threshold = ratio * ratio * ratio; // 큐빅 가속 — 앞 10%에서 느리게 하나씩, 뒤 10%에서 폭발적으로
+        var threshold = Math.pow(ratio, 5); // 5제곱 — 초반 극도로 느리게, 후반 폭발적으로 쏟아짐
         var t = mp < threshold ? 0 : mp >= threshold + 0.008 ? 1 : (mp - threshold) / 0.008;
         mosaicCells[cellIdx].style.opacity = t;
       }
