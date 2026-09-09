@@ -19,7 +19,7 @@
   --prism-ink:#f2f2f2;
   --prism-ink-subtle:#a9a9a9;
   --prism-line:#303030;
-  --prism-card:#ebf0ed;
+  --prism-card:#e8e8e8; /* 연한 그레이 — 원래 살짝 초록빛 도는 색이었음 */
   --prism-card-ink:#151515;
   --prism-accent:#2f6bff; /* Figma annotation-box blue — used only as a UI accent for focus/hover, never as a rendered annotation */
 
@@ -34,6 +34,9 @@
 
 html,body{background:var(--prism-bg);color:var(--prism-ink);overflow-x:clip;max-width:100vw;}
 ::selection{background:var(--prism-accent);color:var(--text-default-inverse);}
+
+/* 사이트 전체 이미지 흑백 처리 — work 카드 사진, callout 렌더 이미지 등 전부 */
+img{filter:grayscale(1);}
 
 /* full-bleed section shell */
 .fb{width:100%;background:var(--prism-bg);}
@@ -310,15 +313,12 @@ html,body{background:var(--prism-bg);color:var(--prism-ink);overflow-x:clip;max-
   background:rgba(217,217,217,.05);border-radius:var(--radius-0);}
 .testi-track-wrap{overflow:hidden;margin-top:var(--space-8);}
 .testi-track{display:flex;gap:var(--grid-gutter-lg);will-change:transform;}
-/* card bg #d4cccc / text #303539 are the literal measured Figma values
-   (123:13309 etc.) — a dusty-pink card distinct from the page's black/white
-   palette, kept as an explicit brand-color exception rather than flattened
-   to var(--prism-card). */
-.testi-card{background:#d4cccc;color:#303539;border-radius:0;
+/* 연한 그레이로 통일 — 원래 dusty-pink(#d4cccc) 브랜드 컬러 예외였던 것을
+   "색 들어간 배경은 다 연한 그레이로" 요청에 맞춰 --prism-card와 동일하게 */
+.testi-card{background:var(--prism-card);color:#303539;border-radius:0;
   padding:48px;display:flex;flex-direction:column;justify-content:space-between;min-height:470px;
   flex:0 0 calc((100% - var(--grid-gutter-lg) * 2) / 3);}
 .testi-card__who{display:flex;align-items:center;gap:var(--space-4);}
-.testi-card__avatar{width:101px;height:101px;border-radius:var(--radius-circle);object-fit:cover;flex:none;}
 .testi-card__name{font-family:var(--font-display);font-weight:400;font-size:var(--fs-body-1);}
 .testi-card__role{font-family:var(--font-mono-body);color:#303539;opacity:.65;font-size:var(--fs-body-2);}
 .testi-card p{font-family:var(--font-mono-body);font-size:24px;line-height:var(--lh-body);}
