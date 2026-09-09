@@ -468,29 +468,56 @@
 
     var DOT = 22; // px — 도트 한 칸 크기. 작을수록 더 잘게 나뉨
     var dots = []; // {el, cx, cy} — cx/cy는 wordmark 기준 도트 중심 좌표
+    var buildGen = 0; // 비동기 이미지 로드 도중 새 build()가 또 걸리면(로드/폰트/리사이즈가
+    // 겹쳐 뜸) 먼저 시작된 게 늦게 끝나 나중 걸 덮어써서 25개짜리 작은 격자로 되돌아가는
+    // 레이스가 있었음 — 세대 번호로 가장 최근 요청만 반영되게 막음.
 
     function build() {
       var rect = wordmark.getBoundingClientRect();
       var w = Math.max(rect.width, 100), h = Math.max(rect.height, 100);
       var cs = getComputedStyle(textEl);
+      var myGen = ++buildGen;
 
-      // PRISM 글자를 실제 워드마크와 완전히 동일한 폰트/크기/좌표계로 캔버스에
-      // 렌더링 — measureText로 실제 글자 상단 위치를 재서 그리므로, 화면에 보이는
-      // 진짜 글자와 도트 격자가 어긋나지 않는다 (이전엔 baseline을 어림값(0.78)
-      // 으로 고정해서 폰트마다 위치가 안 맞았음).
-      var srcCanvas = document.createElement('canvas');
-      srcCanvas.width = w; srcCanvas.height = h;
-      var srcCtx = srcCanvas.getContext('2d');
-      srcCtx.fillStyle = '#000';
-      srcCtx.fillRect(0, 0, w, h);
-      srcCtx.fillStyle = '#fff';
-      srcCtx.font = cs.fontWeight + ' ' + cs.fontSize + ' ' + cs.fontFamily;
-      srcCtx.textAlign = 'left';
-      srcCtx.textBaseline = 'alphabetic';
-      var m = srcCtx.measureText('PRISM');
-      var ascent = m.actualBoundingBoxAscent || parseFloat(cs.fontSize) * 0.75;
-      srcCtx.fillText('PRISM', 0, ascent);
+      // 캔버스 fillText로 글자를 "따로" 다시 그리면 letter-spacing이나 폰트
+      // ascent/descent 계산이 실제 CSS 렌더링과 미묘하게 달라서 계속 어긋났음
+      // (canvas font 문자열엔 letter-spacing이 아예 안 들어감 등). 대신 SVG
+      // foreignObject 안에 실제와 동일한 스타일의 <div>를 넣어서 브라우저의
+      // 진짜 텍스트 레이아웃 엔진으로 그리게 한 뒤 그걸 캔버스로 캡처 —
+      // 화면에 보이는 글자와 100% 동일한 위치/폭으로 나옴.
+      var svg =
+        '<svg xmlns="http://www.w3.org/2000/svg" width="' + w + '" height="' + h + '">' +
+        '<foreignObject width="100%" height="100%">' +
+        '<div xmlns="http://www.w3.org/1999/xhtml" style="' +
+        'width:' + w + 'px;height:' + h + 'px;margin:0;padding:0;' +
+        'font-family:' + cs.fontFamily + ';font-weight:' + cs.fontWeight + ';' +
+        'font-size:' + cs.fontSize + ';letter-spacing:' + cs.letterSpacing + ';' +
+        'line-height:' + cs.lineHeight + ';white-space:nowrap;' +
+        'display:flex;align-items:flex-start;justify-content:flex-start;' +
+        'background:#000;color:#fff;">PRISM</div>' +
+        '</foreignObject></svg>';
+      var svgUrl = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+      var img = new Image();
+      img.onload = function () {
+        if (myGen !== buildGen) return; // 그 사이 더 최신 build()가 시작됐으면 버림
+        var srcCanvas = document.createElement('canvas');
+        srcCanvas.width = w; srcCanvas.height = h;
+        var srcCtx = srcCanvas.getContext('2d');
+        srcCtx.fillStyle = '#000';
+        srcCtx.fillRect(0, 0, w, h);
+        srcCtx.drawImage(img, 0, 0, w, h);
+        finishBuild(srcCanvas, w, h);
+      };
+      img.onerror = function () {
+        if (myGen !== buildGen) return;
+        // 폰트/브라우저 문제로 SVG 렌더링이 실패하면 도트를 비워서 최소한
+        // 엉뚱한 위치에 어긋난 아스키가 뜨는 것보단 안전하게 처리
+        dotsEl.innerHTML = '';
+        dots = [];
+      };
+      img.src = svgUrl;
+    }
 
+    function finishBuild(srcCanvas, w, h) {
       var cols = Math.max(1, Math.round(w / DOT));
       var rows = Math.max(1, Math.round(h / DOT));
       var cellW = w / cols, cellH = h / rows;
