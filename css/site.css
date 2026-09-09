@@ -342,13 +342,17 @@ img{filter:grayscale(1);}
 .footer__top a{font-family:var(--font-mono-body);font-size:var(--fs-body-2);color:var(--prism-ink-subtle);}
 .footer__top a:hover{color:var(--prism-ink);}
 /* 인트로 #brandLogo와 완전히 동일한 폰트/크기(20vw, PartialSans)로 맞춘
-   대형 워드마크 — position:relative로 아스키 오버레이의 기준 박스가 됨 */
-.footer__wordmark{
-  position:relative;overflow:visible;display:block;
+   대형 워드마크 — position:relative로 아스키 오버레이의 기준 박스가 됨.
+   실제 글자는 HTML 텍스트가 아니라 SVG <text>로 렌더링한다 — HTML 인라인
+   요소의 getBoundingClientRect()는 폰트의 라인박스(글자보다 훨씬 큰 여백
+   포함) 전체를 돌려줘서 도트가 글자 모양이 아니라 네모난 덩어리로 활성화
+   되는 문제가 있었음. SVG는 <text>/<tspan>.getBBox()로 실제 잉크(획)
+   기준 타이트한 박스를 얻을 수 있어서 도트 격자가 진짜 글자 모양과 맞음. */
+.footer__wordmark{position:relative;width:100%;height:20vw;color:var(--prism-ink);}
+.footer__wordmark-svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible;display:block;}
+.footer__wordmark-svg text{
   font-family:var(--font-logo);font-weight:normal;letter-spacing:var(--display-tracking);
-  font-size:20vw;line-height:1;color:var(--prism-ink);
-}
-.footer__wordmark-text{display:block;}
+  fill:var(--prism-ink);}
 /* 아주 잘게 나눈 "도트" 격자 — 원래 글자 위에 정확히 겹쳐 깔림. 마우스가
    가까이 온 도트만(js/main.js가 거리 계산으로 is-active 토글) 검정 배경 +
    아스키 글자로 바뀌어 그 자리의 원래 글자를 가려버림. 부드러운 원형

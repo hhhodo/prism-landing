@@ -205,7 +205,6 @@
 
   // 폰트 로드 후 로고 크기 맞춤 + 좌표 측정 → 초기 렌더
   // brandLogo 자체를 100px로 임시 설정해 실제 렌더링 폰트(PartialSans) 기준으로 측정
-  var footerWordmark = document.getElementById('footerWordmark');
   function fitLogoToWidth() {
     if (!brandLogo || !heroSlot) return;
     var available = window.innerWidth - 80; // 좌우 40px 여백
@@ -229,9 +228,15 @@
     // 3) brandLogo 바로 적용
     brandLogo.style.fontSize = fitted + 'px';
 
-    // 4) 푸터 워드마크도 완전히 같은 크기로 — CSS의 20vw는 브라우저마다/폭에 따라
-    // brandLogo의 실측 핏 크기와 어긋나서 "인트로랑 사이즈가 다르다"는 문제가 있었음
-    if (footerWordmark) footerWordmark.style.fontSize = fitted + 'px';
+    // 4) 푸터 워드마크(SVG <text>)도 완전히 같은 크기로 — CSS의 20vw는 브라우저마다/
+    // 폭에 따라 brandLogo의 실측 핏 크기와 어긋나서 "인트로랑 사이즈가 다르다"는
+    // 문제가 있었음. SVG text 엘리먼트에 직접 font-size/y(베이스라인)를 지정한다.
+    var footerSvgText = document.getElementById('footerWordmarkSvgText');
+    if (footerSvgText) {
+      footerSvgText.setAttribute('font-size', fitted + 'px');
+      footerSvgText.setAttribute('y', Math.round(fitted * 0.82) + 'px');
+      window.dispatchEvent(new CustomEvent('footerwordmark:resized'));
+    }
   }
 
   function initLogo(show) {
@@ -462,55 +467,61 @@
   // 꺼지는 방식이라 경계에 흐린 테두리가 생기지 않는다. ──
   (function initFooterWordmarkDots() {
     var wordmark = document.getElementById('footerWordmark');
-    var textEl = wordmark ? wordmark.querySelector('.footer__wordmark-text') : null;
+    var svgEl = document.getElementById('footerWordmarkSvg');
+    var svgText = document.getElementById('footerWordmarkSvgText');
     var dotsEl = wordmark ? wordmark.querySelector('.footer__wordmark-dots') : null;
-    if (!wordmark || !textEl || !dotsEl) return;
+    if (!wordmark || !svgEl || !svgText || !dotsEl) return;
 
     var DOT = 22; // px — 도트 한 칸 크기. 작을수록 더 잘게 나뉨
     var dots = []; // {el, cx, cy} — cx/cy는 wordmark 기준 도트 중심 좌표
-    var buildGen = 0; // 비동기 이미지 로드 도중 새 build()가 또 걸리면(로드/폰트/리사이즈가
-    // 겹쳐 뜸) 먼저 시작된 게 늦게 끝나 나중 걸 덮어써서 25개짜리 작은 격자로 되돌아가는
-    // 레이스가 있었음 — 세대 번호로 가장 최근 요청만 반영되게 막음.
+    var buildGen = 0; // 비동기 이미지 로드가 겹칠 때 최신 요청만 반영
 
+    // 지금까지 두 번 실패한 이유:
+    // 1) HTML 인라인 요소의 getBoundingClientRect()는 폰트 라인박스(잉크보다
+    //    훨씬 큰 여백 포함) 전체를 줌 → 네모난 덩어리로만 활성화됨.
+    // 2) SVG <tspan>.getBBox()도 이 폰트에선 브라우저가 글자별 잉크가 아니라
+    //    폰트의 공통 ascent/descent(em 박스)를 반환해서 모든 글자 높이가
+    //    똑같이 나옴 → 역시 네모난 덩어리.
+    // 그래서 이번엔 아예 "박스로 판단"하지 않고, 실제로 화면에 떠 있는 이
+    // <svg> 엘리먼트 자체를 그대로 직렬화해서 캔버스에 래스터라이즈한 뒤
+    // 픽셀 밝기를 직접 읽는다 — 다른 곳에 다시 그리거나 근사하는 단계가
+    // 전혀 없으므로 화면과 어긋날 수가 없다. CSS 변수(fill:var(--prism-ink)
+    // 등)는 이미지로 분리되는 순간 못 읽으므로, 복제본에 실제 계산된 값을
+    // 인라인으로 박아넣고 그 복제본만 직렬화한다.
     function build() {
-      var rect = wordmark.getBoundingClientRect();
-      var w = Math.max(rect.width, 100), h = Math.max(rect.height, 100);
-      var cs = getComputedStyle(textEl);
+      var wordmarkRect = wordmark.getBoundingClientRect();
+      var w = Math.max(wordmarkRect.width, 100), h = Math.max(wordmarkRect.height, 100);
       var myGen = ++buildGen;
 
-      // 캔버스 fillText로 글자를 "따로" 다시 그리면 letter-spacing이나 폰트
-      // ascent/descent 계산이 실제 CSS 렌더링과 미묘하게 달라서 계속 어긋났음
-      // (canvas font 문자열엔 letter-spacing이 아예 안 들어감 등). 대신 SVG
-      // foreignObject 안에 실제와 동일한 스타일의 <div>를 넣어서 브라우저의
-      // 진짜 텍스트 레이아웃 엔진으로 그리게 한 뒤 그걸 캔버스로 캡처 —
-      // 화면에 보이는 글자와 100% 동일한 위치/폭으로 나옴.
-      var svg =
-        '<svg xmlns="http://www.w3.org/2000/svg" width="' + w + '" height="' + h + '">' +
-        '<foreignObject width="100%" height="100%">' +
-        '<div xmlns="http://www.w3.org/1999/xhtml" style="' +
-        'width:' + w + 'px;height:' + h + 'px;margin:0;padding:0;' +
-        'font-family:' + cs.fontFamily + ';font-weight:' + cs.fontWeight + ';' +
-        'font-size:' + cs.fontSize + ';letter-spacing:' + cs.letterSpacing + ';' +
-        'line-height:' + cs.lineHeight + ';white-space:nowrap;' +
-        'display:flex;align-items:flex-start;justify-content:flex-start;' +
-        'background:#000;color:#fff;">PRISM</div>' +
-        '</foreignObject></svg>';
-      var svgUrl = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+      var textCs = getComputedStyle(svgText);
+      var clone = svgEl.cloneNode(true);
+      clone.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+      clone.setAttribute('width', w);
+      clone.setAttribute('height', h);
+      var cloneText = clone.querySelector('text');
+      cloneText.setAttribute('fill', '#ffffff');
+      cloneText.setAttribute('font-family', textCs.fontFamily);
+      cloneText.setAttribute('font-weight', textCs.fontWeight);
+      cloneText.setAttribute('letter-spacing', textCs.letterSpacing);
+      var rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+      rect.setAttribute('x', '0'); rect.setAttribute('y', '0');
+      rect.setAttribute('width', String(w)); rect.setAttribute('height', String(h));
+      rect.setAttribute('fill', '#000000');
+      clone.insertBefore(rect, clone.firstChild);
+
+      var svgMarkup = new XMLSerializer().serializeToString(clone);
+      var svgUrl = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svgMarkup);
       var img = new Image();
       img.onload = function () {
-        if (myGen !== buildGen) return; // 그 사이 더 최신 build()가 시작됐으면 버림
+        if (myGen !== buildGen) return;
         var srcCanvas = document.createElement('canvas');
         srcCanvas.width = w; srcCanvas.height = h;
         var srcCtx = srcCanvas.getContext('2d');
-        srcCtx.fillStyle = '#000';
-        srcCtx.fillRect(0, 0, w, h);
         srcCtx.drawImage(img, 0, 0, w, h);
         finishBuild(srcCanvas, w, h);
       };
       img.onerror = function () {
         if (myGen !== buildGen) return;
-        // 폰트/브라우저 문제로 SVG 렌더링이 실패하면 도트를 비워서 최소한
-        // 엉뚱한 위치에 어긋난 아스키가 뜨는 것보단 안전하게 처리
         dotsEl.innerHTML = '';
         dots = [];
       };
@@ -522,7 +533,6 @@
       var rows = Math.max(1, Math.round(h / DOT));
       var cellW = w / cols, cellH = h / rows;
 
-      // cols×rows 해상도로 다운샘플해서 도트별 밝기(=그 자리에 글자가 있는지) 추출
       var tmp = document.createElement('canvas');
       tmp.width = cols; tmp.height = rows;
       var tctx = tmp.getContext('2d');
@@ -557,6 +567,9 @@
     window.addEventListener('load', scheduleBuild);
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(scheduleBuild);
     window.addEventListener('resize', scheduleBuild);
+    // fitLogoToWidth()가 SVG text의 font-size/y를 바꿀 때마다 정확히 그 시점
+    // 이후 기준으로 다시 측정 — load/resize보다 더 확실한 트리거
+    window.addEventListener('footerwordmark:resized', scheduleBuild);
 
     // 커서 반경 안에 중심이 들어오는 도트만 활성화 — 그라데이션 없이 딱 켜짐/꺼짐
     var HOVER_RADIUS = 90;
