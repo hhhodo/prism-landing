@@ -57,29 +57,7 @@
   }
   updateMosaic();
 
-  // 비디오 마지막 프레임을 모자이크 배경으로 캡처
-  var mosaicPin = document.querySelector('.mosaic-pin');
-  function captureLastFrame() {
-    if (!scrollVid || !scrollVid.videoWidth || !mosaicPin) return;
-    var c = document.createElement('canvas');
-    c.width = scrollVid.videoWidth;
-    c.height = scrollVid.videoHeight;
-    c.getContext('2d').drawImage(scrollVid, 0, 0);
-    mosaicPin.style.backgroundImage = 'radial-gradient(circle,#c0c0c0 1.2px,transparent 1.2px), url(' + c.toDataURL('image/jpeg', 0.85) + ')';
-    mosaicPin.style.backgroundSize = '32px 32px, cover';
-    mosaicPin.style.backgroundPosition = 'center, center';
-  }
-  if (scrollVid) {
-    scrollVid.addEventListener('loadeddata', function() {
-      scrollVid.currentTime = scrollVid.duration || 0;
-    });
-    scrollVid.addEventListener('seeked', function() {
-      if (Math.abs(scrollVid.currentTime - (scrollVid.duration || 0)) < 0.1) {
-        captureLastFrame();
-        scrollVid.currentTime = 0;
-      }
-    });
-  }
+  // 모자이크 배경은 CSS에서 #000 — 영상 마지막 프레임(검정)과 자연스럽게 이어짐
   var heroSlot = document.getElementById('heroLogoSlot');
   var navSlot = document.getElementById('navLogoSlot');
   var vscrollWrap = document.getElementById('vscrollWrap');

@@ -255,8 +255,8 @@ html,body{background:var(--prism-bg);color:var(--prism-ink);overflow-x:clip;max-
 /* ---------- image mosaic grid fill ---------- */
 .mosaic-wrap{height:900vh;}
 .mosaic-pin{position:sticky;top:0;height:100vh;overflow:hidden;
-  background:#e8e8e8;
-  background-image:radial-gradient(circle,#c0c0c0 1.2px,transparent 1.2px);
+  background:#000;
+  background-image:radial-gradient(circle,rgba(255,255,255,.08) 1.2px,transparent 1.2px);
   background-size:32px 32px;}
 .mosaic-grid{display:grid;grid-template-columns:repeat(20,1fr);
   grid-template-rows:repeat(12,1fr);width:100%;height:100%;gap:0;}
