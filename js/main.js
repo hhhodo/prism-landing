@@ -12,6 +12,21 @@
 (function () {
   var nav = document.getElementById('nav');
   var brandLogo = document.getElementById('brandLogo');
+
+  // ── 서비스 스크롤박스 섹션 ────────────────────────────────────
+  var svcScrollWrap = document.getElementById('svcScrollWrap');
+  var svcCards = Array.prototype.slice.call(document.querySelectorAll('.svc-card'));
+  // 카드 4개: p=0.10, 0.30, 0.50, 0.70 에서 순차 등장
+  var svcThresholds = [0.10, 0.30, 0.50, 0.70];
+  function updateSvcCards() {
+    if (!svcScrollWrap) return;
+    var rect = svcScrollWrap.getBoundingClientRect();
+    var runway = svcScrollWrap.offsetHeight - window.innerHeight;
+    var p = runway > 0 ? Math.min(1, Math.max(0, -rect.top / runway)) : 0;
+    svcCards.forEach(function(card, i) {
+      if (p >= svcThresholds[i]) card.classList.add('is-visible');
+    });
+  }
   var heroSlot = document.getElementById('heroLogoSlot');
   var navSlot = document.getElementById('navLogoSlot');
   var vscrollWrap = document.getElementById('vscrollWrap');
@@ -156,6 +171,7 @@
     }
   }
   window.addEventListener('scroll', onMainScroll, { passive: true });
+  window.addEventListener('scroll', updateSvcCards, { passive: true });
   window.addEventListener('resize', function () { measureLogoRects(); onMainScroll(); });
 
   // 폰트 로드 후 로고 크기 맞춤 + 좌표 측정 → 초기 렌더

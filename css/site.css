@@ -226,6 +226,29 @@ html,body{background:var(--prism-bg);color:var(--prism-ink);overflow-x:clip;max-
 .value-card__title{font-family:var(--font-display);font-weight:700;font-size:42.667px;margin-top:var(--space-6);}
 @media (max-width:768px){.quote blockquote{font-size:32px;}.value-card__title{font-size:28px;}}
 
+/* ---------- service scroll-box section ---------- */
+.svcscroll-wrap{height:500vh;}
+.svcscroll-pin{position:sticky;top:0;height:100vh;overflow:hidden;
+  background:var(--prism-bg);display:flex;align-items:center;}
+.svcscroll-inner{padding-inline:var(--gutter);width:100%;}
+.svc-eyebrow{margin-bottom:var(--space-6);}
+.svc-grid{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-5);}
+.svc-card{
+  background:var(--prism-bg-panel);border:1px solid var(--prism-line);
+  padding:var(--space-7);
+  opacity:0;transform:translateY(52px);
+  transition:opacity .65s cubic-bezier(0.22,1,0.36,1), transform .65s cubic-bezier(0.22,1,0.36,1);}
+.svc-card.is-visible{opacity:1;transform:translateY(0);}
+.svc-card__num{display:block;font-size:var(--fs-body-2);color:var(--prism-ink-subtle);
+  margin-bottom:var(--space-6);letter-spacing:0.06em;}
+.svc-card__title{font-family:var(--font-display);font-weight:700;font-size:var(--fs-h3);
+  line-height:var(--lh-h3);margin-bottom:var(--space-4);}
+.svc-card__desc{color:var(--prism-ink-subtle);font-size:var(--fs-body-2);line-height:1.65;}
+@media (max-width:768px){
+  .svc-grid{grid-template-columns:1fr;}
+  .svcscroll-wrap{height:800vh;}
+}
+
 /* ---------- testimonials — real pinned scroll-jack (127:19167: "스크롤에 따라
    리뷰가 가로로 움직이며, 상단 세로줄 바가 산처럼 솟은 형태로 우측을 향해 이동").
    .testi-pin-wrap is a tall (300vh) scroll runway; .testi-pin sticks to the
