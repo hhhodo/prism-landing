@@ -13,11 +13,10 @@
   var nav = document.getElementById('nav');
   var brandLogo = document.getElementById('brandLogo');
 
-  // ── 이미지 격자 채우기 (6×4 = 24셀, 센터→외곽 순서) ────────
-  var mosaicWrap = document.getElementById('mosaicWrap');
+  // ── 이미지 격자 (20×12, vscrollWrap 안 — 영상 위에 겹쳐서 등장) ──
   var mosaicGrid = document.getElementById('mosaicGrid');
+  var sceneMosaic = document.getElementById('vscene-mosaic');
   var COLS = 20, ROWS = 12, TOTAL = COLS * ROWS;
-  // 센터→외곽 채우기 순서 (맨해튼 거리 기준 정렬)
   var fillOrder = [];
   (function() {
     var cx = (COLS - 1) / 2, cy = (ROWS - 1) / 2;
@@ -29,7 +28,6 @@
     arr.sort(function(a, b) { return a.dist - b.dist || a.idx - b.idx; });
     fillOrder = arr.map(function(x) { return x.idx; });
   })();
-  // 셀 생성
   var mosaicCells = [];
   if (mosaicGrid) {
     for (var i = 0; i < TOTAL; i++) {
@@ -40,30 +38,7 @@
       mosaicCells.push(cell);
     }
   }
-  function updateMosaic() {
-    if (!mosaicWrap || !mosaicCells.length) return;
-    var rect = mosaicWrap.getBoundingClientRect();
-    var runway = mosaicWrap.offsetHeight - window.innerHeight;
-    var p = runway > 0 ? Math.min(1, Math.max(0, -rect.top / runway)) : 0;
-    // 각 셀: fillOrder 순서대로 등장, 짧은 ramp(0.03)로 스냅 느낌
-    var slotW = 0.88 / TOTAL;
-    for (var i = 0; i < TOTAL; i++) {
-      var cellIdx = fillOrder[i];
-      var s = i * slotW;
-      var e = s + 0.03;
-      var t = p < s ? 0 : p >= e ? 1 : (p - s) / 0.03;
-      mosaicCells[cellIdx].style.opacity = t;
-    }
-  }
-  updateMosaic();
-
-  // 모자이크 배경 비디오 — 마지막 프레임으로 고정
-  var mosaicBgVid = document.getElementById('mosaicBgVid');
-  if (mosaicBgVid) {
-    mosaicBgVid.addEventListener('loadedmetadata', function() {
-      mosaicBgVid.currentTime = mosaicBgVid.duration - 0.05;
-    });
-  }
+  // 모자이크는 updateScenes 안에서 vscrollWrap progress로 구동됨 (별도 스크롤 리스너 불필요)
   var heroSlot = document.getElementById('heroLogoSlot');
   var navSlot = document.getElementById('navLogoSlot');
   var vscrollWrap = document.getElementById('vscrollWrap');
@@ -111,26 +86,40 @@
     });
   }
 
-  // ── 씬 전환 (progress 0~1) ───────────────────────────────────
+  // ── 씬 전환 (progress 0~1, 전반 0~0.5 = 영상+callout, 후반 0.5~1.0 = 모자이크) ──
   function updateScenes(p) {
-    // hero: 0~0.30 표시, 0.30~0.36 페이드아웃
-    var heroOp = p < 0.30 ? 1 : p < 0.36 ? 1 - (p - 0.30) / 0.06 : 0;
-    // c1: 0.36~0.40 페이드인, 0.40~0.57 표시, 0.57~0.60 페이드아웃
-    var c1Op = p < 0.36 ? 0 : p < 0.40 ? (p - 0.36) / 0.04 : p < 0.57 ? 1 : p < 0.60 ? 1 - (p - 0.57) / 0.03 : 0;
-    // c2: 0.60~0.63 페이드인, 0.63~0.76 표시, 0.76~0.79 페이드아웃
-    var c2Op = p < 0.60 ? 0 : p < 0.63 ? (p - 0.60) / 0.03 : p < 0.76 ? 1 : p < 0.79 ? 1 - (p - 0.76) / 0.03 : 0;
-    // c3: 0.79~0.82 페이드인, 0.82~0.95 표시, 0.95~0.99 페이드아웃
-    var c3Op = p < 0.79 ? 0 : p < 0.82 ? (p - 0.79) / 0.03 : p < 0.95 ? 1 : p < 0.99 ? 1 - (p - 0.95) / 0.04 : 0;
+    // 전반부(0~0.5)를 0~1로 리맵해서 기존 씬 로직 적용
+    var sp = Math.min(1, p / 0.5); // scene progress 0~1
+
+    var heroOp = sp < 0.30 ? 1 : sp < 0.36 ? 1 - (sp - 0.30) / 0.06 : 0;
+    var c1Op = sp < 0.36 ? 0 : sp < 0.40 ? (sp - 0.36) / 0.04 : sp < 0.57 ? 1 : sp < 0.60 ? 1 - (sp - 0.57) / 0.03 : 0;
+    var c2Op = sp < 0.60 ? 0 : sp < 0.63 ? (sp - 0.60) / 0.03 : sp < 0.76 ? 1 : sp < 0.79 ? 1 - (sp - 0.76) / 0.03 : 0;
+    var c3Op = sp < 0.79 ? 0 : sp < 0.82 ? (sp - 0.79) / 0.03 : sp < 0.95 ? 1 : sp < 0.99 ? 1 - (sp - 0.95) / 0.04 : 0;
 
     setScene(sceneHero, heroOp);
     setScene(sceneC1, c1Op);
     setScene(sceneC2, c2Op);
     setScene(sceneC3, c3Op);
 
-    // 콜아웃 아이템: 씬이 보이는 구간 전체에서 순차 scrub
-    scrubCallout(sceneC1, p, 0.36, 0.50);
-    scrubCallout(sceneC2, p, 0.62, 0.74);
-    scrubCallout(sceneC3, p, 0.86, 0.97);
+    scrubCallout(sceneC1, sp, 0.36, 0.50);
+    scrubCallout(sceneC2, sp, 0.62, 0.74);
+    scrubCallout(sceneC3, sp, 0.86, 0.97);
+
+    // 후반부(0.5~1.0): 모자이크 — callout 사라진 뒤 영상 마지막 프레임 위에 격자 등장
+    var mosaicOp = p < 0.48 ? 0 : p < 0.50 ? (p - 0.48) / 0.02 : 1;
+    setScene(sceneMosaic, mosaicOp);
+
+    if (p >= 0.50 && mosaicCells.length) {
+      var mp = (p - 0.50) / 0.50; // mosaic progress 0~1
+      var slotW = 0.88 / TOTAL;
+      for (var i = 0; i < TOTAL; i++) {
+        var cellIdx = fillOrder[i];
+        var s = i * slotW;
+        var e = s + 0.03;
+        var t = mp < s ? 0 : mp >= e ? 1 : (mp - s) / 0.03;
+        mosaicCells[cellIdx].style.opacity = t;
+      }
+    }
   }
 
   // ── 로고 모프 ────────────────────────────────────────────────
@@ -145,8 +134,8 @@
   function lerp(a, b, t) { return a + (b - a) * t; }
   function updateLogo(p) {
     if (!brandLogo || !startRect || !endRect) return;
-    // 로고 모프: 0~0.285 (= 200vh / 700vh runway)
-    var logoProg = Math.min(1, p / 0.285);
+    // 로고 모프: 전반부 0~0.5 안에서 0~0.285 구간 → p 기준 0~0.1425
+    var logoProg = Math.min(1, p / 0.1425);
     var top = lerp(startRect.top, endRect.top, logoProg);
     var left = lerp(startRect.left, endRect.left, logoProg);
     var fontSize = lerp(startRect.fontSize, endRect.fontSize, logoProg);
@@ -180,23 +169,22 @@
     updateLogo(p);
     updateScenes(p);
 
-    // 비디오 seek은 RAF로 배치 처리
+    // 비디오 scrub — 전반부(p 0~0.5)에서 전체 영상 재생, 0.5 이후 마지막 프레임 고정
     if (scrollVid && scrollVid.duration) {
-      // 각 callout 박스 등장 구간만 고정, 씬 사이는 충분한 scrub 구간 확보
-      // runway=600vh 기준: 전환 구간 각 ~75vh (0.125)
-      var vidP = p < 0.36 ? p          // 히어로: scrub
-               : p < 0.50 ? 0.36       // c1 박스 등장(84vh): 고정
-               : p < 0.62 ? p          // c1→c2 전환(72vh): scrub
-               : p < 0.74 ? 0.62       // c2 박스 등장(72vh): 고정
-               : p < 0.86 ? p          // c2→c3 전환(72vh): scrub
-               : p < 0.97 ? 0.86       // c3 박스 등장(66vh): 고정
-               : p;                    // 아웃트로: scrub
-      targetTime = vidP * scrollVid.duration;
+      var sp = Math.min(1, p / 0.5); // scene progress 0~1
+      // callout 구간 고정 로직 (sp 기준)
+      var vidSp = sp < 0.36 ? sp
+                : sp < 0.50 ? 0.36
+                : sp < 0.62 ? sp
+                : sp < 0.74 ? 0.62
+                : sp < 0.86 ? sp
+                : sp < 0.97 ? 0.86
+                : sp;
+      targetTime = vidSp * scrollVid.duration;
       if (!rafId) rafId = requestAnimationFrame(rafScrub);
     }
   }
   window.addEventListener('scroll', onMainScroll, { passive: true });
-  window.addEventListener('scroll', updateMosaic, { passive: true });
   window.addEventListener('resize', function () { measureLogoRects(); onMainScroll(); });
 
   // 폰트 로드 후 로고 크기 맞춤 + 좌표 측정 → 초기 렌더

@@ -59,7 +59,7 @@ html,body{background:var(--prism-bg);color:var(--prism-ink);overflow-x:clip;max-
    비디오 currentTime = progress × duration.
    씬 4개 (hero / callout×3) opacity로 전환.
    로고 모프도 동일 progress 0→28.5%(= 200vh/600vh runway)로 구동. ---------- */
-.vscroll-wrap{height:700vh;}
+.vscroll-wrap{height:1400vh;}
 .vscroll-pin{position:sticky;top:0;height:100vh;overflow:hidden;background:#000;}
 
 /* 비디오: 풀스크린, mix-blend-mode:screen으로 어두운 배경은 투명해져
@@ -252,11 +252,9 @@ html,body{background:var(--prism-bg);color:var(--prism-ink);overflow-x:clip;max-
   line-height:1.2;}
 @media (max-width:768px){.stats-grid{grid-template-columns:1fr;}}
 
-/* ---------- image mosaic grid fill ---------- */
-.mosaic-wrap{height:900vh;}
-.mosaic-pin{position:sticky;top:0;height:100vh;overflow:hidden;background:#000;}
-.mosaic-bg-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;}
-.mosaic-grid{position:relative;z-index:1;display:grid;grid-template-columns:repeat(20,1fr);
+/* ---------- image mosaic (vscroll-scene 안, 영상 위에 겹침) ---------- */
+.vscroll-scene--mosaic{z-index:3;}
+.mosaic-grid{display:grid;grid-template-columns:repeat(20,1fr);
   grid-template-rows:repeat(12,1fr);width:100%;height:100%;gap:0;}
 .mosaic-cell{overflow:hidden;opacity:0;}
 .mosaic-cell img{width:100%;height:100%;object-fit:cover;display:block;}
