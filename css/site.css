@@ -128,7 +128,16 @@ img{filter:grayscale(1);}
   font-size:74.667px;letter-spacing:var(--display-tracking);line-height:1.1;}
 .hero__meta{text-align:right;}
 .hero__meta .mono-label{display:block;text-transform:uppercase;}
-@media (max-width:768px){.hero__title{font-size:40px;}}
+@media (max-width:768px){
+  .hero__title{font-size:32px;}
+  /* 실제 버그: .hero__title-col(8/12)와 .hero__meta(4/12)가 인라인
+     style="grid-column:span N"으로 나란히 배치돼 있어서, 모바일에서도 절대
+     안 쌓이고 그대로 나란히 앉아 타이틀 줄바꿈이 메타 텍스트와 겹쳐 보였음.
+     !important로 인라인 스타일을 덮어써서 각각 12칸 전체를 차지하게 하면
+     grid가 자동으로 다음 행에 배치 — 세로로 쌓임. */
+  .hero__title-col,.hero__meta{grid-column:1/-1!important;}
+  .hero__meta{text-align:left;margin-top:var(--space-6);}
+}
 
 /* ---------- ascii-reveal media wrapper (blue note 127:19173: "모든 이미지는 ASCII
    문구(12px) 처리된 상태로 로딩. 스크롤에 따라 위에서 아래로 문구가 벗겨지면서
@@ -186,6 +195,12 @@ img{filter:grayscale(1);}
    그 안에서만 실제 이미지가 드러남 (js/main.js의 mousemove가 mask-image로 제어) */
 .callout__mark .ascii-media__glyphs{z-index:2;background:var(--prism-bg-panel);}
 .callout__mark{cursor:pointer;}
+/* 실제 버그: 이 리빌은 오직 mousemove로만 열리는데, 터치 기기엔 마우스가
+   없어서 모바일에서는 사진이 영원히 아스키로 덮인 채로 안 드러났음.
+   hover가 아예 불가능한 기기(터치 전용)에서는 처음부터 사진을 그냥 보여줌. */
+@media (hover:none){
+  .callout__mark .ascii-media__glyphs{opacity:0;}
+}
 
 /* line-height 1.2 = 실측(leading 50.676px / font-size 42.23px) */
 .callout__group-label{font-family:var(--font-mono-body);font-weight:400;
@@ -337,7 +352,7 @@ img{filter:grayscale(1);}
   padding:var(--space-4) var(--space-6);cursor:pointer;transition:background .2s ease,color .2s ease;
 }
 .btn:hover{background:transparent;color:var(--prism-ink);}
-.nav__cta{padding:var(--space-3) var(--space-5);}
+.nav__cta{padding:var(--space-3) var(--space-5);white-space:nowrap;flex:none;}
 
 /* ---------- footer ---------- */
 .footer{padding-block:var(--space-9) var(--space-6);padding-inline:var(--gutter);}
@@ -377,7 +392,6 @@ img{filter:grayscale(1);}
 
 @media (max-width:768px){
   .hero__art{display:none;}
-  .hero__meta{position:static;text-align:left;margin-top:var(--space-8);}
   .values .grid,.testi-grid .grid{gap:var(--space-4);}
 
   /* ---- nav: 좁은 화면에서 링크+버튼이 겹치거나 넘치지 않게 간격/크기 축소 ---- */
@@ -408,6 +422,12 @@ img{filter:grayscale(1);}
 }
 
 @media (max-width:480px){
+  /* 실제 버그: 로고 자리(투명 스페이서)+링크 3개+버튼이 한 줄에 다 안 들어가서
+     버튼이 폭 ~50px까지 눌렸고, border-radius:circle이라 "문의하기" 네 글자가
+     세로로 한 자씩 쌓여 알아볼 수 없는 원 모양이 됐었음. 링크를 숨기고
+     로고+버튼만 남겨서 버튼이 제 폭을 되찾게 함. */
+  .nav__links{display:none;}
+
   /* ---- 아주 좁은 화면(작은 폰): 콜아웃 라벨·워크 캡션 한 번 더 축소 ---- */
   .callout__group-label{font-size:18px;}
   .work-item__title{font-size:20px;}
