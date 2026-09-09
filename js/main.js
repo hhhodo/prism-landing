@@ -118,10 +118,13 @@
     // 후반부(SPLIT~1.0): 모자이크 — callout 사라진 뒤 영상 마지막 프레임 위에 격자 등장
     var mosaicOp = p < SPLIT - MOSAIC_FADE ? 0 : p < SPLIT ? (p - (SPLIT - MOSAIC_FADE)) / MOSAIC_FADE : 1;
     setScene(sceneMosaic, mosaicOp);
-    if (mosaicOp > 0) maybeBuildMosaic();
 
     if (p >= SPLIT && mosaicCells.length) {
       var mp = (p - SPLIT) / (1 - SPLIT); // mosaic progress 0~1
+      // 진짜 마지막 프레임에 최대한 가깝게 잡되, 셀이 눈에 띄게 채워지기 시작하는
+      // 시점(mp>0.1)까지도 정확히 못 맞췄으면 빈 채로 남느니 그냥 그 시점 프레임으로
+      // 강제 캡처 — 정밀도보다 "아예 안 채워지는" 사고를 막는 게 우선.
+      maybeBuildMosaic(mp > 0.1);
       // 기하급수 가속: mp^0.3 → 처음엔 빠르게 몇개 톡톡, 끝에 와다다 쏟아짐
       // 실제로는 역: 셀 i의 threshold = (i/TOTAL)^3 → 앞쪽 셀은 일찍, 뒤쪽 셀은 끝에 몰림
       for (var i = 0; i < TOTAL; i++) {
@@ -202,6 +205,7 @@
 
   // 폰트 로드 후 로고 크기 맞춤 + 좌표 측정 → 초기 렌더
   // brandLogo 자체를 100px로 임시 설정해 실제 렌더링 폰트(PartialSans) 기준으로 측정
+  var footerWordmark = document.getElementById('footerWordmark');
   function fitLogoToWidth() {
     if (!brandLogo || !heroSlot) return;
     var available = window.innerWidth - 80; // 좌우 40px 여백
@@ -224,6 +228,10 @@
 
     // 3) brandLogo 바로 적용
     brandLogo.style.fontSize = fitted + 'px';
+
+    // 4) 푸터 워드마크도 완전히 같은 크기로 — CSS의 20vw는 브라우저마다/폭에 따라
+    // brandLogo의 실측 핏 크기와 어긋나서 "인트로랑 사이즈가 다르다"는 문제가 있었음
+    if (footerWordmark) footerWordmark.style.fontSize = fitted + 'px';
   }
 
   function initLogo(show) {
@@ -411,8 +419,15 @@
   // 재사용 — 모자이크 구간(p>=SPLIT)에 처음 들어오는 순간이면 이미 그 시점까지
   // 여러 프레임에 걸쳐 정상적으로 재생되어 있으므로 훨씬 안정적으로 동작함.
   var mosaicBuilt = false;
-  function maybeBuildMosaic() {
+  function maybeBuildMosaic(force) {
     if (mosaicBuilt || !scrollVid || scrollVid.readyState < 2) return;
+    // targetTime을 실제 currentTime에 반영하는 rafScrub은 다음 프레임에야 도는
+    // 비동기라서, p가 SPLIT을 막 넘은 시점엔 아직 진짜 마지막 프레임이 아닐 수
+    // 있었음 (그래서 실제 화면 마지막 프레임과 모자이크 아스키가 서로 달라 보임).
+    // currentTime이 duration에 충분히 가까워질 때까지 기다렸다가 캡처하되,
+    // force가 true면(셀이 이미 채워지기 시작한 시점) 정밀도를 포기하고서라도
+    // 지금 프레임으로 확정 — 영원히 못 맞춰서 빈 채로 남는 사고를 막기 위함.
+    if (!force && Math.abs(scrollVid.currentTime - scrollVid.duration) > 0.08) return;
     mosaicBuilt = true;
     buildMosaicFromFrame(scrollVid);
   }
@@ -442,51 +457,50 @@
   });
 
   // ── 푸터 대형 PRISM 워드마크 — 마우스 오버 시 커서를 중심으로 한 원형
-  // 영역만 아스키아트로 드러남 (callout 박스와 같은 발상이지만, 뒤에 사진이
-  // 있는 게 아니라 글자 자체 위에 영상 마지막 프레임 기반 아스키를 얹음) ──
+  // 영역만 "글자 자체가" 아스키아트로 바뀌어 보임. 영상 프레임처럼 글자와
+  // 무관한 그림이 비치면 안 되므로, PRISM 텍스트를 그 폰트 그대로 캔버스에
+  // 그려서 그 글자 실루엣을 아스키로 변환한다 (사진 X, 순수 텍스트 아스키화). ──
   (function initFooterWordmarkAscii() {
     var wordmark = document.getElementById('footerWordmark');
     var asciiEl = wordmark ? wordmark.querySelector('.footer__wordmark-ascii') : null;
     if (!wordmark || !asciiEl) return;
 
-    function buildFromFrame(source) {
-      var vw = source.videoWidth || source.naturalWidth;
-      var vh = source.videoHeight || source.naturalHeight;
-      if (!vw || !vh) return;
+    function buildFromText() {
       var rect = wordmark.getBoundingClientRect();
       var w = Math.max(rect.width, 100), h = Math.max(rect.height, 100);
-      var boxAspect = w / h, srcAspect = vw / vh;
-      var sx, sy, sw, sh;
-      if (srcAspect > boxAspect) { sh = vh; sw = sh * boxAspect; sx = (vw - sw) / 2; sy = 0; }
-      else { sw = vw; sh = sw / boxAspect; sx = 0; sy = (vh - sh) / 2; }
+      var cs = getComputedStyle(wordmark);
+
+      // PRISM 글자를 실제 워드마크와 동일한 폰트/크기로 캔버스에 직접 렌더링
+      var srcCanvas = document.createElement('canvas');
+      srcCanvas.width = w; srcCanvas.height = h;
+      var srcCtx = srcCanvas.getContext('2d');
+      srcCtx.fillStyle = '#000';
+      srcCtx.fillRect(0, 0, w, h);
+      srcCtx.fillStyle = '#fff';
+      srcCtx.font = cs.fontWeight + ' ' + cs.fontSize + ' ' + cs.fontFamily;
+      srcCtx.textAlign = 'left';
+      srcCtx.textBaseline = 'alphabetic';
+      // wordmark 텍스트 노드(첫 자식)의 실제 라인 위치에 최대한 맞춤
+      var fontPx = parseFloat(cs.fontSize);
+      srcCtx.fillText('PRISM', 0, fontPx * 0.78);
 
       var fontSize = 16, charW = fontSize * 0.6, charH = fontSize * 1.15;
       var cols = Math.max(1, Math.floor(w / charW));
       var rows = Math.max(1, Math.floor(h / charH));
-      var canvas = document.createElement('canvas');
-      canvas.width = cols; canvas.height = rows;
-      var ctx = canvas.getContext('2d');
-      ctx.drawImage(source, sx, sy, sw, sh, 0, 0, cols, rows);
-      var data = ctx.getImageData(0, 0, cols, rows).data;
-
-      // 자동 레벨 — 모자이크와 동일한 이유(어두운 프레임이어도 텍스처가 보이게)
-      var minB = 1, maxB = 0;
-      for (var i = 0; i < data.length; i += 4) {
-        var b = (data[i] * 0.299 + data[i + 1] * 0.587 + data[i + 2] * 0.114) / 255;
-        if (b < minB) minB = b;
-        if (b > maxB) maxB = b;
-      }
-      var range = Math.max(0.05, maxB - minB);
+      var tmp = document.createElement('canvas');
+      tmp.width = cols; tmp.height = rows;
+      var tctx = tmp.getContext('2d');
+      tctx.drawImage(srcCanvas, 0, 0, w, h, 0, 0, cols, rows);
+      var data = tctx.getImageData(0, 0, cols, rows).data;
 
       var lines = [];
       for (var r = 0; r < rows; r++) {
         var line = '';
         for (var c = 0; c < cols; c++) {
           var idx = (r * cols + c) * 4;
-          var b2 = (data[idx] * 0.299 + data[idx + 1] * 0.587 + data[idx + 2] * 0.114) / 255;
-          b2 = (b2 - minB) / range;
-          b2 = Math.min(1, Math.max(0, (b2 - 0.5) * ASCII_CONTRAST + 0.5));
-          var ci = Math.floor(b2 * (ASCII_MAP.length - 1));
+          // 글자는 흰색, 배경은 검정이라 자동 레벨 없이 밝기 그대로 써도 대비가 확실함
+          var b = (data[idx] * 0.299 + data[idx + 1] * 0.587 + data[idx + 2] * 0.114) / 255;
+          var ci = Math.floor(b * (ASCII_MAP.length - 1));
           line += ASCII_MAP[ci];
         }
         lines.push(line);
@@ -494,29 +508,30 @@
       asciiEl.textContent = lines.join('\n');
     }
 
-    var built = false;
-    function tryBuild() {
-      if (built || !scrollVid || scrollVid.readyState < 2) return;
-      built = true;
-      buildFromFrame(scrollVid);
+    var buildTimer = null;
+    function scheduleBuild() {
+      clearTimeout(buildTimer);
+      buildTimer = setTimeout(buildFromText, 50);
     }
-    window.addEventListener('load', tryBuild);
-    // 리사이즈되면 이전 크기 기준으로 만든 아스키가 안 맞으므로 다시 만들게 함
-    var resizeTimer = null;
-    window.addEventListener('resize', function () {
-      clearTimeout(resizeTimer);
-      resizeTimer = setTimeout(function () { built = false; tryBuild(); }, 200);
-    });
+    window.addEventListener('load', scheduleBuild);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(scheduleBuild);
+    window.addEventListener('resize', scheduleBuild);
 
-    var FOOTER_REVEAL_RADIUS = 140; // px — 큰 워드마크에 맞춘 더 넓은 원
+    // 원 안쪽만 아스키가 보이도록 부드러운 원형 마스크로 노출 (callout 박스와 동일한
+    // mask-image 방식 — clip-path는 경계가 각지고 딱딱하게 잘려 보였음)
+    var FOOTER_REVEAL_RADIUS = 140;
+    var FOOTER_REVEAL_FEATHER = 24;
     wordmark.addEventListener('mousemove', function (e) {
-      tryBuild();
       var rect = wordmark.getBoundingClientRect();
       var x = e.clientX - rect.left, y = e.clientY - rect.top;
-      asciiEl.style.clipPath = 'circle(' + FOOTER_REVEAL_RADIUS + 'px at ' + x + 'px ' + y + 'px)';
+      var mask = 'radial-gradient(circle at ' + x + 'px ' + y + 'px, #000 0, #000 ' +
+        FOOTER_REVEAL_RADIUS + 'px, transparent ' + (FOOTER_REVEAL_RADIUS + FOOTER_REVEAL_FEATHER) + 'px)';
+      asciiEl.style.webkitMaskImage = mask;
+      asciiEl.style.maskImage = mask;
     });
     wordmark.addEventListener('mouseleave', function () {
-      asciiEl.style.clipPath = 'circle(0px at 50% 50%)';
+      asciiEl.style.webkitMaskImage = '';
+      asciiEl.style.maskImage = '';
     });
   })();
 

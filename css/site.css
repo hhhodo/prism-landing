@@ -348,13 +348,15 @@ html,body{background:var(--prism-bg);color:var(--prism-ink);overflow-x:clip;max-
   font-family:var(--font-logo);font-weight:normal;letter-spacing:var(--display-tracking);
   font-size:20vw;line-height:1;color:var(--prism-ink);
 }
-/* 마우스 오버 시 커서 위치를 중심으로 원형 부분만 아스키아트로 드러남
-   (js/main.js가 mousemove로 clip-path 반경을 갱신, 기본은 반경 0 = 안 보임) */
+/* 마우스 오버 시 커서 위치를 중심으로 원형 부분만 아스키아트로 드러남 —
+   mask-image라서 clip-path처럼 각지게 잘리지 않고 경계가 부드럽게 페이드됨.
+   js/main.js가 mousemove로 마스크 원을 갱신하고, 기본은 반경 0(전부 안 보임). */
 .footer__wordmark-ascii{position:absolute;inset:0;display:block;pointer-events:none;
   overflow:hidden;font-family:'Courier New',Courier,monospace;
   font-size:16px;line-height:1.15;letter-spacing:0;white-space:pre;
   color:var(--prism-ink);background:var(--prism-bg);
-  clip-path:circle(0px at 50% 50%);}
+  -webkit-mask-image:radial-gradient(circle at 50% 50%, #000 0, transparent 0);
+  mask-image:radial-gradient(circle at 50% 50%, #000 0, transparent 0);}
 .footer__bottom{display:flex;align-items:center;justify-content:space-between;
   margin-top:var(--space-8);flex-wrap:wrap;gap:var(--space-4);}
 .footer__links{display:flex;gap:var(--space-6);}
