@@ -13,17 +13,11 @@
   var nav = document.getElementById('nav');
   var brandLogo = document.getElementById('brandLogo');
 
-  // ── 이미지 격자 (20×12, vscrollWrap 안 — 영상 위에 겹쳐서 등장) ──
+  // ── 이미지 격자 (20×12, vscrollWrap 안 — 영상 마지막 키프레임을 아스키아트로
+  // 쪼개서 셀 하나하나 와다다 등장. 사진 타일이 아니라 순수 아스키 텍스트임. ──
   var mosaicGrid = document.getElementById('mosaicGrid');
   var sceneMosaic = document.getElementById('vscene-mosaic');
   var COLS = 20, ROWS = 12, TOTAL = COLS * ROWS;
-  // 노이즈 텍스처 17장 — Selected projects에 쓴 형체있는 사진과 겹치지 않는 별도 풀
-  var NOISE_IMAGES = [
-    'noise-01.jpg','noise-02.jpg','noise-03.jpg','noise-04.jpg','noise-05.jpg',
-    'noise-06.jpg','noise-07.jpg','noise-08.jpg','noise-09.jpg','noise-10.jpg',
-    'noise-11.jpg','noise-12.jpg','noise-13.jpg','noise-14.jpg','noise-15.jpg',
-    'noise-16.jpg','noise-17.jpg'
-  ];
   // seeded shuffle (mulberry32) — 매번 같은 결과지만 육안상 랜덤하게 섞임
   function seededShuffle(arr, seed) {
     var a = arr.slice();
@@ -37,20 +31,14 @@
     }
     return a;
   }
-  // 랜덤 셔플 순서 (시드 고정으로 매번 같은 결과)
+  // 랜덤 셔플 순서 (시드 고정으로 매번 같은 결과) — 셀이 등장하는 순서
   var fillOrder = seededShuffle(Array.from({ length: TOTAL }, function (_, i) { return i; }), 42);
-  // 셀별 이미지 배정: 17장을 반복 배열한 뒤 별도 시드로 다시 섞어 인접 셀에 같은
-  // 이미지가 몰리지 않게 함 (겹치지 않고 화면 전체에 고르게 랜덤 분산)
-  var cellImages = seededShuffle(
-    Array.from({ length: TOTAL }, function (_, i) { return NOISE_IMAGES[i % NOISE_IMAGES.length]; }),
-    99
-  );
   var mosaicCells = [];
   if (mosaicGrid) {
     for (var i = 0; i < TOTAL; i++) {
       var cell = document.createElement('div');
       cell.className = 'mosaic-cell';
-      cell.innerHTML = '<img src="assets/images/' + cellImages[i] + '" alt="" loading="lazy">';
+      cell.innerHTML = '<div class="mosaic-cell__ascii" aria-hidden="true"></div>';
       mosaicGrid.appendChild(cell);
       mosaicCells.push(cell);
     }
@@ -130,6 +118,7 @@
     // 후반부(SPLIT~1.0): 모자이크 — callout 사라진 뒤 영상 마지막 프레임 위에 격자 등장
     var mosaicOp = p < SPLIT - MOSAIC_FADE ? 0 : p < SPLIT ? (p - (SPLIT - MOSAIC_FADE)) / MOSAIC_FADE : 1;
     setScene(sceneMosaic, mosaicOp);
+    if (mosaicOp > 0) maybeBuildMosaic();
 
     if (p >= SPLIT && mosaicCells.length) {
       var mp = (p - SPLIT) / (1 - SPLIT); // mosaic progress 0~1
@@ -332,6 +321,87 @@
     var invert = container.classList.contains('callout__mark');
     if (imgEl && glyphsEl) buildAscii(imgEl, glyphsEl, invert);
   });
+
+  // ── 모자이크 격자 — 영상이 멈춘 마지막 키프레임을 캡처해 20×12칸으로 쪼갠 뒤
+  // 칸마다 독립적으로 아스키아트 텍스트를 생성한다 (사진 타일이 아님). ──
+  function buildMosaicFromFrame(source) {
+    if (!mosaicGrid || !mosaicCells.length) return;
+    var vw = source.videoWidth || source.naturalWidth;
+    var vh = source.videoHeight || source.naturalHeight;
+    if (!vw || !vh) return;
+
+    // 실제 화면의 object-fit:cover와 동일한 크롭 — 뷰포트 비율 기준
+    var viewportAspect = (window.innerWidth > 0 && window.innerHeight > 0)
+      ? window.innerWidth / window.innerHeight
+      : 16 / 9; // 뷰포트 크기를 읽을 수 없는 예외 상황(예: 숨겨진 탭) 대비 fallback
+    var srcAspect = vw / vh;
+    var sx, sy, sw, sh;
+    if (srcAspect > viewportAspect) {
+      sh = vh; sw = sh * viewportAspect; sx = (vw - sw) / 2; sy = 0;
+    } else {
+      sw = vw; sh = sw / viewportAspect; sx = 0; sy = (vh - sh) / 2;
+    }
+
+    var CAP_W = 960, CAP_H = Math.round(CAP_W / viewportAspect);
+    var cap = document.createElement('canvas');
+    cap.width = CAP_W; cap.height = CAP_H;
+    var capCtx = cap.getContext('2d');
+    capCtx.drawImage(source, sx, sy, sw, sh, 0, 0, CAP_W, CAP_H);
+
+    var cellCapW = CAP_W / COLS, cellCapH = CAP_H / ROWS;
+    var fontSize = 5; // 작은 셀에 맞춘 축소 폰트 — CSS .mosaic-cell__ascii와 반드시 일치
+    var charW = fontSize * 0.6, charH = fontSize * 1.15;
+    var tmp = document.createElement('canvas');
+    var tctx = tmp.getContext('2d');
+
+    for (var r = 0; r < ROWS; r++) {
+      for (var c = 0; c < COLS; c++) {
+        var idx = r * COLS + c;
+        var cellEl = mosaicCells[idx];
+        var asciiEl = cellEl.querySelector('.mosaic-cell__ascii');
+        if (!asciiEl) continue;
+        var rect = cellEl.getBoundingClientRect();
+        var w = Math.max(rect.width || cellEl.offsetWidth, 20);
+        var h = Math.max(rect.height || cellEl.offsetHeight, 20);
+        var cols = Math.max(1, Math.floor(w / charW));
+        var rows = Math.max(1, Math.floor(h / charH));
+        tmp.width = cols; tmp.height = rows;
+        try {
+          tctx.drawImage(cap, c * cellCapW, r * cellCapH, cellCapW, cellCapH, 0, 0, cols, rows);
+        } catch (err) {
+          console.error('mosaic cell draw failed', { r: r, c: c, cols: cols, rows: rows, capW: cap.width, capH: cap.height, err: err.message });
+          continue;
+        }
+        var data = tctx.getImageData(0, 0, cols, rows).data;
+
+        var lines = [];
+        for (var rr = 0; rr < rows; rr++) {
+          var line = '';
+          for (var cc = 0; cc < cols; cc++) {
+            var i2 = (rr * cols + cc) * 4;
+            var brightness = (data[i2] * 0.299 + data[i2 + 1] * 0.587 + data[i2 + 2] * 0.114) / 255;
+            brightness = Math.min(1, Math.max(0, (brightness - 0.5) * ASCII_CONTRAST + 0.5));
+            var ci = Math.floor(brightness * (ASCII_MAP.length - 1));
+            line += ASCII_MAP[ci];
+          }
+          lines.push(line);
+        }
+        asciiEl.textContent = lines.join('\n');
+      }
+    }
+  }
+
+  // 별도 숨겨진 video로 duration 근처를 직접 seek하는 방식은 일부 브라우저/코덱
+  // 조합에서 큐(cue) 정보 부족으로 seek이 0으로 튕겨버리는 문제가 있었음.
+  // 대신 이미 스크롤에 따라 점진적으로 scrub되고 있는 실제 scrollVid를 그대로
+  // 재사용 — 모자이크 구간(p>=SPLIT)에 처음 들어오는 순간이면 이미 그 시점까지
+  // 여러 프레임에 걸쳐 정상적으로 재생되어 있으므로 훨씬 안정적으로 동작함.
+  var mosaicBuilt = false;
+  function maybeBuildMosaic() {
+    if (mosaicBuilt || !scrollVid || scrollVid.readyState < 2) return;
+    mosaicBuilt = true;
+    buildMosaicFromFrame(scrollVid);
+  }
 
   // ── callout 박스 — 마우스 위치를 중심으로 원형으로 아스키아트가 벗겨지며
   // 뒤에 깔린 실제 이미지가 드러남 (스크롤 peel과 무관, 순수 hover 인터랙션) ──

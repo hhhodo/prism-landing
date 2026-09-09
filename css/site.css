@@ -64,8 +64,10 @@ html,body{background:var(--prism-bg);color:var(--prism-ink);overflow-x:clip;max-
 
 /* 비디오: 풀스크린, mix-blend-mode:screen으로 어두운 배경은 투명해져
    로고 위에 밝은 오브젝트만 덮이는 효과 */
+/* pointer-events:none 필수 — 안 그러면 씬(z-index:1)보다 위에 있는 비디오가
+   전체 화면을 덮어 callout 박스의 mousemove/hover가 전혀 안 먹혔음 */
 .vscroll-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
-  z-index:2;mix-blend-mode:screen;}
+  z-index:2;mix-blend-mode:screen;pointer-events:none;}
 
 /* 씬 공통: 절대 inset-0, 기본 opacity:0, transition으로 부드럽게 전환 */
 .vscroll-scene{position:absolute;inset:0;z-index:1;opacity:0;overflow:visible;
@@ -260,12 +262,16 @@ html,body{background:var(--prism-bg);color:var(--prism-ink);overflow-x:clip;max-
   .stat-card{min-height:220px;}
 }
 
-/* ---------- image mosaic (vscroll-scene 안, 영상 위에 겹침) ---------- */
+/* ---------- ascii mosaic (vscroll-scene 안, 영상 위에 겹침) — 사진 타일이 아니라
+   영상 마지막 키프레임을 캡처해 칸마다 아스키아트로 렌더링 (js/main.js
+   buildMosaicFromFrame). 셀이 fillOrder 순서대로 하나씩 와다다 나타남. ---------- */
 .vscroll-scene--mosaic{z-index:3;}
 .mosaic-grid{display:grid;grid-template-columns:repeat(20,1fr);
-  grid-template-rows:repeat(12,1fr);width:100%;height:100%;gap:0;}
-.mosaic-cell{overflow:hidden;opacity:0;}
-.mosaic-cell img{width:100%;height:100%;object-fit:cover;display:block;filter:grayscale(1);}
+  grid-template-rows:repeat(12,1fr);width:100%;height:100%;gap:0;background:#000;}
+.mosaic-cell{overflow:hidden;opacity:0;background:#000;}
+.mosaic-cell__ascii{width:100%;height:100%;display:block;overflow:hidden;
+  font-family:'Courier New',Courier,monospace;font-size:5px;line-height:1.15;
+  letter-spacing:0;white-space:pre;color:rgba(242,242,242,.9);}
 
 /* ---------- testimonials — real pinned scroll-jack (127:19167: "스크롤에 따라
    리뷰가 가로로 움직이며, 상단 세로줄 바가 산처럼 솟은 형태로 우측을 향해 이동").
