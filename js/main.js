@@ -709,7 +709,16 @@
       var runway = pinWrap.offsetHeight - vh;
       var progress = runway > 0 ? (-rect.top) / runway : 0;
       progress = Math.min(1, Math.max(0, progress));
-      var maxScroll = Math.max(0, track.scrollWidth - track.parentElement.clientWidth);
+      // 실제 버그: clientWidth엔 부모(.testi-track-wrap)의 좌우 padding이 이미
+      // 포함돼 있는데, 이 계산은 그 사실을 무시하고 그대로 빼서 실제 필요한
+      // 스크롤량보다 padding 두 배(좌+우)만큼 덜 이동시켰음 — 그래서 좌우
+      // 여백을 추가한 뒤로 트랙이 끝까지 안 밀려서 마지막 카드가 오른쪽
+      // 여백 없이 뷰포트 밖으로 잘려 보였음. padding을 뺀 실제 콘텐츠 폭
+      // 기준으로 계산해야 마지막 카드도 왼쪽과 동일한 여백을 두고 멈춘다.
+      var wrapCs = getComputedStyle(track.parentElement);
+      var visibleWidth = track.parentElement.clientWidth
+        - (parseFloat(wrapCs.paddingLeft) || 0) - (parseFloat(wrapCs.paddingRight) || 0);
+      var maxScroll = Math.max(0, track.scrollWidth - visibleWidth);
       track.style.transform = 'translateX(-' + (progress * maxScroll) + 'px)';
       var peak = progress * (bars.length - 1);
       bars.forEach(function (bar, i) {
