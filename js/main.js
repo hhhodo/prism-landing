@@ -17,16 +17,20 @@
   var mosaicGrid = document.getElementById('mosaicGrid');
   var sceneMosaic = document.getElementById('vscene-mosaic');
   var COLS = 20, ROWS = 12, TOTAL = COLS * ROWS;
+  // 랜덤 셔플 순서 (시드 고정으로 매번 같은 결과)
   var fillOrder = [];
   (function() {
-    var cx = (COLS - 1) / 2, cy = (ROWS - 1) / 2;
-    var arr = [];
-    for (var i = 0; i < TOTAL; i++) {
-      var r = Math.floor(i / COLS), c = i % COLS;
-      arr.push({ idx: i, dist: Math.abs(c - cx) + Math.abs(r - cy) });
+    for (var i = 0; i < TOTAL; i++) fillOrder.push(i);
+    // seeded shuffle (mulberry32)
+    var seed = 42;
+    function rand() { seed |= 0; seed = seed + 0x6D2B79F5 | 0;
+      var t = Math.imul(seed ^ seed >>> 15, 1 | seed);
+      t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+      return ((t ^ t >>> 14) >>> 0) / 4294967296; }
+    for (var i = TOTAL - 1; i > 0; i--) {
+      var j = Math.floor(rand() * (i + 1));
+      var tmp = fillOrder[i]; fillOrder[i] = fillOrder[j]; fillOrder[j] = tmp;
     }
-    arr.sort(function(a, b) { return a.dist - b.dist || a.idx - b.idx; });
-    fillOrder = arr.map(function(x) { return x.idx; });
   })();
   var mosaicCells = [];
   if (mosaicGrid) {
@@ -111,12 +115,13 @@
 
     if (p >= 0.50 && mosaicCells.length) {
       var mp = (p - 0.50) / 0.50; // mosaic progress 0~1
-      var slotW = 0.88 / TOTAL;
+      // 기하급수 가속: mp^0.3 → 처음엔 빠르게 몇개 톡톡, 끝에 와다다 쏟아짐
+      // 실제로는 역: 셀 i의 threshold = (i/TOTAL)^3 → 앞쪽 셀은 일찍, 뒤쪽 셀은 끝에 몰림
       for (var i = 0; i < TOTAL; i++) {
         var cellIdx = fillOrder[i];
-        var s = i * slotW;
-        var e = s + 0.03;
-        var t = mp < s ? 0 : mp >= e ? 1 : (mp - s) / 0.03;
+        var ratio = i / TOTAL;
+        var threshold = ratio * ratio * ratio; // 큐빅 가속 — 앞 10%에서 느리게 하나씩, 뒤 10%에서 폭발적으로
+        var t = mp < threshold ? 0 : mp >= threshold + 0.008 ? 1 : (mp - threshold) / 0.008;
         mosaicCells[cellIdx].style.opacity = t;
       }
     }
