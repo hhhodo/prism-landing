@@ -341,6 +341,29 @@
     onTestiScroll();
   }
 
+  // ── 인용구 01/02 토글 ────────────────────────────────────────
+  var quoteToggle = document.getElementById('quoteToggle');
+  var quoteText = document.getElementById('quoteText');
+  var quoteCite = document.getElementById('quoteCite');
+  if (quoteToggle && quoteText && quoteCite) {
+    quoteToggle.addEventListener('click', function (e) {
+      var btn = e.target.closest('[data-quote-index]');
+      if (!btn) return;
+      var idx = btn.dataset.quoteIndex;
+      quoteToggle.querySelectorAll('button').forEach(function (b) {
+        b.classList.toggle('is-active', b === btn);
+      });
+      quoteText.style.opacity = '0';
+      quoteCite.style.opacity = '0';
+      setTimeout(function () {
+        quoteText.textContent = '"' + quoteText.getAttribute('data-quote-' + idx) + '"';
+        quoteCite.textContent = quoteCite.getAttribute('data-cite-' + idx);
+        quoteText.style.opacity = '1';
+        quoteCite.style.opacity = '.55';
+      }, 200);
+    });
+  }
+
   // ── reveal-on-scroll ─────────────────────────────────────────
   var revealTargets = document.querySelectorAll('[data-reveal]');
   var revealObserver = new IntersectionObserver(function (entries) {
