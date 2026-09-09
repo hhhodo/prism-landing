@@ -17,27 +17,40 @@
   var mosaicGrid = document.getElementById('mosaicGrid');
   var sceneMosaic = document.getElementById('vscene-mosaic');
   var COLS = 20, ROWS = 12, TOTAL = COLS * ROWS;
-  // 랜덤 셔플 순서 (시드 고정으로 매번 같은 결과)
-  var fillOrder = [];
-  (function() {
-    for (var i = 0; i < TOTAL; i++) fillOrder.push(i);
-    // seeded shuffle (mulberry32)
-    var seed = 42;
+  // 노이즈 텍스처 17장 — Selected projects에 쓴 형체있는 사진과 겹치지 않는 별도 풀
+  var NOISE_IMAGES = [
+    'noise-01.jpg','noise-02.jpg','noise-03.jpg','noise-04.jpg','noise-05.jpg',
+    'noise-06.jpg','noise-07.jpg','noise-08.jpg','noise-09.jpg','noise-10.jpg',
+    'noise-11.jpg','noise-12.jpg','noise-13.jpg','noise-14.jpg','noise-15.jpg',
+    'noise-16.jpg','noise-17.jpg'
+  ];
+  // seeded shuffle (mulberry32) — 매번 같은 결과지만 육안상 랜덤하게 섞임
+  function seededShuffle(arr, seed) {
+    var a = arr.slice();
     function rand() { seed |= 0; seed = seed + 0x6D2B79F5 | 0;
       var t = Math.imul(seed ^ seed >>> 15, 1 | seed);
       t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
       return ((t ^ t >>> 14) >>> 0) / 4294967296; }
-    for (var i = TOTAL - 1; i > 0; i--) {
+    for (var i = a.length - 1; i > 0; i--) {
       var j = Math.floor(rand() * (i + 1));
-      var tmp = fillOrder[i]; fillOrder[i] = fillOrder[j]; fillOrder[j] = tmp;
+      var tmp = a[i]; a[i] = a[j]; a[j] = tmp;
     }
-  })();
+    return a;
+  }
+  // 랜덤 셔플 순서 (시드 고정으로 매번 같은 결과)
+  var fillOrder = seededShuffle(Array.from({ length: TOTAL }, function (_, i) { return i; }), 42);
+  // 셀별 이미지 배정: 17장을 반복 배열한 뒤 별도 시드로 다시 섞어 인접 셀에 같은
+  // 이미지가 몰리지 않게 함 (겹치지 않고 화면 전체에 고르게 랜덤 분산)
+  var cellImages = seededShuffle(
+    Array.from({ length: TOTAL }, function (_, i) { return NOISE_IMAGES[i % NOISE_IMAGES.length]; }),
+    99
+  );
   var mosaicCells = [];
   if (mosaicGrid) {
     for (var i = 0; i < TOTAL; i++) {
       var cell = document.createElement('div');
       cell.className = 'mosaic-cell';
-      cell.innerHTML = '<img src="assets/images/tile-container.png" alt="">';
+      cell.innerHTML = '<img src="assets/images/' + cellImages[i] + '" alt="" loading="lazy">';
       mosaicGrid.appendChild(cell);
       mosaicCells.push(cell);
     }
