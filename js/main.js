@@ -56,9 +56,25 @@
   var sceneC3 = document.getElementById('vscene-c3');
 
   // ── nav 스크롤 배경 ──────────────────────────────────────────
+  // 실제 버그: .nav.is-scrolled가 붙으면 padding-block이 space-6(32px)→
+  // space-3(12px)로 줄어들면서 navLogoSlot(로고 도착 지점)이 위로 올라가는데,
+  // measureLogoRects()는 페이지 로드/리사이즈 때만 좌표를 재는 로직이라 이
+  // 변화를 전혀 반영 못 했음 — 그래서 로고가 스크롤된 뒤에도 계속 "패딩이
+  // 컸을 때의" 더 낮은 자리를 목표로 삼아 실제 nav 자리보다 아래로 처져
+  // 보였음. is-scrolled 상태가 바뀔 때마다(패딩 트랜지션 .3s 끝난 뒤) 좌표를
+  // 다시 재고 즉시 반영한다.
+  var wasScrolled = false;
   function onNavScroll() {
-    if (window.scrollY > 24) nav.classList.add('is-scrolled');
-    else nav.classList.remove('is-scrolled');
+    var scrolled = window.scrollY > 24;
+    if (scrolled !== wasScrolled) {
+      wasScrolled = scrolled;
+      nav.classList.toggle('is-scrolled', scrolled);
+      setTimeout(function () {
+        measureLogoRects();
+        lastScrollP = -1;
+        onMainScroll();
+      }, 320); // nav padding-block transition(.3s)이 끝난 뒤 최종 위치로 측정
+    }
   }
   window.addEventListener('scroll', onNavScroll, { passive: true });
   onNavScroll();
