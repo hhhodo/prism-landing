@@ -217,6 +217,13 @@ img{filter:grayscale(1);}
      깔아 밝기와 무관하게 항상 읽히게 함. */
   .callout__group-label{display:inline-block;background:rgba(14,14,14,.72);
     padding:6px 10px;text-shadow:none;}
+
+  /* 박스가 먼저(위), 텍스트가 나중(아래)에 오도록 순서 통일 — 원래 그룹마다
+     DOM 순서가 달라서(어떤 그룹은 라벨이 박스보다 먼저 나옴) 세로로 쌓일 때
+     박스/텍스트 순서가 그룹마다 들쭉날쭉했음. flex order로 항상 박스를
+     위, 텍스트를 아래로 고정. */
+  .callout__mark{order:1;margin-bottom:var(--space-4);}
+  .callout__group-label{order:2;}
 }
 
 /* ---------- feature rows (Selected Projects — dark bg, white polaroid cards,
