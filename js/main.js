@@ -103,10 +103,15 @@
     });
   }
 
-  // ── 씬 전환 (progress 0~1, 전반 0~0.5 = 영상+callout, 후반 0.5~1.0 = 모자이크) ──
+  // ── 씬 전환 (progress 0~1, 전반 0~SPLIT = 영상+callout(700vh), 후반 SPLIT~1.0 = 모자이크(200vh) ──
+  // 모자이크 구간을 700vh→200vh로 줄여 격자 노이즈가 훨씬 빨리 지나가도록 함.
+  // .vscroll-wrap 총 높이(css: 900vh) = FRONT_VH + BACK_VH 와 반드시 일치해야 함.
+  var FRONT_VH = 700, BACK_VH = 200, TOTAL_VH = FRONT_VH + BACK_VH;
+  var SPLIT = FRONT_VH / TOTAL_VH;
+  var MOSAIC_FADE = 20 / TOTAL_VH; // 모자이크 씬으로 20vh 동안 크로스페이드
   function updateScenes(p) {
-    // 전반부(0~0.5)를 0~1로 리맵해서 기존 씬 로직 적용
-    var sp = Math.min(1, p / 0.5); // scene progress 0~1
+    // 전반부(0~SPLIT)를 0~1로 리맵해서 기존 씬 로직 적용
+    var sp = Math.min(1, p / SPLIT); // scene progress 0~1
 
     var heroOp = sp < 0.30 ? 1 : sp < 0.36 ? 1 - (sp - 0.30) / 0.06 : 0;
     var c1Op = sp < 0.36 ? 0 : sp < 0.40 ? (sp - 0.36) / 0.04 : sp < 0.57 ? 1 : sp < 0.60 ? 1 - (sp - 0.57) / 0.03 : 0;
@@ -122,12 +127,12 @@
     scrubCallout(sceneC2, sp, 0.62, 0.74);
     scrubCallout(sceneC3, sp, 0.86, 0.97);
 
-    // 후반부(0.5~1.0): 모자이크 — callout 사라진 뒤 영상 마지막 프레임 위에 격자 등장
-    var mosaicOp = p < 0.48 ? 0 : p < 0.50 ? (p - 0.48) / 0.02 : 1;
+    // 후반부(SPLIT~1.0): 모자이크 — callout 사라진 뒤 영상 마지막 프레임 위에 격자 등장
+    var mosaicOp = p < SPLIT - MOSAIC_FADE ? 0 : p < SPLIT ? (p - (SPLIT - MOSAIC_FADE)) / MOSAIC_FADE : 1;
     setScene(sceneMosaic, mosaicOp);
 
-    if (p >= 0.50 && mosaicCells.length) {
-      var mp = (p - 0.50) / 0.50; // mosaic progress 0~1
+    if (p >= SPLIT && mosaicCells.length) {
+      var mp = (p - SPLIT) / (1 - SPLIT); // mosaic progress 0~1
       // 기하급수 가속: mp^0.3 → 처음엔 빠르게 몇개 톡톡, 끝에 와다다 쏟아짐
       // 실제로는 역: 셀 i의 threshold = (i/TOTAL)^3 → 앞쪽 셀은 일찍, 뒤쪽 셀은 끝에 몰림
       for (var i = 0; i < TOTAL; i++) {
@@ -153,8 +158,8 @@
   function lerp(a, b, t) { return a + (b - a) * t; }
   function updateLogo(p) {
     if (!brandLogo || !startRect || !endRect) return;
-    // 로고 모프: 전반부 0~0.5 안에서 0~0.285 구간 → p 기준 0~0.1425
-    var logoProg = Math.min(1, p / 0.1425);
+    // 로고 모프: 전반부(SPLIT) 안에서 0~0.285 구간 → p 기준 0~(SPLIT*0.285)
+    var logoProg = Math.min(1, p / (SPLIT * 0.285));
     var top = lerp(startRect.top, endRect.top, logoProg);
     var left = lerp(startRect.left, endRect.left, logoProg);
     var fontSize = lerp(startRect.fontSize, endRect.fontSize, logoProg);
@@ -188,9 +193,9 @@
     updateLogo(p);
     updateScenes(p);
 
-    // 비디오 scrub — 전반부(p 0~0.5)에서 전체 영상 재생, 0.5 이후 마지막 프레임 고정
+    // 비디오 scrub — 전반부(p 0~SPLIT)에서 전체 영상 재생, SPLIT 이후 마지막 프레임 고정
     if (scrollVid && scrollVid.duration) {
-      var sp = Math.min(1, p / 0.5); // scene progress 0~1
+      var sp = Math.min(1, p / SPLIT); // scene progress 0~1
       // callout 구간 고정 로직 (sp 기준)
       var vidSp = sp < 0.36 ? sp
                 : sp < 0.50 ? 0.36
@@ -260,6 +265,7 @@
   // (원본의 밝은 부분 = 밀도 높은 밝은 글자, 어두운 부분 = 공백으로 배경 그대로)
   // 그래야 실제 이미지 명암과 맞게 보임 — 반전시키면 색반전처럼 보임.
   var ASCII_MAP = ' .\'`^",:;Il!i><~+_-?][}{1)(|tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$';
+  var ASCII_CONTRAST = 2.4; // >1 = 더 세게 대비, 중간톤을 흑/백 극단으로 밀어냄
 
   function buildAscii(imgEl, glyphsEl) {
     var img = new Image();
@@ -287,6 +293,8 @@
         for (var c = 0; c < cols; c++) {
           var idx = (r * cols + c) * 4;
           var brightness = (data[idx] * 0.299 + data[idx + 1] * 0.587 + data[idx + 2] * 0.114) / 255;
+          // 명암 대비 강화 — 중간톤을 양 극단으로 밀어붙여 흑/백이 뚜렷하게 갈리게 함
+          brightness = Math.min(1, Math.max(0, (brightness - 0.5) * ASCII_CONTRAST + 0.5));
           // 밝은 픽셀 → 밀도 높은 문자 (반전 없음 — 원본 명암과 일치)
           var ci = Math.floor(brightness * (ASCII_MAP.length - 1));
           line += ASCII_MAP[ci];
