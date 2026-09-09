@@ -13,30 +13,47 @@
   var nav = document.getElementById('nav');
   var brandLogo = document.getElementById('brandLogo');
 
-  // ── 이미지 모자이크 스크롤잭 ────────────────────────────────
+  // ── 이미지 격자 채우기 (6×4 = 24셀, 센터→외곽 순서) ────────
   var mosaicWrap = document.getElementById('mosaicWrap');
-  var mosaicBoxes = Array.prototype.slice.call(document.querySelectorAll('.mosaic-box'));
-  // 박스 10개(0~9): 각 박스가 자체 progress 범위에서 opacity+scale scrub
-  // 마지막(9)은 풀스크린 — 나머지 박스를 덮으며 다음 섹션으로 전환
-  var mosaicN = mosaicBoxes.length;
+  var mosaicGrid = document.getElementById('mosaicGrid');
+  var COLS = 6, ROWS = 4, TOTAL = COLS * ROWS;
+  // 센터→외곽 채우기 순서 (맨해튼 거리 기준 정렬)
+  var fillOrder = [];
+  (function() {
+    var cx = (COLS - 1) / 2, cy = (ROWS - 1) / 2;
+    var arr = [];
+    for (var i = 0; i < TOTAL; i++) {
+      var r = Math.floor(i / COLS), c = i % COLS;
+      arr.push({ idx: i, dist: Math.abs(c - cx) + Math.abs(r - cy) });
+    }
+    arr.sort(function(a, b) { return a.dist - b.dist || a.idx - b.idx; });
+    fillOrder = arr.map(function(x) { return x.idx; });
+  })();
+  // 셀 생성
+  var mosaicCells = [];
+  if (mosaicGrid) {
+    for (var i = 0; i < TOTAL; i++) {
+      var cell = document.createElement('div');
+      cell.className = 'mosaic-cell';
+      cell.innerHTML = '<img src="assets/images/tile-container.png" alt="">';
+      mosaicGrid.appendChild(cell);
+      mosaicCells.push(cell);
+    }
+  }
   function updateMosaic() {
-    if (!mosaicWrap) return;
+    if (!mosaicWrap || !mosaicCells.length) return;
     var rect = mosaicWrap.getBoundingClientRect();
     var runway = mosaicWrap.offsetHeight - window.innerHeight;
     var p = runway > 0 ? Math.min(1, Math.max(0, -rect.top / runway)) : 0;
-    var slotW = 0.85 / mosaicN; // 0~0.85 구간을 n등분
-    mosaicBoxes.forEach(function(box, i) {
+    // 각 셀: fillOrder 순서대로 등장, 짧은 ramp(0.03)로 스냅 느낌
+    var slotW = 0.88 / TOTAL;
+    for (var i = 0; i < TOTAL; i++) {
+      var cellIdx = fillOrder[i];
       var s = i * slotW;
-      var e = s + slotW * 1.2; // 약간 겹침
-      var t = p < s ? 0 : p >= e ? 1 : (p - s) / (e - s);
-      box.style.opacity = t;
-      var sc = 0.85 + 0.15 * t; // scale 0.85→1
-      if (box.classList.contains('mosaic-box--full')) {
-        box.style.transform = 'scale(1)';
-      } else {
-        box.style.transform = 'scale(' + sc + ')';
-      }
-    });
+      var e = s + 0.03;
+      var t = p < s ? 0 : p >= e ? 1 : (p - s) / 0.03;
+      mosaicCells[cellIdx].style.opacity = t;
+    }
   }
   updateMosaic();
   var heroSlot = document.getElementById('heroLogoSlot');
