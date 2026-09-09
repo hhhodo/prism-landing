@@ -374,7 +374,7 @@ img{filter:grayscale(1);}
   padding:var(--space-4) var(--space-6);cursor:pointer;transition:background .2s ease,color .2s ease;
 }
 .btn:hover{background:transparent;color:var(--prism-ink);}
-.nav__cta{padding:var(--space-3) var(--space-5);white-space:nowrap;flex:none;}
+.nav__cta{padding:var(--space-3) var(--space-5);white-space:nowrap;flex:none;font-size:16px;}
 
 /* ---------- footer ---------- */
 .footer{padding-block:var(--space-9) var(--space-6);padding-inline:var(--gutter);}
@@ -426,7 +426,7 @@ img{filter:grayscale(1);}
   .nav__row{gap:var(--space-3);}
   .nav__links{gap:var(--space-4);}
   .nav__links a{font-size:12px;}
-  .nav__cta{padding:var(--space-2) var(--space-4);font-size:12px;}
+  .nav__cta{padding:var(--space-2) var(--space-4);font-size:16px;}
 
   /* ---- callout 박스: 1024px 미디어쿼리에서 이미 세로 스택으로 바뀌지만
      115px/95px 박스는 작은 폰에서도 여전히 큼 — 한 단계 더 축소 ---- */
