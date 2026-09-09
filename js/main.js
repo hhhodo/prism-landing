@@ -102,9 +102,9 @@
     setScene(sceneC3, c3Op);
 
     // 콜아웃 아이템: 씬이 보이는 구간 전체에서 순차 scrub
-    scrubCallout(sceneC1, p, 0.36, 0.57);
-    scrubCallout(sceneC2, p, 0.60, 0.76);
-    scrubCallout(sceneC3, p, 0.79, 0.95);
+    scrubCallout(sceneC1, p, 0.36, 0.50);
+    scrubCallout(sceneC2, p, 0.62, 0.74);
+    scrubCallout(sceneC3, p, 0.86, 0.97);
   }
 
   // ── 로고 모프 ────────────────────────────────────────────────
@@ -156,13 +156,14 @@
 
     // 비디오 seek은 RAF로 배치 처리
     if (scrollVid && scrollVid.duration) {
-      // 각 callout 씬이 활성인 동안만 비디오 고정, 씬 사이 전환 구간에서는 정상 scrub
-      var vidP = p < 0.36 ? p          // 히어로: 정상 scrub
-               : p < 0.57 ? 0.36       // c1 활성: 0.36 프레임 고정
-               : p < 0.60 ? p          // c1→c2 전환: scrub
-               : p < 0.76 ? 0.60       // c2 활성: 0.60 프레임 고정
-               : p < 0.79 ? p          // c2→c3 전환: scrub
-               : p < 0.95 ? 0.79       // c3 활성: 0.79 프레임 고정
+      // 각 callout 박스 등장 구간만 고정, 씬 사이는 충분한 scrub 구간 확보
+      // runway=600vh 기준: 전환 구간 각 ~75vh (0.125)
+      var vidP = p < 0.36 ? p          // 히어로: scrub
+               : p < 0.50 ? 0.36       // c1 박스 등장(84vh): 고정
+               : p < 0.62 ? p          // c1→c2 전환(72vh): scrub
+               : p < 0.74 ? 0.62       // c2 박스 등장(72vh): 고정
+               : p < 0.86 ? p          // c2→c3 전환(72vh): scrub
+               : p < 0.97 ? 0.86       // c3 박스 등장(66vh): 고정
                : p;                    // 아웃트로: scrub
       targetTime = vidP * scrollVid.duration;
       if (!rafId) rafId = requestAnimationFrame(rafScrub);
