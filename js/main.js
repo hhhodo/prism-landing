@@ -184,18 +184,20 @@
     brandLogo.style.fontSize = fitted + 'px';
   }
 
-  function initLogo() {
+  function initLogo(show) {
     fitLogoToWidth();
     measureLogoRects();
     onMainScroll();
-    // 위치·크기 확정 후 표시 (첫 프레임 오위치 플래시 방지)
-    if (brandLogo) brandLogo.style.opacity = '1';
+    // 폰트 로드 완료 후에만 표시 — 그 전에는 opacity:0 유지해 오위치 플래시 방지
+    if (show && brandLogo) brandLogo.style.opacity = '1';
   }
-  // 1) 즉시 실행 — 폰트 로드 전이라도 위치 계산 시도
-  initLogo();
-  // 2) 폰트 로드 후 재조정 — PartialSans 기준 크기·위치 정밀 보정
+  // 1) 즉시 실행 — 위치·크기 계산만, 표시는 아직 하지 않음
+  initLogo(false);
+  // 2) 폰트 로드 후 재조정 — PartialSans 기준 크기·위치 정밀 보정 후 표시
   if (document.fonts && document.fonts.ready) {
-    document.fonts.ready.then(initLogo);
+    document.fonts.ready.then(function() { initLogo(true); });
+  } else {
+    initLogo(true);
   }
   window.addEventListener('resize', function() { fitLogoToWidth(); measureLogoRects(); onMainScroll(); });
 
