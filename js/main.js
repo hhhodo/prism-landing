@@ -13,31 +13,32 @@
   var nav = document.getElementById('nav');
   var brandLogo = document.getElementById('brandLogo');
 
-  // ── 서비스 스크롤박스 섹션 ────────────────────────────────────
-  var svcScrollWrap = document.getElementById('svcScrollWrap');
-  var svcCards = Array.prototype.slice.call(document.querySelectorAll('.svc-card'));
-  // 카드 4개 — 각 카드마다 자체 progress 범위를 갖고 스크롤 위치가 opacity/translateY를 직접 제어.
-  // transition 없음. 스크롤 멈추면 애니메이션도 멈춤.
-  // 범위: [진입시작, 진입완료] — 그 사이를 t=0→1로 선형 보간
-  var svcRanges = [
-    [0.00, 0.18],  // 카드 0: 0~72vh 스크롤 동안 등장
-    [0.25, 0.43],  // 카드 1
-    [0.50, 0.68],  // 카드 2
-    [0.75, 0.93],  // 카드 3
-  ];
-  function updateSvcCards() {
-    if (!svcScrollWrap) return;
-    var rect = svcScrollWrap.getBoundingClientRect();
-    var runway = svcScrollWrap.offsetHeight - window.innerHeight;
+  // ── 이미지 모자이크 스크롤잭 ────────────────────────────────
+  var mosaicWrap = document.getElementById('mosaicWrap');
+  var mosaicBoxes = Array.prototype.slice.call(document.querySelectorAll('.mosaic-box'));
+  // 박스 10개(0~9): 각 박스가 자체 progress 범위에서 opacity+scale scrub
+  // 마지막(9)은 풀스크린 — 나머지 박스를 덮으며 다음 섹션으로 전환
+  var mosaicN = mosaicBoxes.length;
+  function updateMosaic() {
+    if (!mosaicWrap) return;
+    var rect = mosaicWrap.getBoundingClientRect();
+    var runway = mosaicWrap.offsetHeight - window.innerHeight;
     var p = runway > 0 ? Math.min(1, Math.max(0, -rect.top / runway)) : 0;
-    svcCards.forEach(function(card, i) {
-      var r = svcRanges[i];
-      var t = p < r[0] ? 0 : p >= r[1] ? 1 : (p - r[0]) / (r[1] - r[0]);
-      card.style.opacity = t;
-      card.style.transform = 'translateY(' + (52 * (1 - t)) + 'px)';
+    var slotW = 0.85 / mosaicN; // 0~0.85 구간을 n등분
+    mosaicBoxes.forEach(function(box, i) {
+      var s = i * slotW;
+      var e = s + slotW * 1.2; // 약간 겹침
+      var t = p < s ? 0 : p >= e ? 1 : (p - s) / (e - s);
+      box.style.opacity = t;
+      var sc = 0.85 + 0.15 * t; // scale 0.85→1
+      if (box.classList.contains('mosaic-box--full')) {
+        box.style.transform = 'scale(1)';
+      } else {
+        box.style.transform = 'scale(' + sc + ')';
+      }
     });
   }
-  updateSvcCards();
+  updateMosaic();
   var heroSlot = document.getElementById('heroLogoSlot');
   var navSlot = document.getElementById('navLogoSlot');
   var vscrollWrap = document.getElementById('vscrollWrap');
@@ -170,7 +171,7 @@
     }
   }
   window.addEventListener('scroll', onMainScroll, { passive: true });
-  window.addEventListener('scroll', updateSvcCards, { passive: true });
+  window.addEventListener('scroll', updateMosaic, { passive: true });
   window.addEventListener('resize', function () { measureLogoRects(); onMainScroll(); });
 
   // 폰트 로드 후 로고 크기 맞춤 + 좌표 측정 → 초기 렌더

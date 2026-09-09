@@ -169,159 +169,126 @@ Footer    → full-bleed
   </div>
 </div>
 
-<!-- 서비스 스크롤박스 섹션: 500vh 런웨이, 배경 고정, 카드 4개 순차 등장 -->
-<div class="svcscroll-wrap" id="svcScrollWrap">
-  <div class="svcscroll-pin" id="svcScrollPin">
-    <div class="svcscroll-inner">
-      <p class="mono-label svc-eyebrow">What We Do</p>
-      <div class="svc-grid">
-        <div class="svc-card" data-svc="0">
-          <span class="svc-card__num">01</span>
-          <div class="svc-card__title">온에어 아이덴티티</div>
-          <p class="svc-card__desc">로고·타이포·컬러 시스템부터 오프닝·전환·자막 패키지까지. 채널의 얼굴을 처음부터 다시 설계합니다.</p>
-        </div>
-        <div class="svc-card" data-svc="1">
-          <span class="svc-card__num">02</span>
-          <div class="svc-card__title">라이브 프로덕션</div>
-          <p class="svc-card__desc">멀티 플랫폼 동시 송출과 실시간 그래픽을 하나의 운영 시스템으로 통합합니다.</p>
-        </div>
-        <div class="svc-card" data-svc="2">
-          <span class="svc-card__num">03</span>
-          <div class="svc-card__title">숏폼 오토메이션</div>
-          <p class="svc-card__desc">AI가 원본 콘텐츠를 자동 분할·자막·비율 변환해 수십 개 채널 컷을 동시에 뽑아냅니다.</p>
-        </div>
-        <div class="svc-card" data-svc="3">
-          <span class="svc-card__num">04</span>
-          <div class="svc-card__title">데이터 인텔리전스</div>
-          <p class="svc-card__desc">시청 데이터를 실시간 시각화해 편성 결정을 지원하는 내부 대시보드를 구축합니다.</p>
-        </div>
-      </div>
+<!-- 이미지 모자이크 스크롤잭: dot-grid 위에 이미지 박스가 하나씩 등장 → 화면 가득 -->
+<div class="mosaic-wrap" id="mosaicWrap">
+  <div class="mosaic-pin">
+    <div class="mosaic-box" data-mosaic="0" style="top:35%;left:38%;width:180px;height:180px;">
+      <img src="assets/images/tile-container.png" alt="">
+    </div>
+    <div class="mosaic-box" data-mosaic="1" style="top:12%;left:8%;width:220px;height:165px;">
+      <img src="assets/images/tile-container.png" alt="">
+    </div>
+    <div class="mosaic-box" data-mosaic="2" style="top:8%;left:62%;width:260px;height:195px;">
+      <img src="assets/images/tile-container.png" alt="">
+    </div>
+    <div class="mosaic-box" data-mosaic="3" style="top:58%;left:65%;width:200px;height:200px;">
+      <img src="assets/images/tile-container.png" alt="">
+    </div>
+    <div class="mosaic-box" data-mosaic="4" style="top:55%;left:10%;width:280px;height:210px;">
+      <img src="assets/images/tile-container.png" alt="">
+    </div>
+    <div class="mosaic-box" data-mosaic="5" style="top:22%;left:30%;width:300px;height:225px;">
+      <img src="assets/images/tile-container.png" alt="">
+    </div>
+    <div class="mosaic-box" data-mosaic="6" style="top:45%;left:48%;width:340px;height:255px;">
+      <img src="assets/images/tile-container.png" alt="">
+    </div>
+    <div class="mosaic-box" data-mosaic="7" style="top:5%;left:40%;width:380px;height:285px;">
+      <img src="assets/images/tile-container.png" alt="">
+    </div>
+    <div class="mosaic-box" data-mosaic="8" style="top:30%;left:5%;width:420px;height:315px;">
+      <img src="assets/images/tile-container.png" alt="">
+    </div>
+    <!-- 최종: 화면 전체를 덮는 풀스크린 박스 -->
+    <div class="mosaic-box mosaic-box--full" data-mosaic="9">
+      <img src="assets/images/tile-container.png" alt="">
     </div>
   </div>
 </div>
 
 <section class="work fb" id="work">
     <div class="work__head" data-reveal>
-      <h2>Selected<br>Work</h2>
-      <p class="mono-label">05 Projects — 2024–2026</p>
+      <h2>Selected<br>projects</h2>
+      <p class="mono-label">07 Projects — 2024–2026</p>
     </div>
 
-    <div class="work-row work-row--8-4">
-      <div>
-        <div class="ascii-media work-card__media" data-work-veil>
-          <div class="ascii-media__glyphs" aria-hidden="true"></div>
-          <img class="work-card__img" src="assets/images/tile-container.png" alt="">
-        </div>
-        <div class="work-card__meta">
-          <span class="work-card__mark"></span>
-          <div>
-            <div class="work-card__title">채널 리브랜딩 · ONAIR WAVE</div>
-            <p class="work-card__desc">지상파 뉴스 채널의 온에어 아이덴티티와 그래픽 패키지를 처음부터 다시 설계했습니다.</p>
-          </div>
-        </div>
+    <!-- Row 1: 텍스트 2 + 이미지 2 (4-col grid) -->
+    <div class="work-row work-row--quad">
+      <div class="work-card work-card--text" data-reveal>
+        <div class="work-card__title">채널 리브랜딩</div>
+        <p class="work-card__sub">ONAIR WAVE</p>
+        <p class="work-card__desc">지상파 뉴스 채널의 온에어 아이덴티티와 그래픽 패키지를 처음부터 다시 설계했습니다.</p>
       </div>
-      <div>
-        <div class="ascii-media work-card__media" data-work-veil>
-          <div class="ascii-media__glyphs" aria-hidden="true"></div>
-          <img class="work-card__img" src="assets/images/tile-container.png" alt="">
-        </div>
-        <div class="work-card__meta">
-          <span class="work-card__mark"></span>
-          <div>
-            <div class="work-card__title">라이브 스트리밍 OS</div>
-            <p class="work-card__desc">멀티 플랫폼 동시 송출을 하나의 대시보드에서 제어하는 운영 시스템.</p>
-          </div>
-        </div>
+      <div class="work-card work-card--text" data-reveal data-reveal-delay="1">
+        <div class="work-card__title">라이브 스트리밍</div>
+        <p class="work-card__sub">Oxide_01</p>
+        <p class="work-card__desc">멀티 플랫폼 동시 송출을 하나의 대시보드에서 제어하는 운영 시스템.</p>
+      </div>
+      <div class="work-card work-card--img" data-reveal data-reveal-delay="2">
+        <img src="assets/images/tile-container.png" alt="">
+      </div>
+      <div class="work-card work-card--img" data-reveal data-reveal-delay="3">
+        <img src="assets/images/tile-container.png" alt="">
       </div>
     </div>
 
-    <div class="work-row work-row--12">
-      <div>
-        <div class="ascii-media work-card__media work-card__media--wide" data-work-veil>
-          <div class="ascii-media__glyphs" aria-hidden="true"></div>
-          <img class="work-card__img" src="assets/images/tile-container.png" alt="">
-        </div>
-        <div class="work-card__meta">
-          <span class="work-card__mark"></span>
-          <div>
-            <div class="work-card__title">숏폼 오토메이션 파이프라인</div>
-            <p class="work-card__desc">장편 콘텐츠를 AI가 자동 분할·자막·비율 변환하는 숏폼 배급 파이프라인. 하나의 원본에서 수십 개 채널용 컷을 동시에 뽑아냅니다.</p>
-          </div>
-        </div>
-      </div>
-    </div>
-
+    <!-- Row 2: 텍스트 + 와이드 이미지 (4-8) -->
     <div class="work-row work-row--4-8">
-      <div>
-        <div class="ascii-media work-card__media" data-work-veil>
-          <div class="ascii-media__glyphs" aria-hidden="true"></div>
-          <img class="work-card__img" src="assets/images/tile-container.png" alt="">
-        </div>
-        <div class="work-card__meta">
-          <span class="work-card__mark"></span>
-          <div>
-            <div class="work-card__title">팟캐스트 네트워크</div>
-            <p class="work-card__desc">오디오·영상 동시 제작 워크플로우와 배급 자동화를 구축했습니다.</p>
-          </div>
-        </div>
+      <div class="work-card work-card--text" data-reveal>
+        <div class="work-card__title">숏폼 오토메이션</div>
+        <p class="work-card__sub">Studio III</p>
+        <p class="work-card__desc">장편 콘텐츠를 AI가 자동 분할·자막·비율 변환하는 숏폼 배급 파이프라인.</p>
       </div>
-      <div>
-        <div class="ascii-media work-card__media" data-work-veil>
-          <div class="ascii-media__glyphs" aria-hidden="true"></div>
-          <img class="work-card__img" src="assets/images/tile-container.png" alt="">
-        </div>
-        <div class="work-card__meta">
-          <span class="work-card__mark"></span>
-          <div>
-            <div class="work-card__title">뉴스룸 데이터 대시보드</div>
-            <p class="work-card__desc">시청 데이터를 실시간으로 시각화해 편성 결정을 지원하는 내부 툴.</p>
-          </div>
-        </div>
+      <div class="work-card work-card--img work-card--img-tall" data-reveal data-reveal-delay="1">
+        <img src="assets/images/tile-container.png" alt="">
+      </div>
+    </div>
+
+    <!-- Row 3: 이미지 + 텍스트 (8-4) -->
+    <div class="work-row work-row--8-4">
+      <div class="work-card work-card--img" data-reveal>
+        <img src="assets/images/tile-container.png" alt="">
+      </div>
+      <div class="work-card work-card--text" data-reveal data-reveal-delay="1">
+        <div class="work-card__title">팟캐스트 네트워크</div>
+        <p class="work-card__sub">PULSE FM</p>
+        <p class="work-card__desc">오디오·영상 동시 제작 워크플로우와 배급 자동화를 구축했습니다.</p>
       </div>
     </div>
 </section>
 
-<section class="quote fb fb--soft" id="studio">
-    <span class="mono-label quote__eyebrow" data-reveal>Our Strength Is Our People</span>
-    <blockquote data-reveal data-reveal-delay="1">
-      “좋은 방송은 기술이 아니라 함께 만드는 사람들의 밀도에서 나온다고 믿습니다.”
+<!-- 인용문 -->
+<section class=”quote fb fb--soft” id=”studio”>
+    <blockquote data-reveal>
+      “좋은 방송은 기술이 아니라 함께 만드는 사람들의 밀도에서 나온다고 믿습니다. 품질과 다양성에 대한 책임감이 우리의 강점입니다.”
     </blockquote>
-    <cite data-reveal data-reveal-delay="2">PRISM 제작본부</cite>
+    <cite data-reveal data-reveal-delay=”1”>
+      <img class=”quote__avatar” src=”assets/images/avatar-1.png” alt=””>
+      <div>
+        <span class=”quote__name”>한지민</span>
+        <span class=”quote__role”>CJ ENM 편성팀</span>
+      </div>
+    </cite>
+</section>
 
-    <!-- 122:8980 실측: 카드 5개(3열×2행, 마지막 칸 비움), 타이틀 42.667px -->
-    <div class="values grid">
-      <div style="grid-column:span 4;">
-        <div class="value-card" data-reveal>
-          <span class="value-card__mark"></span>
-          <div class="value-card__title">기획 · 운영</div>
-        </div>
+<!-- 스탯/값 섹션 -->
+<section class=”stats fb” id=”stats”>
+  <div class=”stats__inner”>
+    <div class=”stats-grid”>
+      <div class=”stat-card” data-reveal>
+        <span class=”stat-card__label”>Operation</span>
+        <span class=”stat-card__value”>기획 · 운영</span>
       </div>
-      <div style="grid-column:span 4;">
-        <div class="value-card" data-reveal data-reveal-delay="1">
-          <span class="value-card__mark"></span>
-          <div class="value-card__title">품질 프로세스</div>
-        </div>
+      <div class=”stat-card” data-reveal data-reveal-delay=”1”>
+        <span class=”stat-card__label”>Quality Processes</span>
+        <span class=”stat-card__value”>품질 프로세스</span>
       </div>
-      <div style="grid-column:span 4;">
-        <div class="value-card" data-reveal data-reveal-delay="2">
-          <span class="value-card__mark"></span>
-          <div class="value-card__title">보안</div>
-        </div>
+      <div class=”stat-card” data-reveal data-reveal-delay=”2”>
+        <span class=”stat-card__label”>6 Associates</span>
+        <span class=”stat-card__value”>보안 · 유지보수</span>
       </div>
-      <div style="grid-column:span 4;">
-        <div class="value-card" data-reveal>
-          <span class="value-card__mark"></span>
-          <div class="value-card__title">유지보수</div>
-        </div>
-      </div>
-      <div style="grid-column:span 4;">
-        <div class="value-card" data-reveal data-reveal-delay="1">
-          <span class="value-card__mark"></span>
-          <div class="value-card__title">행정 · 리소스</div>
-        </div>
-      </div>
-      <div style="grid-column:span 4;"></div>
     </div>
+  </div>
 </section>
 
 <!-- 가로 스크롤 = 세로 스크롤을 pin된 섹션 안에서 가로 이동으로 변환하는 스크롤재킹.
