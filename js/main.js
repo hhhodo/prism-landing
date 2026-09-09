@@ -16,17 +16,25 @@
   // ── 서비스 스크롤박스 섹션 ────────────────────────────────────
   var svcScrollWrap = document.getElementById('svcScrollWrap');
   var svcCards = Array.prototype.slice.call(document.querySelectorAll('.svc-card'));
-  // 카드 4개: 각 카드마다 스크롤 100vh 필요.
-  // runway = 500vh - 100vh = 400vh → 카드별 임계값: 50/400, 150/400, 250/400, 350/400
-  var svcThresholds = [0.125, 0.375, 0.625, 0.875];
+  // 카드 4개 — 각 카드마다 자체 progress 범위를 갖고 스크롤 위치가 opacity/translateY를 직접 제어.
+  // transition 없음. 스크롤 멈추면 애니메이션도 멈춤.
+  // 범위: [진입시작, 진입완료] — 그 사이를 t=0→1로 선형 보간
+  var svcRanges = [
+    [0.00, 0.18],  // 카드 0: 0~72vh 스크롤 동안 등장
+    [0.25, 0.43],  // 카드 1
+    [0.50, 0.68],  // 카드 2
+    [0.75, 0.93],  // 카드 3
+  ];
   function updateSvcCards() {
     if (!svcScrollWrap) return;
     var rect = svcScrollWrap.getBoundingClientRect();
     var runway = svcScrollWrap.offsetHeight - window.innerHeight;
     var p = runway > 0 ? Math.min(1, Math.max(0, -rect.top / runway)) : 0;
     svcCards.forEach(function(card, i) {
-      if (p >= svcThresholds[i]) card.classList.add('is-visible');
-      else card.classList.remove('is-visible');
+      var r = svcRanges[i];
+      var t = p < r[0] ? 0 : p >= r[1] ? 1 : (p - r[0]) / (r[1] - r[0]);
+      card.style.opacity = t;
+      card.style.transform = 'translateY(' + (52 * (1 - t)) + 'px)';
     });
   }
   updateSvcCards();

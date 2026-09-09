@@ -237,8 +237,8 @@ html,body{background:var(--prism-bg);color:var(--prism-ink);overflow-x:clip;max-
   background:var(--prism-bg-panel);border:1px solid var(--prism-line);
   padding:var(--space-7);
   opacity:0;transform:translateY(52px);
-  transition:opacity .65s cubic-bezier(0.22,1,0.36,1), transform .65s cubic-bezier(0.22,1,0.36,1);}
-.svc-card.is-visible{opacity:1;transform:translateY(0);}
+  /* transition 없음 — JS가 scroll position으로 매 프레임 직접 제어 */
+}
 .svc-card__num{display:block;font-size:var(--fs-body-2);color:var(--prism-ink-subtle);
   margin-bottom:var(--space-6);letter-spacing:0.06em;}
 .svc-card__title{font-family:var(--font-display);font-weight:700;font-size:var(--fs-h3);
