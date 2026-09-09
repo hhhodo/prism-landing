@@ -266,9 +266,15 @@ html,body{background:var(--prism-bg);color:var(--prism-ink);overflow-x:clip;max-
    영상 마지막 키프레임을 캡처해 칸마다 아스키아트로 렌더링 (js/main.js
    buildMosaicFromFrame). 셀이 fillOrder 순서대로 하나씩 와다다 나타남. ---------- */
 .vscroll-scene--mosaic{z-index:3;}
+/* grid 자체엔 배경을 주지 않음 — 안 그러면 셀이 하나도 안 나타난 상태에서도
+   grid 전체가 즉시 검게 덮여서 "셀이 하나씩 와다다 등장" 연출이 무너짐.
+   각 .mosaic-cell이 opacity 0→1로 개별적으로 나타나면서 자기 배경으로
+   그 칸만큼만 영상을 덮는 게 맞음. */
 .mosaic-grid{display:grid;grid-template-columns:repeat(20,1fr);
-  grid-template-rows:repeat(12,1fr);width:100%;height:100%;gap:0;background:#000;}
-.mosaic-cell{overflow:hidden;opacity:0;background:#000;}
+  grid-template-rows:repeat(12,1fr);width:100%;height:100%;gap:0;}
+/* 순수 검정이 아니라 --prism-bg-panel — 영상 마지막 프레임이 어두워도
+   "칸이 덮어씌워졌다"는 게 시각적으로 분명히 구분되게 함 */
+.mosaic-cell{overflow:hidden;opacity:0;background:var(--prism-bg-panel);}
 .mosaic-cell__ascii{width:100%;height:100%;display:block;overflow:hidden;
   font-family:'Courier New',Courier,monospace;font-size:5px;line-height:1.15;
   letter-spacing:0;white-space:pre;color:rgba(242,242,242,.9);}

@@ -348,6 +348,19 @@
     var capCtx = cap.getContext('2d');
     capCtx.drawImage(source, sx, sy, sw, sh, 0, 0, CAP_W, CAP_H);
 
+    // 자동 레벨 보정 — 마지막 프레임이 어둡거나(페이드아웃 등) 밋밋한 경우
+    // 아스키 글자가 거의 안 보여서 "영상이 안 가려진 것처럼" 보이는 문제가 있었음.
+    // 캡처된 프레임 전체의 밝기 min/max로 0~1 전체 범위를 다시 늘려 써서
+    // 어떤 장면이든 흑/백 텍스처가 확실히 드러나게 함.
+    var fullData = capCtx.getImageData(0, 0, CAP_W, CAP_H).data;
+    var minB = 1, maxB = 0;
+    for (var fi = 0; fi < fullData.length; fi += 4) {
+      var fb = (fullData[fi] * 0.299 + fullData[fi + 1] * 0.587 + fullData[fi + 2] * 0.114) / 255;
+      if (fb < minB) minB = fb;
+      if (fb > maxB) maxB = fb;
+    }
+    var levelRange = Math.max(0.05, maxB - minB); // 0으로 안 나눠지게 최소치 보장
+
     var cellCapW = CAP_W / COLS, cellCapH = CAP_H / ROWS;
     var fontSize = 5; // 작은 셀에 맞춘 축소 폰트 — CSS .mosaic-cell__ascii와 반드시 일치
     var charW = fontSize * 0.6, charH = fontSize * 1.15;
@@ -380,6 +393,7 @@
           for (var cc = 0; cc < cols; cc++) {
             var i2 = (rr * cols + cc) * 4;
             var brightness = (data[i2] * 0.299 + data[i2 + 1] * 0.587 + data[i2 + 2] * 0.114) / 255;
+            brightness = (brightness - minB) / levelRange; // 자동 레벨: 전체 범위로 재분배
             brightness = Math.min(1, Math.max(0, (brightness - 0.5) * ASCII_CONTRAST + 0.5));
             var ci = Math.floor(brightness * (ASCII_MAP.length - 1));
             line += ASCII_MAP[ci];
