@@ -254,11 +254,9 @@ html,body{background:var(--prism-bg);color:var(--prism-ink);overflow-x:clip;max-
 
 /* ---------- image mosaic grid fill ---------- */
 .mosaic-wrap{height:900vh;}
-.mosaic-pin{position:sticky;top:0;height:100vh;overflow:hidden;
-  background:#000;
-  background-image:radial-gradient(circle,rgba(255,255,255,.08) 1.2px,transparent 1.2px);
-  background-size:32px 32px;}
-.mosaic-grid{display:grid;grid-template-columns:repeat(20,1fr);
+.mosaic-pin{position:sticky;top:0;height:100vh;overflow:hidden;background:#000;}
+.mosaic-bg-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;}
+.mosaic-grid{position:relative;z-index:1;display:grid;grid-template-columns:repeat(20,1fr);
   grid-template-rows:repeat(12,1fr);width:100%;height:100%;gap:0;}
 .mosaic-cell{overflow:hidden;opacity:0;}
 .mosaic-cell img{width:100%;height:100%;object-fit:cover;display:block;}

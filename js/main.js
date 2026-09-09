@@ -57,7 +57,13 @@
   }
   updateMosaic();
 
-  // 모자이크 배경은 CSS에서 #000 — 영상 마지막 프레임(검정)과 자연스럽게 이어짐
+  // 모자이크 배경 비디오 — 마지막 프레임으로 고정
+  var mosaicBgVid = document.getElementById('mosaicBgVid');
+  if (mosaicBgVid) {
+    mosaicBgVid.addEventListener('loadedmetadata', function() {
+      mosaicBgVid.currentTime = mosaicBgVid.duration - 0.05;
+    });
+  }
   var heroSlot = document.getElementById('heroLogoSlot');
   var navSlot = document.getElementById('navLogoSlot');
   var vscrollWrap = document.getElementById('vscrollWrap');
