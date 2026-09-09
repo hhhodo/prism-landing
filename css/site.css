@@ -198,8 +198,8 @@ html,body{background:var(--prism-bg);color:var(--prism-ink);overflow-x:clip;max-
 .work{padding-block:var(--space-11);padding-inline:var(--gutter);}
 .work__head{display:flex;align-items:flex-end;justify-content:space-between;
   margin-bottom:var(--space-9);gap:var(--space-5);}
-.work__head h2{font-family:var(--font-display);font-size:var(--fs-h0);font-weight:400;
-  line-height:var(--lh-h0);}
+.work__head h2{font-family:var(--font-display);font-size:var(--fs-h1);font-weight:400;
+  line-height:var(--lh-h1);}
 .work-row{display:flex;gap:var(--space-9);align-items:flex-start;margin-bottom:var(--space-11);}
 .work-row:last-child{margin-bottom:0;}
 .work-row--lg-sm .work-item--lg{flex:1.78 1 0;}
@@ -228,7 +228,9 @@ html,body{background:var(--prism-bg);color:var(--prism-ink);overflow-x:clip;max-
 /* ---------- pull-quote (dark bg — 122:8980 실측: OUR STRENGTH IS OUR PEOPLE
    태그 + 01/02 스텝 필 + 64px 볼드 인용구, 흐린 회색 "by NAME" 서명, 아바타 없음) ---------- */
 .quote{padding-block:var(--space-11);padding-inline:var(--gutter);text-align:center;
-  display:flex;flex-direction:column;align-items:center;gap:var(--space-6);}
+  display:flex;flex-direction:column;align-items:center;}
+.quote__title{display:flex;flex-direction:column;align-items:center;gap:var(--space-6);
+  margin-bottom:var(--space-9);}
 .quote__tag{letter-spacing:0.12em;}
 .quote__toggle{display:flex;gap:var(--space-1);background:var(--prism-ink);border-radius:0;padding:4px;}
 .quote__toggle button{display:flex;align-items:center;justify-content:center;width:40px;height:40px;
@@ -240,18 +242,20 @@ html,body{background:var(--prism-bg);color:var(--prism-ink);overflow-x:clip;max-
   font-size:var(--fs-h1);line-height:1.3;color:var(--prism-ink);
   max-width:26ch;margin-inline:auto;transition:opacity .25s ease;}
 .quote cite{display:block;font-style:normal;font-family:var(--font-display);font-weight:400;
-  font-size:var(--fs-h2);color:var(--prism-ink-subtle);opacity:.55;transition:opacity .25s ease;}
+  font-size:var(--fs-h2);color:var(--prism-ink-subtle);opacity:.55;transition:opacity .25s ease;
+  margin-top:var(--space-6);}
 @media (max-width:768px){.quote blockquote{font-size:28px;}.quote cite{font-size:20px;}}
 
 /* ---------- stats — 6장 아이콘 카드, 3열×2행, 라이트 카드(#ebf0ed).
    사이즈/여백/본문 크기를 아래 testi-card와 동일하게 맞춤 (padding 48px,
-   min-height 340px, gap = --grid-gutter-lg, 본문 폰트 크기 동일). ---------- */
+   min-height는 testi-card가 본문 3줄만큼 늘어난 430px에 맞춰 동일하게 증가,
+   gap = --grid-gutter-lg, 본문 폰트 크기 동일). ---------- */
 .stats{padding-block:var(--space-9);padding-inline:var(--gutter);box-sizing:border-box;}
 .stats__inner{width:100%;}
 .stats-grid{display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(2,1fr);
   gap:var(--grid-gutter-lg);}
 .stat-card{background:var(--prism-card);color:var(--prism-card-ink);border-radius:0;
-  padding:48px;min-height:340px;display:flex;flex-direction:column;justify-content:space-between;}
+  padding:48px;min-height:430px;display:flex;flex-direction:column;justify-content:space-between;}
 .stat-card__icon{width:64px;height:64px;color:var(--prism-card-ink);}
 .stat-card__icon svg{width:100%;height:100%;}
 .stat-card__label{font-family:var(--font-display);font-weight:400;font-size:var(--fs-body-1);
@@ -293,7 +297,7 @@ html,body{background:var(--prism-bg);color:var(--prism-ink);overflow-x:clip;max-
 .testi{padding-block:var(--space-11) 0;}
 .testi__head h2{font-family:var(--font-display);font-size:var(--fs-h1);font-weight:400;
   line-height:var(--lh-h1);max-width:14ch;}
-.testi-pin-wrap{position:relative;height:300vh;}
+.testi-pin-wrap{position:relative;height:300vh;margin-top:var(--space-9);}
 .testi-pin{position:sticky;top:0;height:100vh;display:flex;flex-direction:column;justify-content:center;}
 /* 123:13056~13305 실측 스텝값: flat 14px/5%, peak 39px/100% 백색, 대칭 3단
    (18px/19% → 25px/46% → 32px/73% → 39px/100%).
@@ -310,14 +314,14 @@ html,body{background:var(--prism-bg);color:var(--prism-ink);overflow-x:clip;max-
    (123:13309 etc.) — a dusty-pink card distinct from the page's black/white
    palette, kept as an explicit brand-color exception rather than flattened
    to var(--prism-card). */
-.testi-card{background:#d4cccc;color:#303539;border-radius:var(--radius-sm);
-  padding:48px;display:flex;flex-direction:column;justify-content:space-between;min-height:340px;
+.testi-card{background:#d4cccc;color:#303539;border-radius:0;
+  padding:48px;display:flex;flex-direction:column;justify-content:space-between;min-height:430px;
   flex:0 0 calc((100% - var(--grid-gutter-lg) * 2) / 3);}
 .testi-card__who{display:flex;align-items:center;gap:var(--space-4);}
 .testi-card__avatar{width:101px;height:101px;border-radius:var(--radius-circle);object-fit:cover;flex:none;}
 .testi-card__name{font-family:var(--font-display);font-weight:400;font-size:var(--fs-body-1);}
 .testi-card__role{font-family:var(--font-mono-body);color:#303539;opacity:.65;font-size:var(--fs-body-2);}
-.testi-card p{font-family:var(--font-mono-body);font-size:var(--fs-body-2);line-height:var(--lh-body);}
+.testi-card p{font-family:var(--font-mono-body);font-size:var(--fs-body-1);line-height:var(--lh-body);}
 @media (max-width:768px){
   .testi-card{flex:0 0 85%;}
 }
