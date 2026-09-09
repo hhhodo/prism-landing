@@ -397,7 +397,11 @@
     var levelRange = Math.max(0.05, maxB - minB); // 0으로 안 나눠지게 최소치 보장
 
     var cellCapW = CAP_W / COLS, cellCapH = CAP_H / ROWS;
-    var fontSize = 5; // 작은 셀에 맞춘 축소 폰트 — CSS .mosaic-cell__ascii와 반드시 일치
+    // 모바일은 셀이 훨씬 작아서 같은 5px 폰트를 쓰면 글자 수가 너무 적어
+    // 아스키 패턴이 뭉개진 채로 커 보였음(신고: "아스키아트 사이즈 너무큼") —
+    // 화면이 좁을수록 폰트를 줄여 같은 면적에 더 촘촘한 문자를 채운다.
+    // CSS .mosaic-cell__ascii의 반응형 font-size와 반드시 일치시켜야 함.
+    var fontSize = window.innerWidth <= 768 ? 3 : 5;
     var charW = fontSize * 0.6, charH = fontSize * 1.15;
     var tmp = document.createElement('canvas');
     var tctx = tmp.getContext('2d');

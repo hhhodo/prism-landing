@@ -255,7 +255,12 @@ img{filter:grayscale(1);}
 .work-item__desc{font-family:var(--font-mono-body);font-size:15px;line-height:1.4;
   color:var(--prism-ink-subtle);text-transform:uppercase;max-width:38ch;}
 @media (max-width:1024px){
-  .work-row{flex-direction:column;}
+  /* 실제 버그: align-items:flex-start(+ --sm 카드의 align-self:flex-end/start)는
+     가로 배치용 값인데, 세로로 쌓이는 모바일에서도 그대로 남아있어서 크로스축
+     (여기선 가로폭)이 stretch 안 되고 카드마다 제각각 다른 폭(251~295px)으로
+     쪼그라들었음 — 그래서 카드 이미지 크기가 서로 안 맞아 보였음. stretch로
+     바꿔서 모든 work-item이 좌우 패딩 기준 동일한 폭을 꽉 채우게 함. */
+  .work-row{flex-direction:column;align-items:stretch;}
   .work-row--full{padding-inline:0;}
   .work-row--lg-sm .work-item--sm,.work-row--sm-lg .work-item--sm{align-self:stretch;}
 }
@@ -316,6 +321,10 @@ img{filter:grayscale(1);}
 .mosaic-cell__ascii{width:100%;height:100%;display:block;overflow:hidden;
   font-family:'Courier New',Courier,monospace;font-size:5px;line-height:1.15;
   letter-spacing:0;white-space:pre;color:rgba(242,242,242,.9);}
+@media (max-width:768px){
+  /* js/main.js buildMosaicFromFrame의 모바일 분기(fontSize=3)와 반드시 일치 */
+  .mosaic-cell__ascii{font-size:3px;}
+}
 
 /* ---------- testimonials — real pinned scroll-jack (127:19167: "스크롤에 따라
    리뷰가 가로로 움직이며, 상단 세로줄 바가 산처럼 솟은 형태로 우측을 향해 이동").
