@@ -295,7 +295,7 @@
     var vh = window.innerHeight;
     veilCards.forEach(function (card) {
       var rect = card.getBoundingClientRect();
-      var progress = (vh - rect.top) / (vh * 0.85);
+      var progress = (vh * 0.5 - rect.top) / (vh * 0.5);
       progress = Math.min(1, Math.max(0, progress));
       var glyphs = card.querySelector('.ascii-media__glyphs');
       if (glyphs) glyphs.style.clipPath = 'inset(' + (progress * 100) + '% 0 0 0)';
