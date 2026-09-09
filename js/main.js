@@ -472,7 +472,7 @@
     var dotsEl = wordmark ? wordmark.querySelector('.footer__wordmark-dots') : null;
     if (!wordmark || !svgEl || !svgText || !dotsEl) return;
 
-    var DOT = 22; // px — 도트 한 칸 크기. 작을수록 더 잘게 나뉨
+    var DOT = 13; // px — 도트 한 칸 크기. 작을수록 더 잘게 나뉨(요청대로 더 잘게)
     var dots = []; // {el, cx, cy} — cx/cy는 wordmark 기준 도트 중심 좌표
     var buildGen = 0; // 비동기 이미지 로드가 겹칠 때 최신 요청만 반영
 
