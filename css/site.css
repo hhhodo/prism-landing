@@ -206,9 +206,9 @@ html,body{background:var(--prism-bg);color:var(--prism-ink);overflow-x:clip;max-
 .work-card--text{display:flex;flex-direction:column;justify-content:flex-end;
   padding:var(--space-6);background:#1a1a1a;color:#f2f2f2;min-height:280px;
   border-radius:var(--radius-sm);}
-.work-card--img{overflow:hidden;background:#ddd;border-radius:var(--radius-sm);}
+.work-card--img{overflow:hidden;background:#ddd;border-radius:var(--radius-sm);aspect-ratio:1/1;}
 .work-card--img img{width:100%;height:100%;object-fit:cover;display:block;}
-.work-card--img-lg{min-height:360px;}
+.work-card--img-lg{aspect-ratio:4/3;}
 .work-card__title{font-family:var(--font-display);font-weight:700;font-size:var(--fs-h3);
   line-height:var(--lh-h3);margin-top:var(--space-3);}
 .work-card__sub{font-family:var(--font-mono-label);font-size:var(--fs-badge);
@@ -279,7 +279,7 @@ html,body{background:var(--prism-bg);color:var(--prism-ink);overflow-x:clip;max-
    palette, kept as an explicit brand-color exception rather than flattened
    to var(--prism-card). */
 .testi-card{background:#d4cccc;color:#303539;border-radius:var(--radius-sm);
-  padding:var(--space-6);display:flex;flex-direction:column;justify-content:space-between;min-height:260px;
+  padding:var(--space-7);display:flex;flex-direction:column;justify-content:space-between;min-height:340px;
   flex:0 0 calc((100% - var(--grid-gutter-lg) * 2) / 3);}
 .testi-card__who{display:flex;align-items:center;gap:var(--space-4);}
 .testi-card__avatar{width:101px;height:101px;border-radius:var(--radius-circle);object-fit:cover;flex:none;}
