@@ -173,10 +173,10 @@ html,body{background:var(--prism-bg);color:var(--prism-ink);overflow-x:clip;max-
 /* 박스 내부 이미지 */
 .callout__mark-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1;}
 
-/* ASCII 글리프 베일 — 기본은 완전 불투명, 호버 시 사라지고 이미지 노출 */
-.callout__mark .ascii-media__glyphs{z-index:2;background:var(--prism-bg-panel);
-  transition:opacity .35s ease;}
-.callout__mark:hover .ascii-media__glyphs{opacity:0;}
+/* ASCII 글리프 베일 — 기본은 완전 불투명(이미지 전체를 덮음).
+   호버 시 전체가 사라지는 게 아니라, 마우스 위치를 중심으로 원형 구멍만 뚫려
+   그 안에서만 실제 이미지가 드러남 (js/main.js의 mousemove가 mask-image로 제어) */
+.callout__mark .ascii-media__glyphs{z-index:2;background:var(--prism-bg-panel);}
 .callout__mark{cursor:pointer;}
 
 /* line-height 1.2 = 실측(leading 50.676px / font-size 42.23px) */
@@ -265,7 +265,7 @@ html,body{background:var(--prism-bg);color:var(--prism-ink);overflow-x:clip;max-
 .mosaic-grid{display:grid;grid-template-columns:repeat(20,1fr);
   grid-template-rows:repeat(12,1fr);width:100%;height:100%;gap:0;}
 .mosaic-cell{overflow:hidden;opacity:0;}
-.mosaic-cell img{width:100%;height:100%;object-fit:cover;display:block;}
+.mosaic-cell img{width:100%;height:100%;object-fit:cover;display:block;filter:grayscale(1);}
 
 /* ---------- testimonials — real pinned scroll-jack (127:19167: "스크롤에 따라
    리뷰가 가로로 움직이며, 상단 세로줄 바가 산처럼 솟은 형태로 우측을 향해 이동").

@@ -267,7 +267,9 @@
   var ASCII_MAP = ' .\'`^",:;Il!i><~+_-?][}{1)(|tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$';
   var ASCII_CONTRAST = 2.4; // >1 = 더 세게 대비, 중간톤을 흑/백 극단으로 밀어냄
 
-  function buildAscii(imgEl, glyphsEl) {
+  // invert: true면 색반전(어두운 픽셀 → 밀도 높은 문자) — callout 박스 전용 스타일.
+  // 기본(false)은 실제 이미지 명암과 일치하는 정방향 매핑 (work 카드용).
+  function buildAscii(imgEl, glyphsEl, invert) {
     var img = new Image();
     img.onload = function () {
       var rect = glyphsEl.getBoundingClientRect();
@@ -280,11 +282,29 @@
       var cols = Math.floor(w / charW);
       var rows = Math.floor(h / charH);
 
+      // object-fit:cover와 동일하게 소스 이미지를 컨테이너 비율로 크롭 —
+      // 크롭 없이 원본 전체를 넣으면 실제 보이는 사진과 아스키아트의 비율이
+      // 달라져서 서로 안 맞아 보였음.
+      var containerAspect = w / h;
+      var imgAspect = img.naturalWidth / img.naturalHeight;
+      var sx, sy, sw, sh;
+      if (imgAspect > containerAspect) {
+        sh = img.naturalHeight;
+        sw = sh * containerAspect;
+        sx = (img.naturalWidth - sw) / 2;
+        sy = 0;
+      } else {
+        sw = img.naturalWidth;
+        sh = sw / containerAspect;
+        sx = 0;
+        sy = (img.naturalHeight - sh) / 2;
+      }
+
       var canvas = document.createElement('canvas');
       canvas.width = cols;
       canvas.height = rows;
       var ctx = canvas.getContext('2d');
-      ctx.drawImage(img, 0, 0, cols, rows);
+      ctx.drawImage(img, sx, sy, sw, sh, 0, 0, cols, rows);
       var data = ctx.getImageData(0, 0, cols, rows).data;
 
       var lines = [];
@@ -295,7 +315,7 @@
           var brightness = (data[idx] * 0.299 + data[idx + 1] * 0.587 + data[idx + 2] * 0.114) / 255;
           // 명암 대비 강화 — 중간톤을 양 극단으로 밀어붙여 흑/백이 뚜렷하게 갈리게 함
           brightness = Math.min(1, Math.max(0, (brightness - 0.5) * ASCII_CONTRAST + 0.5));
-          // 밝은 픽셀 → 밀도 높은 문자 (반전 없음 — 원본 명암과 일치)
+          if (invert) brightness = 1 - brightness;
           var ci = Math.floor(brightness * (ASCII_MAP.length - 1));
           line += ASCII_MAP[ci];
         }
@@ -309,7 +329,32 @@
   document.querySelectorAll('.ascii-media').forEach(function (container) {
     var imgEl = container.querySelector('img');
     var glyphsEl = container.querySelector('.ascii-media__glyphs');
-    if (imgEl && glyphsEl) buildAscii(imgEl, glyphsEl);
+    var invert = container.classList.contains('callout__mark');
+    if (imgEl && glyphsEl) buildAscii(imgEl, glyphsEl, invert);
+  });
+
+  // ── callout 박스 — 마우스 위치를 중심으로 원형으로 아스키아트가 벗겨지며
+  // 뒤에 깔린 실제 이미지가 드러남 (스크롤 peel과 무관, 순수 hover 인터랙션) ──
+  var REVEAL_RADIUS = 46; // px
+  var REVEAL_FEATHER = 10; // px
+  document.querySelectorAll('.callout__mark').forEach(function (mark) {
+    var glyphs = mark.querySelector('.ascii-media__glyphs');
+    if (!glyphs) return;
+    function onMove(e) {
+      var rect = mark.getBoundingClientRect();
+      var x = e.clientX - rect.left;
+      var y = e.clientY - rect.top;
+      var mask = 'radial-gradient(circle at ' + x + 'px ' + y + 'px, transparent 0, transparent ' +
+        REVEAL_RADIUS + 'px, #000 ' + (REVEAL_RADIUS + REVEAL_FEATHER) + 'px)';
+      glyphs.style.webkitMaskImage = mask;
+      glyphs.style.maskImage = mask;
+    }
+    function onLeave() {
+      glyphs.style.webkitMaskImage = '';
+      glyphs.style.maskImage = '';
+    }
+    mark.addEventListener('mousemove', onMove);
+    mark.addEventListener('mouseleave', onLeave);
   });
 
   // ── ASCII peel (work 카드만 — callout 박스는 sticky 안이라 scroll과 무관) ──
