@@ -348,21 +348,16 @@ img{filter:grayscale(1);}
   font-family:var(--font-logo);font-weight:normal;letter-spacing:var(--display-tracking);
   font-size:20vw;line-height:1;color:var(--prism-ink);
 }
-/* 원래 글자 — 기본은 그대로 보이다가, 마우스가 올라간 원 안쪽만 뚫려서
-   사라짐(그 자리에 아래 아스키 레이어가 대신 보임). js/main.js가 mousemove로
-   "구멍" 원을 갱신, 기본은 구멍 없음(mask-image 없음 = 항상 전체 표시). */
 .footer__wordmark-text{display:block;}
-/* 마우스 오버 시 커서 위치를 중심으로 원형 부분만 아스키아트로 드러남.
-   배경을 안 채워서(투명) 글자 획이 있던 자리에만 실제로 잉크(문자)가
-   생기므로, 원 안이라도 글자 실루엣 바깥은 저절로 안 보임 — 즉 "원이 글자
-   모양대로 잘려" 보임. mask-image라서 clip-path처럼 각지게 안 잘리고
-   경계가 부드럽게 페이드됨. 기본은 반경 0(전부 안 보임). */
-.footer__wordmark-ascii{position:absolute;inset:0;display:block;pointer-events:none;
+/* 아주 잘게 나눈 "도트" 격자 — 원래 글자 위에 정확히 겹쳐 깔림. 마우스가
+   가까이 온 도트만(js/main.js가 거리 계산으로 is-active 토글) 검정 배경 +
+   아스키 글자로 바뀌어 그 자리의 원래 글자를 가려버림. 부드러운 원형
+   그라데이션(mask-image) 대신 도트 단위로 딱 켜짐/꺼짐이라 경계가 없음. */
+.footer__wordmark-dots{position:absolute;inset:0;display:grid;pointer-events:none;}
+.footer__wordmark-dot{display:flex;align-items:center;justify-content:center;
   overflow:hidden;font-family:'Courier New',Courier,monospace;
-  font-size:16px;line-height:1.15;letter-spacing:0;white-space:pre;
-  color:var(--prism-ink);background:transparent;
-  -webkit-mask-image:radial-gradient(circle at 50% 50%, #000 0, transparent 0);
-  mask-image:radial-gradient(circle at 50% 50%, #000 0, transparent 0);}
+  color:transparent;background:transparent;}
+.footer__wordmark-dot.is-active{color:var(--prism-ink);background:var(--prism-bg);}
 .footer__bottom{display:flex;align-items:center;justify-content:space-between;
   margin-top:var(--space-8);flex-wrap:wrap;gap:var(--space-4);}
 .footer__links{display:flex;gap:var(--space-6);}

@@ -456,22 +456,28 @@
     mark.addEventListener('mouseleave', onLeave);
   });
 
-  // ── 푸터 대형 PRISM 워드마크 — 마우스 오버 시 커서를 중심으로 한 원형
-  // 영역만 "글자 자체가" 아스키아트로 바뀌어 보임. 영상 프레임처럼 글자와
-  // 무관한 그림이 비치면 안 되므로, PRISM 텍스트를 그 폰트 그대로 캔버스에
-  // 그려서 그 글자 실루엣을 아스키로 변환한다 (사진 X, 순수 텍스트 아스키화). ──
-  (function initFooterWordmarkAscii() {
+  // ── 푸터 대형 PRISM 워드마크 — 아주 잘게 나눈 도트 격자를 글자 위에 정확히
+  // 겹쳐 깔고, 마우스에 가까운 도트만 그 자리의 글자를 가리며 아스키 글자로
+  // 바뀐다. 부드러운 원형 그라데이션(mask-image) 대신 도트 단위로 딱 켜지고
+  // 꺼지는 방식이라 경계에 흐린 테두리가 생기지 않는다. ──
+  (function initFooterWordmarkDots() {
     var wordmark = document.getElementById('footerWordmark');
     var textEl = wordmark ? wordmark.querySelector('.footer__wordmark-text') : null;
-    var asciiEl = wordmark ? wordmark.querySelector('.footer__wordmark-ascii') : null;
-    if (!wordmark || !textEl || !asciiEl) return;
+    var dotsEl = wordmark ? wordmark.querySelector('.footer__wordmark-dots') : null;
+    if (!wordmark || !textEl || !dotsEl) return;
 
-    function buildFromText() {
+    var DOT = 22; // px — 도트 한 칸 크기. 작을수록 더 잘게 나뉨
+    var dots = []; // {el, cx, cy} — cx/cy는 wordmark 기준 도트 중심 좌표
+
+    function build() {
       var rect = wordmark.getBoundingClientRect();
       var w = Math.max(rect.width, 100), h = Math.max(rect.height, 100);
       var cs = getComputedStyle(textEl);
 
-      // PRISM 글자를 실제 워드마크와 동일한 폰트/크기로 캔버스에 직접 렌더링
+      // PRISM 글자를 실제 워드마크와 완전히 동일한 폰트/크기/좌표계로 캔버스에
+      // 렌더링 — measureText로 실제 글자 상단 위치를 재서 그리므로, 화면에 보이는
+      // 진짜 글자와 도트 격자가 어긋나지 않는다 (이전엔 baseline을 어림값(0.78)
+      // 으로 고정해서 폰트마다 위치가 안 맞았음).
       var srcCanvas = document.createElement('canvas');
       srcCanvas.width = w; srcCanvas.height = h;
       var srcCtx = srcCanvas.getContext('2d');
@@ -481,67 +487,66 @@
       srcCtx.font = cs.fontWeight + ' ' + cs.fontSize + ' ' + cs.fontFamily;
       srcCtx.textAlign = 'left';
       srcCtx.textBaseline = 'alphabetic';
-      // wordmark 텍스트 노드(첫 자식)의 실제 라인 위치에 최대한 맞춤
-      var fontPx = parseFloat(cs.fontSize);
-      srcCtx.fillText('PRISM', 0, fontPx * 0.78);
+      var m = srcCtx.measureText('PRISM');
+      var ascent = m.actualBoundingBoxAscent || parseFloat(cs.fontSize) * 0.75;
+      srcCtx.fillText('PRISM', 0, ascent);
 
-      var fontSize = 16, charW = fontSize * 0.6, charH = fontSize * 1.15;
-      var cols = Math.max(1, Math.floor(w / charW));
-      var rows = Math.max(1, Math.floor(h / charH));
+      var cols = Math.max(1, Math.round(w / DOT));
+      var rows = Math.max(1, Math.round(h / DOT));
+      var cellW = w / cols, cellH = h / rows;
+
+      // cols×rows 해상도로 다운샘플해서 도트별 밝기(=그 자리에 글자가 있는지) 추출
       var tmp = document.createElement('canvas');
       tmp.width = cols; tmp.height = rows;
       var tctx = tmp.getContext('2d');
       tctx.drawImage(srcCanvas, 0, 0, w, h, 0, 0, cols, rows);
       var data = tctx.getImageData(0, 0, cols, rows).data;
 
-      var lines = [];
+      dotsEl.style.gridTemplateColumns = 'repeat(' + cols + ', 1fr)';
+      dotsEl.style.gridTemplateRows = 'repeat(' + rows + ', 1fr)';
+      dotsEl.style.fontSize = Math.max(6, Math.floor(cellH * 0.9)) + 'px';
+      dotsEl.innerHTML = '';
+      dots = [];
+
       for (var r = 0; r < rows; r++) {
-        var line = '';
         for (var c = 0; c < cols; c++) {
           var idx = (r * cols + c) * 4;
-          // 글자는 흰색, 배경은 검정이라 자동 레벨 없이 밝기 그대로 써도 대비가 확실함
           var b = (data[idx] * 0.299 + data[idx + 1] * 0.587 + data[idx + 2] * 0.114) / 255;
           var ci = Math.floor(b * (ASCII_MAP.length - 1));
-          line += ASCII_MAP[ci];
+          var el = document.createElement('span');
+          el.className = 'footer__wordmark-dot';
+          el.textContent = ASCII_MAP[ci];
+          dotsEl.appendChild(el);
+          dots.push({ el: el, cx: (c + 0.5) * cellW, cy: (r + 0.5) * cellH });
         }
-        lines.push(line);
       }
-      asciiEl.textContent = lines.join('\n');
     }
 
     var buildTimer = null;
     function scheduleBuild() {
       clearTimeout(buildTimer);
-      buildTimer = setTimeout(buildFromText, 50);
+      buildTimer = setTimeout(build, 50);
     }
     window.addEventListener('load', scheduleBuild);
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(scheduleBuild);
     window.addEventListener('resize', scheduleBuild);
 
-    // 원 안쪽만 아스키가 보이도록 부드러운 원형 마스크로 노출 (callout 박스와 동일한
-    // mask-image 방식 — clip-path는 경계가 각지고 딱딱하게 잘려 보였음).
-    // 원래 글자 쪽엔 정반대 마스크(원 안쪽만 뚫어서 숨김)를 같이 걸어서, 커서가
-    // 지나간 자리는 진짜 글자가 사라지고 그 자리에 아스키만 남게 함 — 아스키
-    // 레이어 배경이 투명이라 글자 획이 없는 빈칸은 저절로 안 보이므로, 결과적으로
-    // "원이 글자 실루엣대로 잘려서" 아스키로 드러나는 것처럼 보임.
-    var FOOTER_REVEAL_RADIUS = 140;
-    var FOOTER_REVEAL_FEATHER = 24;
+    // 커서 반경 안에 중심이 들어오는 도트만 활성화 — 그라데이션 없이 딱 켜짐/꺼짐
+    var HOVER_RADIUS = 90;
+    var R2 = HOVER_RADIUS * HOVER_RADIUS;
     wordmark.addEventListener('mousemove', function (e) {
       var rect = wordmark.getBoundingClientRect();
       var x = e.clientX - rect.left, y = e.clientY - rect.top;
-      var r0 = FOOTER_REVEAL_RADIUS + 'px', r1 = (FOOTER_REVEAL_RADIUS + FOOTER_REVEAL_FEATHER) + 'px';
-      var showAscii = 'radial-gradient(circle at ' + x + 'px ' + y + 'px, #000 0, #000 ' + r0 + ', transparent ' + r1 + ')';
-      var hideText = 'radial-gradient(circle at ' + x + 'px ' + y + 'px, transparent 0, transparent ' + r0 + ', #000 ' + r1 + ')';
-      asciiEl.style.webkitMaskImage = showAscii;
-      asciiEl.style.maskImage = showAscii;
-      textEl.style.webkitMaskImage = hideText;
-      textEl.style.maskImage = hideText;
+      for (var i = 0; i < dots.length; i++) {
+        var d = dots[i];
+        var dx = d.cx - x, dy = d.cy - y;
+        var active = (dx * dx + dy * dy) <= R2;
+        if (active) d.el.classList.add('is-active');
+        else d.el.classList.remove('is-active');
+      }
     });
     wordmark.addEventListener('mouseleave', function () {
-      asciiEl.style.webkitMaskImage = '';
-      asciiEl.style.maskImage = '';
-      textEl.style.webkitMaskImage = '';
-      textEl.style.maskImage = '';
+      for (var i = 0; i < dots.length; i++) dots[i].el.classList.remove('is-active');
     });
   })();
 
