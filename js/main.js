@@ -16,7 +16,7 @@
   // ── 이미지 격자 채우기 (6×4 = 24셀, 센터→외곽 순서) ────────
   var mosaicWrap = document.getElementById('mosaicWrap');
   var mosaicGrid = document.getElementById('mosaicGrid');
-  var COLS = 6, ROWS = 4, TOTAL = COLS * ROWS;
+  var COLS = 20, ROWS = 12, TOTAL = COLS * ROWS;
   // 센터→외곽 채우기 순서 (맨해튼 거리 기준 정렬)
   var fillOrder = [];
   (function() {
@@ -56,6 +56,30 @@
     }
   }
   updateMosaic();
+
+  // 비디오 마지막 프레임을 모자이크 배경으로 캡처
+  var mosaicPin = document.querySelector('.mosaic-pin');
+  function captureLastFrame() {
+    if (!scrollVid || !scrollVid.videoWidth || !mosaicPin) return;
+    var c = document.createElement('canvas');
+    c.width = scrollVid.videoWidth;
+    c.height = scrollVid.videoHeight;
+    c.getContext('2d').drawImage(scrollVid, 0, 0);
+    mosaicPin.style.backgroundImage = 'radial-gradient(circle,#c0c0c0 1.2px,transparent 1.2px), url(' + c.toDataURL('image/jpeg', 0.85) + ')';
+    mosaicPin.style.backgroundSize = '32px 32px, cover';
+    mosaicPin.style.backgroundPosition = 'center, center';
+  }
+  if (scrollVid) {
+    scrollVid.addEventListener('loadeddata', function() {
+      scrollVid.currentTime = scrollVid.duration || 0;
+    });
+    scrollVid.addEventListener('seeked', function() {
+      if (Math.abs(scrollVid.currentTime - (scrollVid.duration || 0)) < 0.1) {
+        captureLastFrame();
+        scrollVid.currentTime = 0;
+      }
+    });
+  }
   var heroSlot = document.getElementById('heroLogoSlot');
   var navSlot = document.getElementById('navLogoSlot');
   var vscrollWrap = document.getElementById('vscrollWrap');
