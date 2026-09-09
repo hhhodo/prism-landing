@@ -64,45 +64,24 @@
     el.style.pointerEvents = opacity > 0.01 ? 'auto' : 'none';
   }
 
-  // ── 스크롤 잠금 (콜아웃 애니메이션 동안 스크롤 차단) ────────────
-  var scrollLockEl = null;
-  function lockScroll(ms) {
-    if (scrollLockEl) return;
-    scrollLockEl = document.createElement('div');
-    scrollLockEl.style.cssText = 'position:fixed;inset:0;z-index:99999;cursor:wait;';
-    scrollLockEl.addEventListener('wheel', function(e){ e.preventDefault(); }, { passive: false });
-    scrollLockEl.addEventListener('touchmove', function(e){ e.preventDefault(); }, { passive: false });
-    document.body.appendChild(scrollLockEl);
-    setTimeout(function() {
-      if (scrollLockEl) { scrollLockEl.remove(); scrollLockEl = null; }
-    }, ms);
-  }
-
-  // ── 콜아웃 그룹 순차 등장 ────────────────────────────────────
-  var triggeredScenes = {};
-  function triggerCallout(sceneEl) {
-    if (!sceneEl || triggeredScenes[sceneEl.id]) return;
-    triggeredScenes[sceneEl.id] = true;
-    var groups = sceneEl.querySelectorAll('[data-seq]');
-    var maxSeq = 0;
-    groups.forEach(function(g) {
-      var s = parseInt(g.dataset.seq, 10);
-      if (s > maxSeq) maxSeq = s;
-    });
-    // 스크롤 잠금 — 마지막 아이템 등장 후 300ms 여유
-    lockScroll(maxSeq * 420 + 300);
-    // data-seq 순서대로 420ms 간격으로 등장 (짝수=박스, 홀수=레이블)
-    groups.forEach(function(g) {
-      var delay = parseInt(g.dataset.seq, 10) * 420;
-      setTimeout(function() { g.classList.add('is-revealed'); }, delay);
-    });
-  }
-  // 씬이 다시 숨겨질 때 초기화 (다음 씬 진입 대비)
-  function resetCallout(sceneEl) {
-    if (!sceneEl || !triggeredScenes[sceneEl.id]) return;
-    triggeredScenes[sceneEl.id] = false;
-    sceneEl.querySelectorAll('[data-seq]').forEach(function(g) {
-      g.classList.remove('is-revealed');
+  // ── 콜아웃 아이템 scrub — transition 없음, p가 매 프레임 직접 제어 ──
+  // sceneEl 안의 [data-seq] 요소를 pStart~pEnd 구간에서 seq 순서대로 등장시킴.
+  // 각 아이템은 전체 구간을 n등분한 슬롯 하나를 차지하고, 그 슬롯의 60%에서 완전히 나타남.
+  function scrubCallout(sceneEl, p, pStart, pEnd) {
+    if (!sceneEl) return;
+    var items = sceneEl.querySelectorAll('[data-seq]');
+    var n = items.length;
+    if (!n) return;
+    var span = pEnd - pStart;
+    var slotW = span / n;
+    var entryW = slotW * 0.6; // 각 슬롯의 60% 구간 동안 t 0→1
+    items.forEach(function(item) {
+      var seq = parseInt(item.dataset.seq, 10);
+      var s = pStart + seq * slotW;
+      var t = p < s ? 0 : p >= s + entryW ? 1 : (p - s) / entryW;
+      item.style.opacity = t;
+      item.style.transform = 'translateY(' + (10 * (1 - t)) + 'px)';
+      item.style.filter = t < 1 ? 'blur(' + (4 * (1 - t)) + 'px)' : 'none';
     });
   }
 
@@ -122,10 +101,10 @@
     setScene(sceneC2, c2Op);
     setScene(sceneC3, c3Op);
 
-    // 씬 진입 즉시(>0.01) 트리거 — 스크롤 잠금과 함께 순차 애니메이션 시작
-    if (c1Op > 0.01) triggerCallout(sceneC1); else resetCallout(sceneC1);
-    if (c2Op > 0.01) triggerCallout(sceneC2); else resetCallout(sceneC2);
-    if (c3Op > 0.01) triggerCallout(sceneC3); else resetCallout(sceneC3);
+    // 콜아웃 아이템: 씬이 보이는 구간 전체에서 순차 scrub
+    scrubCallout(sceneC1, p, 0.36, 0.57);
+    scrubCallout(sceneC2, p, 0.60, 0.76);
+    scrubCallout(sceneC3, p, 0.79, 0.95);
   }
 
   // ── 로고 모프 ────────────────────────────────────────────────
