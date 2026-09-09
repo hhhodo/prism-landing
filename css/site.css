@@ -344,17 +344,23 @@ html,body{background:var(--prism-bg);color:var(--prism-ink);overflow-x:clip;max-
 /* 인트로 #brandLogo와 완전히 동일한 폰트/크기(20vw, PartialSans)로 맞춘
    대형 워드마크 — position:relative로 아스키 오버레이의 기준 박스가 됨 */
 .footer__wordmark{
-  position:relative;overflow:visible;
+  position:relative;overflow:visible;display:block;
   font-family:var(--font-logo);font-weight:normal;letter-spacing:var(--display-tracking);
   font-size:20vw;line-height:1;color:var(--prism-ink);
 }
-/* 마우스 오버 시 커서 위치를 중심으로 원형 부분만 아스키아트로 드러남 —
-   mask-image라서 clip-path처럼 각지게 잘리지 않고 경계가 부드럽게 페이드됨.
-   js/main.js가 mousemove로 마스크 원을 갱신하고, 기본은 반경 0(전부 안 보임). */
+/* 원래 글자 — 기본은 그대로 보이다가, 마우스가 올라간 원 안쪽만 뚫려서
+   사라짐(그 자리에 아래 아스키 레이어가 대신 보임). js/main.js가 mousemove로
+   "구멍" 원을 갱신, 기본은 구멍 없음(mask-image 없음 = 항상 전체 표시). */
+.footer__wordmark-text{display:block;}
+/* 마우스 오버 시 커서 위치를 중심으로 원형 부분만 아스키아트로 드러남.
+   배경을 안 채워서(투명) 글자 획이 있던 자리에만 실제로 잉크(문자)가
+   생기므로, 원 안이라도 글자 실루엣 바깥은 저절로 안 보임 — 즉 "원이 글자
+   모양대로 잘려" 보임. mask-image라서 clip-path처럼 각지게 안 잘리고
+   경계가 부드럽게 페이드됨. 기본은 반경 0(전부 안 보임). */
 .footer__wordmark-ascii{position:absolute;inset:0;display:block;pointer-events:none;
   overflow:hidden;font-family:'Courier New',Courier,monospace;
   font-size:16px;line-height:1.15;letter-spacing:0;white-space:pre;
-  color:var(--prism-ink);background:var(--prism-bg);
+  color:var(--prism-ink);background:transparent;
   -webkit-mask-image:radial-gradient(circle at 50% 50%, #000 0, transparent 0);
   mask-image:radial-gradient(circle at 50% 50%, #000 0, transparent 0);}
 .footer__bottom{display:flex;align-items:center;justify-content:space-between;

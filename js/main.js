@@ -462,13 +462,14 @@
   // 그려서 그 글자 실루엣을 아스키로 변환한다 (사진 X, 순수 텍스트 아스키화). ──
   (function initFooterWordmarkAscii() {
     var wordmark = document.getElementById('footerWordmark');
+    var textEl = wordmark ? wordmark.querySelector('.footer__wordmark-text') : null;
     var asciiEl = wordmark ? wordmark.querySelector('.footer__wordmark-ascii') : null;
-    if (!wordmark || !asciiEl) return;
+    if (!wordmark || !textEl || !asciiEl) return;
 
     function buildFromText() {
       var rect = wordmark.getBoundingClientRect();
       var w = Math.max(rect.width, 100), h = Math.max(rect.height, 100);
-      var cs = getComputedStyle(wordmark);
+      var cs = getComputedStyle(textEl);
 
       // PRISM 글자를 실제 워드마크와 동일한 폰트/크기로 캔버스에 직접 렌더링
       var srcCanvas = document.createElement('canvas');
@@ -518,20 +519,29 @@
     window.addEventListener('resize', scheduleBuild);
 
     // 원 안쪽만 아스키가 보이도록 부드러운 원형 마스크로 노출 (callout 박스와 동일한
-    // mask-image 방식 — clip-path는 경계가 각지고 딱딱하게 잘려 보였음)
+    // mask-image 방식 — clip-path는 경계가 각지고 딱딱하게 잘려 보였음).
+    // 원래 글자 쪽엔 정반대 마스크(원 안쪽만 뚫어서 숨김)를 같이 걸어서, 커서가
+    // 지나간 자리는 진짜 글자가 사라지고 그 자리에 아스키만 남게 함 — 아스키
+    // 레이어 배경이 투명이라 글자 획이 없는 빈칸은 저절로 안 보이므로, 결과적으로
+    // "원이 글자 실루엣대로 잘려서" 아스키로 드러나는 것처럼 보임.
     var FOOTER_REVEAL_RADIUS = 140;
     var FOOTER_REVEAL_FEATHER = 24;
     wordmark.addEventListener('mousemove', function (e) {
       var rect = wordmark.getBoundingClientRect();
       var x = e.clientX - rect.left, y = e.clientY - rect.top;
-      var mask = 'radial-gradient(circle at ' + x + 'px ' + y + 'px, #000 0, #000 ' +
-        FOOTER_REVEAL_RADIUS + 'px, transparent ' + (FOOTER_REVEAL_RADIUS + FOOTER_REVEAL_FEATHER) + 'px)';
-      asciiEl.style.webkitMaskImage = mask;
-      asciiEl.style.maskImage = mask;
+      var r0 = FOOTER_REVEAL_RADIUS + 'px', r1 = (FOOTER_REVEAL_RADIUS + FOOTER_REVEAL_FEATHER) + 'px';
+      var showAscii = 'radial-gradient(circle at ' + x + 'px ' + y + 'px, #000 0, #000 ' + r0 + ', transparent ' + r1 + ')';
+      var hideText = 'radial-gradient(circle at ' + x + 'px ' + y + 'px, transparent 0, transparent ' + r0 + ', #000 ' + r1 + ')';
+      asciiEl.style.webkitMaskImage = showAscii;
+      asciiEl.style.maskImage = showAscii;
+      textEl.style.webkitMaskImage = hideText;
+      textEl.style.maskImage = hideText;
     });
     wordmark.addEventListener('mouseleave', function () {
       asciiEl.style.webkitMaskImage = '';
       asciiEl.style.maskImage = '';
+      textEl.style.webkitMaskImage = '';
+      textEl.style.maskImage = '';
     });
   })();
 
