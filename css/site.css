@@ -39,7 +39,7 @@ html,body{background:var(--prism-bg);color:var(--prism-ink);overflow-x:clip;max-
 .fb{width:100%;background:var(--prism-bg);}
 .fb--soft{background:var(--prism-bg-soft);}
 .fb--panel{background:var(--prism-bg-panel);}
-.fb--light{width:100%;background:#f2f2f2;color:#151515;}
+.fb--light{width:100%;background:#f0f0f0;color:#151515;}
 
 .mono-label{font-family:var(--font-mono-label);font-size:var(--fs-body-2);
   text-transform:uppercase;color:var(--prism-ink-subtle);}
@@ -191,11 +191,12 @@ html,body{background:var(--prism-bg);color:var(--prism-ink);overflow-x:clip;max-
 }
 
 /* ---------- feature rows (Selected Projects — light bg) ---------- */
-.work{padding-block:var(--space-11);padding-inline:var(--gutter);}
+.work{padding-block:var(--space-11);padding-inline:var(--gutter);background:#f0f0f0;color:#151515;}
 .mono-label--dark{color:#888;}
 .work__head{display:flex;align-items:flex-end;justify-content:space-between;
   margin-bottom:var(--space-9);gap:var(--space-5);}
-.work__head h2{font-family:var(--font-display);font-size:var(--fs-h0);color:#151515;}
+.work__head h2{font-family:var(--font-display);font-size:var(--fs-h1);font-weight:700;
+  line-height:var(--lh-h1);color:#151515;}
 .work-row{display:grid;gap:var(--space-4);margin-bottom:var(--space-4);}
 .work-row:last-child{margin-bottom:0;}
 .work-row--quad{grid-template-columns:repeat(4,1fr);}
@@ -208,7 +209,7 @@ html,body{background:var(--prism-bg);color:var(--prism-ink);overflow-x:clip;max-
   border-radius:var(--radius-sm);}
 .work-card--img{overflow:hidden;background:#ddd;border-radius:var(--radius-sm);aspect-ratio:1/1;}
 .work-card--img img{width:100%;height:100%;object-fit:cover;display:block;}
-.work-card--img-lg{aspect-ratio:4/3;}
+.work-card--img-lg{aspect-ratio:auto;}
 .work-card__title{font-family:var(--font-display);font-weight:700;font-size:var(--fs-h3);
   line-height:var(--lh-h3);margin-top:var(--space-3);}
 .work-card__sub{font-family:var(--font-mono-label);font-size:var(--fs-badge);
@@ -221,9 +222,10 @@ html,body{background:var(--prism-bg);color:var(--prism-ink);overflow-x:clip;max-
 @media (max-width:768px){.work-row{grid-template-columns:1fr!important;}}
 
 /* ---------- pull-quote (light bg) ---------- */
-.quote{padding-block:var(--space-11);padding-inline:var(--gutter);text-align:center;}
+.quote{padding-block:var(--space-11);padding-inline:var(--gutter);text-align:center;
+  background:#f0f0f0;color:#151515;}
 .quote blockquote{font-family:var(--font-display);font-weight:400;font-style:italic;
-  font-size:var(--fs-h3);line-height:1.6;color:#333;
+  font-size:28px;line-height:1.6;color:#333;
   max-width:52ch;margin-inline:auto;}
 .quote cite{display:flex;align-items:center;justify-content:center;gap:var(--space-4);
   margin-top:var(--space-6);font-style:normal;color:#333;}
@@ -234,7 +236,7 @@ html,body{background:var(--prism-bg);color:var(--prism-ink);overflow-x:clip;max-
 
 /* ---------- stats (dark bg) ---------- */
 .stats{padding-block:var(--space-11);padding-inline:var(--gutter);}
-.stats__inner{max-width:var(--container-default);margin-inline:auto;}
+.stats__inner{width:100%;}
 .stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--space-4);}
 .stat-card{background:var(--prism-bg-panel);border:1px solid var(--prism-line);
   border-radius:var(--radius-sm);
@@ -264,7 +266,8 @@ html,body{background:var(--prism-bg);color:var(--prism-ink);overflow-x:clip;max-
    matching a real horizontal-scroll-via-vertical-scroll interaction (not a
    simple pass-through translate, and no manual carousel controls). */
 .testi{padding-block:var(--space-11) 0;overflow:hidden;}
-.testi__head h2{font-family:var(--font-display);font-size:var(--fs-h0);max-width:14ch;}
+.testi__head h2{font-family:var(--font-display);font-size:var(--fs-h1);font-weight:700;
+  line-height:var(--lh-h1);max-width:14ch;}
 .testi-pin-wrap{position:relative;height:300vh;}
 .testi-pin{position:sticky;top:0;height:100vh;display:flex;flex-direction:column;justify-content:center;}
 /* 123:13056~13305 실측 스텝값: flat 14px/5%, peak 39px/100% 백색, 대칭 3단
@@ -279,7 +282,7 @@ html,body{background:var(--prism-bg);color:var(--prism-ink);overflow-x:clip;max-
    palette, kept as an explicit brand-color exception rather than flattened
    to var(--prism-card). */
 .testi-card{background:#d4cccc;color:#303539;border-radius:var(--radius-sm);
-  padding:var(--space-7);display:flex;flex-direction:column;justify-content:space-between;min-height:340px;
+  padding:48px;display:flex;flex-direction:column;justify-content:space-between;min-height:340px;
   flex:0 0 calc((100% - var(--grid-gutter-lg) * 2) / 3);}
 .testi-card__who{display:flex;align-items:center;gap:var(--space-4);}
 .testi-card__avatar{width:101px;height:101px;border-radius:var(--radius-circle);object-fit:cover;flex:none;}
