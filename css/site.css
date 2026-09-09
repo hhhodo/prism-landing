@@ -361,6 +361,9 @@ img{filter:grayscale(1);}
 .testi-card p{font-family:var(--font-mono-body);font-size:24px;line-height:var(--lh-body);}
 @media (max-width:768px){
   .testi-card{flex:0 0 85%;}
+  /* 트랙이 벽(화면 좌우 끝)에 딱 붙어있었음 — 좌우에 gutter만큼 여백을 줘서
+     카드가 화면 가장자리에서 살짝 띄워져 보이게 함. */
+  .testi-track-wrap{padding-inline:var(--gutter);}
 }
 
 /* ---------- 문의하기 — 페이지 유일 버튼, nav에만 존재 (지어낸 CTA 클로저 섹션 제거) ---------- */
